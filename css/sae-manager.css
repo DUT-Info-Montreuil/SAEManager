@@ -1,0 +1,13 @@
+
+:root {
+    --menu-color: #0D1117;
+}
+
+.menu {
+    background-color: var(--menu-color);
+    color: white;
+}
+
+.flex-1 {
+    flex: 1;
+}
