@@ -1,11 +1,11 @@
 <?php
 
 require_once 'Connexion.php';
-require_once 'components/menu/MenuComponent.php';
+require_once 'components/menu/NavBarComponent.php';
 
 Connexion::initConnexion();
 
-$menu = new MenuComponent();
+$menu = new NavBarComponent();
 
 include 'template.php';
 

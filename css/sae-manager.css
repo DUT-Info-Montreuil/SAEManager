@@ -5,9 +5,12 @@
 
 .menu {
     background-color: var(--menu-color);
-    color: white;
 }
 
 .flex-1 {
     flex: 1;
+}
+
+.icon {
+    fill: white;
 }
