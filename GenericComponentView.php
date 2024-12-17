@@ -1,15 +1,17 @@
 <?php
 
-class GenericComponentView {
+class GenericComponentView
+{
 
     protected $affichage;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->affichage = "";
     }
 
-    public function getAffichage() {
+    public function getAffichage()
+    {
         return $this->affichage;
     }
-
 }
