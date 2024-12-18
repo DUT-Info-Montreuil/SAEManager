@@ -17,6 +17,9 @@ class Site
 			case "sae":
 				require_once 'modules/mod_sae/SaeModule.php';
 				break;
+			case "rendus":
+				require_once 'modules/mod_rendus/RendusModule.php';
+				break;
 			default:
 				die("Module inexistant");
 		}
