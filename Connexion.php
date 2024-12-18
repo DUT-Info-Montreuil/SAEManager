@@ -7,6 +7,6 @@ class Connexion
 
     static function initConnexion()
     {
-        self::$bdd = new PDO('mysql:host=localhost;dbname=web', 'root', 'root');
+        self::$bdd = new PDO('mysql:host=database-etudiants.iut.univ-paris8.fr;dbname=dutinfopw201626', "dutinfopw201626", "nasesyhy");
     }
 }

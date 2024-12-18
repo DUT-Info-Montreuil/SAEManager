@@ -17,6 +17,6 @@ class HomeController
 
     public function exec()
     {
-        return $this->view->getAffichage();
+        return $this->view->initHomePage();
     }
 }

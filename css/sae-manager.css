@@ -1,6 +1,8 @@
 
 :root {
     --menu-color: #0D1117;
+    --sae-color: #7171FF;
+    --rendus-color: #F1B2FD;
 }
 
 .menu {
@@ -13,4 +15,16 @@
 
 .icon {
     fill: white;
+}
+
+.card {
+    border: none;
+}
+
+.card-sae {
+    background: var(--sae-color);
+}
+
+.card-rendus {
+    background: var(--rendus-color);
 }

@@ -4,7 +4,7 @@ class GenericModule
 {
     protected $affichage;
     protected $title;
-    protected $controller;
+    public $controller;
 
     public function __construct()
     {

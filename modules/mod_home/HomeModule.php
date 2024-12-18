@@ -11,6 +11,5 @@ class HomeModule extends GenericModule
     {
         parent::__construct();
         $this->controller = new HomeController();
-        $this->affichage = $this->controller->exec();
     }
 }

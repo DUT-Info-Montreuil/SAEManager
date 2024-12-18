@@ -2,8 +2,7 @@
 
 class GenericComponent {
 
-    // Ne pas laisser public
-	public $controller;
+	protected $controller;
 
 	public function __construct () {
 

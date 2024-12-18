@@ -13,9 +13,7 @@
 
     <header><?php echo $menu->getAffichage(); ?></header>
 
-    <?php echo $home->getAffichage(); ?>
-
-
+    <main><?=$module ?></main>
 
 </body>
 
