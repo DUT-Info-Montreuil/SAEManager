@@ -14,7 +14,7 @@ class HomeView extends GenericView
 
         echo <<<HTML
         <div class="container mt-5">
-            <h1>ACCUEIL</h1>
+            <h1 class="fw-bold">ACCUEIL</h1>
             <div class="card shadow bg-white rounded w-100 h-75">
                 <div class="d-flex w-100 h-75 justify-content-center m-auto">
                     {$this->cardSAE()}
@@ -32,7 +32,7 @@ class HomeView extends GenericView
     {
         return <<<HTML
         <div class="card shadow px-3 rounded w-25 h-75 card-sae-content">
-            <a href="index.php?module=home" class="text-decoration-none text-reset">
+            <a href="index.php?module=sae" class="text-decoration-none text-reset">
                 <div class="card card-sae shadow w-100 h-100"></div>
                 <div class="m-4">
                     <h4>SAÉs</h4>

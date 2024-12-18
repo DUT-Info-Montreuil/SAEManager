@@ -41,3 +41,11 @@
 .card-rendus-content:hover {
     transform: scale(1.05);
 }
+
+.w-25px {
+    width: 25px;
+}
+
+.h-25px {
+    height: 25px;
+}
