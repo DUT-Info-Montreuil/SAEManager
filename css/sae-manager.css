@@ -17,14 +17,27 @@
     fill: white;
 }
 
+/* Home Page */
+
 .card {
     border: none;
+    border-radius: 0 0 20px 20px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-sae {
     background: var(--sae-color);
+    
 }
 
 .card-rendus {
     background: var(--rendus-color);
+}
+
+.card-sae:hover,
+.card-sae-content:hover,
+.card-rendus:hover,
+.card-rendus-content:hover {
+    transform: scale(1.05);
 }

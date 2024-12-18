@@ -5,6 +5,7 @@ require_once 'components/menu/NavBarView.php';
 
 class NavBarController
 {
+    public $vue;
 
     public function __construct()
     {
