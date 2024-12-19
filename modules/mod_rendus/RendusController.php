@@ -17,6 +17,22 @@ class RendusController
 
     public function exec()
     {
-        return $this->view->initRendusPage();
+        switch ($_GET['action']) {
+            case "home":
+                $this->initRendus();
+                break;
+        }
+    }
+
+    private function initRendus()
+    {
+        $rendus = $this->model->getRendus();
+
+        $lines = "";
+        foreach ($rendus as $rendu) {
+            $lines .= $this->view->lineRendus($rendu['name'], $rendu['id'], $rendu['saeName']);
+        }
+
+        $this->view->initRendusPage($lines);
     }
 }

@@ -32,7 +32,7 @@ class HomeView extends GenericView
     {
         return <<<HTML
         <div class="card shadow px-3 rounded w-25 h-75 card-sae-content">
-            <a href="index.php?module=sae" class="text-decoration-none text-reset">
+            <a href="index.php?module=sae&action=home" class="text-decoration-none text-reset">
                 <div class="card card-sae shadow w-100 h-100"></div>
                 <div class="m-4">
                     <h4>SAÉs</h4>
@@ -47,7 +47,7 @@ class HomeView extends GenericView
     {
         return <<<HTML
         <div class="card shadow px-3 mx-5 rounded-bottom w-25 h-75 card-rendus-content">
-            <a href="index.php?module=rendus" class="text-decoration-none text-reset">
+            <a href="index.php?module=rendus&action=home" class="text-decoration-none text-reset">
                 <div class="card card-rendus shadow w-100 h-100"></div>
                 <div class="m-4">
                     <h4>Rendus</h4>

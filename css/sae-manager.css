@@ -49,3 +49,7 @@
 .h-25px {
     height: 25px;
 }
+
+.min-h75 {
+    min-height: 75%;
+}
