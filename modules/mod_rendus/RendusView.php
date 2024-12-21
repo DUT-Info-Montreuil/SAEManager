@@ -25,6 +25,7 @@ class RendusView extends GenericView
                     </div>
                     <h3 class="fw-bold">Liste des différents rendus des SAÉs auxquelles vous êtes inscrit(e) :</h3>
                 </div>
+                <div class="rendu-list">
 HTML;
         foreach ($rendus as $rendu) {
             $renduNom = $rendu['rendu_nom'];
@@ -34,6 +35,7 @@ HTML;
             echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
         }
         <<<HTML
+        </div>
             </div>
                 
             </div>
@@ -53,8 +55,8 @@ HTML;
                 <span class="fw-bold mx-1 d-flex">$renduNom</span>
                 <span class="fst-italic mx-1 d-flex">$saeNom</span>
             </div>
-            <div>
-                <p class="text-danger">A déposer avant le : $dateLimite</p>
+            <div class="text-end">
+                <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
                 <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
             </div>
             

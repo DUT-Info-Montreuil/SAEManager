@@ -22,7 +22,7 @@ class SaeView extends GenericView
                         <use xlink:href="#arrow-icon"></use>
                     </svg>
                 </div>
-                <h3 class="fw-bold">Liste des SAÉs auxquelles vous êtes inscrit :</h3>
+                <h3 class="fw-bold">Liste des SAÉs auxquelles vous êtes inscrit(e) :</h3>
             </div>
             <div class="sae-list">
 HTML;
