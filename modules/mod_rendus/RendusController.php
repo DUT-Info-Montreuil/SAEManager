@@ -26,13 +26,8 @@ class RendusController
 
     private function initRendus()
     {
-        $rendus = $this->model->getRendus();
+        $rendus = $this->model->getRendusByPersonne(1);
 
-        $lines = "";
-        foreach ($rendus as $rendu) {
-            $lines .= $this->view->lineRendus($rendu['name'], $rendu['id'], $rendu['saeName']);
-        }
-
-        $this->view->initRendusPage($lines);
+        $this->view->initRendusPage($rendus);
     }
 }

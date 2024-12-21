@@ -1,85 +1,75 @@
 <?php
 
-class SaeModel
+class SaeModel extends Connexion
 {
-    public function getSaes()
+
+    // GET
+
+    public function getSaesByPersonneId($idPersonne)
     {
-        return [
-            ['id' => 1, 'name' => 'SAE DEV WEB'],
-            ['id' => 2, 'name' => 'SAE GESTION DE PROJET'],
-            ['id' => 3, 'name' => 'SAE CONCEPTION'],
-            ['id' => 4, 'name' => 'SAE SANS NOM'],
-        ];
+        $req = "SELECT sae.nom, sae.idSAE
+                FROM personne
+                INNER JOIN etudiantgroupe ON personne.idPersonne = etudiantgroupe.idEtudiant
+                INNER JOIN groupe ON groupe.idGroupe = etudiantgroupe.idGroupe
+                INNER JOIN sae ON sae.idSae = groupe.idSae
+                WHERE personne.idPersonne = :idPersonne
+                ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
     }
 
-    public function getSaeById($id)
+    public function getSaeById($idSAE)
     {
-        $saes = $this->getSaes();
-        foreach ($saes as $sae) {
-            if ($sae['id'] == $id) {
-                return $sae;
-            }
-        }
-        return null;
+        $req = "SELECT *
+                FROM sae
+                WHERE idSAE = :idSAE
+                ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
     }
 
-    public function getSaeResources($saeId)
+    public function getRessourceBySAE($idSAE)
     {
-        $resources = [
-            1 => [
-                ['title' => 'Cours PHP', 'link' => 'php.pdf'],
-                ['title' => 'Comment faire une maquette ?', 'link' => 'coursmaquette.pdf'],
-            ],
-            2 => [
-                ['title' => 'Gestion des équipes', 'link' => 'gestion.pdf'],
-            ],
-            3 => [
-                ['title' => 'Introduction à la conception', 'link' => 'conception.pdf'],
-            ],
-        ];
-        return $resources[$saeId] ?? [];
+        $req = "SELECT contenu
+                FROM ressource
+                INNER JOIN ressourcessae ON ressourcessae.idRessource = ressource.idRessource
+                INNER JOIN sae ON ressourcessae.idSAE = sae.idSAE
+                WHERE sae.idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
     }
 
-    public function getSaeRendus($saeId)
+
+    public function getRenduBySae($idSAE)
     {
-        $rendus = [
-            1 => [
-                ['title' => 'Premier sprint', 'status' => 'rendu', 'deadline' => null],
-                ['title' => 'User Story Map', 'status' => 'à rendre', 'deadline' => '2024-12-18 00:00'],
-            ],
-            2 => [
-                ['title' => 'Charte de projet', 'status' => 'à rendre', 'deadline' => '2024-12-20 12:00'],
-            ],
-        ];
-        return $rendus[$saeId] ?? [];
+
+        $req = "
+                SELECT rendu.nom, rendu.dateLimite
+                FROM rendu
+                INNER JOIN sae ON sae.idSAE = rendu.idSAE
+                WHERE sae.idSAE = :idSAE
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
     }
 
-    public function getSaeSoutenances($saeId)
+    function getSoutenanceBySae($idSAE)
     {
-        $soutenances = [
-            1 => [
-                [
-                    'title' => 'Première soutenance',
-                    'date' => '2024-12-12 14:00',
-                    'room' => 'B0-01',
-                    'status' => 'à venir',
-                ],
-                [
-                    'title' => 'Soutenance finale',
-                    'date' => null,
-                    'room' => null,
-                    'status' => 'pas défini',
-                ],
-            ],
-            2 => [
-                [
-                    'title' => 'Présentation intermédiaire',
-                    'date' => '2024-12-15 10:00',
-                    'room' => 'A1-02',
-                    'status' => 'à venir',
-                ],
-            ],
-        ];
-        return $soutenances[$saeId] ?? [];
+        $req = "SELECT soutenance.titre, soutenance.date, soutenance.salle
+                FROM soutenance
+                INNER JOIN sae ON sae.idSAE = soutenance.idSAE
+                WHERE sae.idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
     }
 }

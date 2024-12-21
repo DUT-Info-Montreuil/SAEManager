@@ -29,37 +29,30 @@ class SaeController
 
     private function initSae()
     {
-        $saes = $this->model->getSaes();
 
-        $lines = "";
-        foreach ($saes as $sae) {
-            $lines .= $this->view->lineSae($sae['name'], $sae['id']);
-        }
-
-        $this->view->initSaePage($lines);
+        $saes = $this->model->getSaesByPersonneId(1);
+        $this->view->initSaePage($saes);
     }
 
     private function initDetails()
     {
-        $id = $_GET['idsae'];
-        $saeRessource = $this->model->getSaeResources($id);
-        $lineRessource = "";
-        foreach ($saeRessource as $saeR) {
-            $lineRessource .= $this->view->lineRessource($saeR['title'], $saeR['link']);
+        $mySAE = $this->model->getSaesByPersonneId(1);
+        $acces = false;
+        foreach ($mySAE as $sae) {
+            if ($sae['idSAE'] == $_GET['id']) {
+                $acces = true;
+            }
         }
 
-        $saeRendus = $this->model->getSaeRendus($id);
-        $lineRendu = "";
-        foreach ($saeRendus as $saeR) {
-            $lineRendu .= $this->view->lineRendus($saeR['title'], $saeR['status']);
-        }
+        if ($acces) {
+            $saes = $this->model->getSaeById($_GET['id']);
+            $ressource = $this->model->getRessourceBySAE($_GET['id']);
+            $rendus = $this->model->getRenduBySae($_GET['id']);
+            $soutenance = $this->model->getSoutenanceBySae($_GET['id']);
 
-        $saeSoutenance = $this->model->getSaeSoutenances($id);
-        $lineSoutenance = "";
-        foreach ($saeSoutenance as $saeS) {
-            $lineSoutenance .= $this->view->lineRendus($saeS['title'], $saeS['date'], $saeS['room']);
+            $this->view->initSaeDetails($saes, $ressource, $rendus, $soutenance);
+        } else {
+            header('Location: index.php');
         }
-
-        $this->view->initSaeDetails($lineRessource, $lineRendu, $lineSoutenance);
     }
 }

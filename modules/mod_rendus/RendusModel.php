@@ -1,15 +1,22 @@
 <?php
 
-class RendusModel
+class RendusModel extends Connexion
 {
 
-    public function getRendus()
+    // GET
+
+    function getRendusByPersonne($idPersonne)
     {
-        return [
-            ['id' => 1, 'name' => 'User Story Map', 'saeName' => 'SAE DEV WEB'],
-            ['id' => 2, 'name' => 'Personna', 'saeName' => 'SAE GESTION DE PROJET'],
-            ['id' => 3, 'name' => 'User stories ', 'saeName' => 'SAE CONCEPTION'],
-            ['id' => 4, 'name' => 'User mappin ', 'saeName' => 'SAE SANS NOM'],
-        ];
+        $req = "SELECT rendu.nom AS rendu_nom, sae.nom AS sae_nom, rendu.dateLimite, sae.idSAE
+                FROM personne
+                INNER JOIN etudiantgroupe ON etudiantgroupe.idEtudiant = personne.idPersonne
+                INNER JOIN rendugroupe ON rendugroupe.idGroupe = etudiantgroupe.idGroupe
+                INNER JOIN rendu ON rendu.idRendu = rendugroupe.idRendu
+                INNER JOIN sae ON sae.idSAE = rendu.idSAE
+                WHERE personne.idPersonne = :idPersonne";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
     }
 }
