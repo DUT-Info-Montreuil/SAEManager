@@ -24,6 +24,9 @@ class SaeController
             case "details":
                 $this->initDetails();
                 break;
+            case "groupe":
+                $this->initGroup();
+                break;
         }
     }
 
@@ -54,5 +57,15 @@ class SaeController
         } else {
             header('Location: index.php');
         }
+    }
+
+    private function initGroup()
+    {
+        $sae = $this->model->getSaeById($_GET['saeID']);
+        $groupeID = $this->model->getMyGroupId($_GET['saeID']);
+        $groupe = $this->model->getMyGroup($_GET['saeID'], $groupeID);
+        $responsable = $this->model->getSaeResponsable($_GET['saeID']);
+
+        $this->view->initGroupPage($sae, $groupe, $responsable);
     }
 }

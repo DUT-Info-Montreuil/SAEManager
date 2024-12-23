@@ -39,7 +39,7 @@ HTML;
 
     function lineSae($sae)
     {
-        $nom = htmlspecialchars($sae['nom']);
+        $nom = htmlspecialchars($sae['nomSae']);
         $idSAE = htmlspecialchars($sae['idSAE']);
 
         return <<<HTML
@@ -53,7 +53,6 @@ HTML;
             </div>
         </div>
 
-
         HTML;
     }
 
@@ -62,8 +61,9 @@ HTML;
     function initSaeDetails($sae, $ressource, $rendus, $soutenance)
     {
 
+
         foreach ($sae as $s) {
-            $nom = htmlspecialchars($s['nom']);
+            $nom = htmlspecialchars($s['nomSae']);
             $dateModif = htmlspecialchars($s['dateModificationSujet']);
             $sujet = htmlspecialchars($s['sujet']);
         }
@@ -82,6 +82,7 @@ HTML;
             $dateSoutenance = htmlspecialchars($s['date']);
             $salle = htmlspecialchars($s['salle']);
         }
+
 
         echo <<<HTML
     <div class="container mt-5">
@@ -187,5 +188,89 @@ HTML;
         </div>
     </div>
     HTML;
+    }
+
+
+    /* Groupes */
+
+    function initGroupPage($sae, $groupe, $responsable)
+    {
+
+        foreach ($sae as $s) {
+            $nomSAE = htmlspecialchars($s['sujet']);
+        }
+
+        echo <<<HTML
+    <div class="container mt-5">
+        <h1 class="fw-bold">$nomSAE</h1>
+        <div class="card shadow bg-white rounded p-4 min-h75">
+            <!-- MEMBRE DU GROUPE -->
+            <div class="mb-5">
+                <h3 class="d-flex align-items-center">
+                    <svg class="me-2" width="25" height="25">
+                        <use xlink:href="#arrow-icon"></use>
+                    </svg>
+                    Membre du groupe
+                </h3>
+                <div class="d-flex flex-wrap">
+HTML;
+        foreach ($groupe as $membre) {
+            $nom = $membre['nom'];
+            $prenom = $membre['prenom'];
+            echo $this->linePersonne($prenom, $nom);
+        }
+        echo <<<HTML
+                </div>
+            </div>
+
+            <!-- RESPONSABLE -->
+            <div class="mb-5">
+                <h3 class="d-flex align-items-center">
+                    <svg class="me-2" width="25" height="25">
+                        <use xlink:href="#arrow-icon"></use>
+                    </svg>
+                    Responsable(s) et intervetant(e)
+                </h3>
+                <div class="d-flex flex-wrap">
+HTML;
+        foreach ($responsable as $resp) {
+            $nom = $resp['nom'];
+            $prenom = $resp['prenom'];
+            echo $this->linePersonne($prenom, $nom);
+        }
+        echo <<<HTML
+                </div>
+            </div>
+
+            <!-- MESSAGE -->
+            <div class="mb-5">
+                <h3 class="d-flex align-items-center">
+                    <svg class="me-2" width="25" height="25">
+                        <use xlink:href="#arrow-icon"></use>
+                    </svg>
+                    Message(s) du groupe
+                </h3>
+                <div class="d-flex flex-column">
+                    SOON...
+                </div>
+            </div>
+
+        </div>
+    </div>
+    HTML;
+    }
+
+    function linePersonne($prenom, $nom)
+    {
+        return <<<HTML
+    <div class="px-3 my-3 w-200px">
+        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm">
+            <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-warning mx-2 w-25px h-25px"></div>
+                <span class="fw-bold mx-1">$prenom $nom</span>
+            </div>
+        </div>
+    </div>
+HTML;
     }
 }

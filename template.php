@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,9 @@
 
     <header><?php echo $menu->getAffichage(); ?></header>
 
-    <main><?=$module ?></main>
+    <main><?= $module ?></main>
+
+    <script src="js/navbar/navbar.js"></script>
 
 </body>
 

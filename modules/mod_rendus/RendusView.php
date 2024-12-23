@@ -27,9 +27,10 @@ class RendusView extends GenericView
                 </div>
                 <div class="rendu-list">
 HTML;
+
         foreach ($rendus as $rendu) {
-            $renduNom = $rendu['rendu_nom'];
-            $saeNom = $rendu['sae_nom'];
+            $renduNom = $rendu['Rendu_nom'];
+            $saeNom = $rendu['SAE_nom'];
             $dateLimite = $rendu['dateLimite'];
             $idSAE = $rendu['idSAE'];
             echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);

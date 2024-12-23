@@ -22,3 +22,11 @@
         <path d="M360-200v-80h264L160-744l56-56 464 464v-264h80v400H360Z"/></svg>
     </symbol>
 </svg>
+
+<!-- Menu SVG -->
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id ="menu-icon" viewBox="0 -960 960 960">
+        <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
+    </symbol>
+</svg>

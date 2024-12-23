@@ -66,11 +66,11 @@ CREATE TABLE IF NOT EXISTS `document` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `etudiantgroupe`
+-- Structure de la table `EtudiantGroupe`
 --
 
-DROP TABLE IF EXISTS `etudiantgroupe`;
-CREATE TABLE IF NOT EXISTS `etudiantgroupe` (
+DROP TABLE IF EXISTS `EtudiantGroupe`;
+CREATE TABLE IF NOT EXISTS `EtudiantGroupe` (
   `idGroupe` int(11) NOT NULL,
   `idEtudiant` int(11) NOT NULL,
   PRIMARY KEY (`idGroupe`,`idEtudiant`),
@@ -78,10 +78,10 @@ CREATE TABLE IF NOT EXISTS `etudiantgroupe` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Déchargement des données de la table `etudiantgroupe`
+-- Déchargement des données de la table `EtudiantGroupe`
 --
 
-INSERT INTO `etudiantgroupe` (`idGroupe`, `idEtudiant`) VALUES
+INSERT INTO `EtudiantGroupe` (`idGroupe`, `idEtudiant`) VALUES
 (1, 1),
 (2, 1),
 (2, 2);
@@ -179,11 +179,11 @@ INSERT INTO `note` (`idEval`, `idEleve`, `note`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `personne`
+-- Structure de la table `Personne`
 --
 
-DROP TABLE IF EXISTS `personne`;
-CREATE TABLE IF NOT EXISTS `personne` (
+DROP TABLE IF EXISTS `Personne`;
+CREATE TABLE IF NOT EXISTS `Personne` (
   `idPersonne` int(11) NOT NULL,
   `nom` varchar(45) NOT NULL,
   `prenom` varchar(45) NOT NULL,
@@ -192,10 +192,10 @@ CREATE TABLE IF NOT EXISTS `personne` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Déchargement des données de la table `personne`
+-- Déchargement des données de la table `Personne`
 --
 
-INSERT INTO `personne` (`idPersonne`, `nom`, `prenom`, `photoDeProfil`) VALUES
+INSERT INTO `Personne` (`idPersonne`, `nom`, `prenom`, `photoDeProfil`) VALUES
 (1, 'Dupont', 'Jean', 'jean_dupont.jpg'),
 (2, 'Martin', 'Sophie', 'sophie_martin.jpg'),
 (3, 'Durand', 'Pierre', 'pierre_durand.jpg');
@@ -203,11 +203,11 @@ INSERT INTO `personne` (`idPersonne`, `nom`, `prenom`, `photoDeProfil`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `rendu`
+-- Structure de la table `Rendu`
 --
 
-DROP TABLE IF EXISTS `rendu`;
-CREATE TABLE IF NOT EXISTS `rendu` (
+DROP TABLE IF EXISTS `Rendu`;
+CREATE TABLE IF NOT EXISTS `Rendu` (
   `idRendu` int(11) NOT NULL,
   `nom` varchar(45) NOT NULL,
   `dateLimite` datetime NOT NULL,
@@ -219,21 +219,21 @@ CREATE TABLE IF NOT EXISTS `rendu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Déchargement des données de la table `rendu`
+-- Déchargement des données de la table `Rendu`
 --
 
-INSERT INTO `rendu` (`idRendu`, `nom`, `dateLimite`, `idSAE`, `idEvaluation`) VALUES
+INSERT INTO `Rendu` (`idRendu`, `nom`, `dateLimite`, `idSAE`, `idEvaluation`) VALUES
 (1, 'Rendu du projet de développement', '2024-12-30 23:59:59', 1, 1),
 (2, 'Rendu de la soutenance de projet', '2025-01-15 23:59:59', 2, 2);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `rendugroupe`
+-- Structure de la table `RenduGroupe`
 --
 
-DROP TABLE IF EXISTS `rendugroupe`;
-CREATE TABLE IF NOT EXISTS `rendugroupe` (
+DROP TABLE IF EXISTS `RenduGroupe`;
+CREATE TABLE IF NOT EXISTS `RenduGroupe` (
   `idRendu` int(11) NOT NULL,
   `idGroupe` int(11) NOT NULL,
   `fichier` varchar(100) DEFAULT NULL,
@@ -242,12 +242,12 @@ CREATE TABLE IF NOT EXISTS `rendugroupe` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Déchargement des données de la table `rendugroupe`
+-- Déchargement des données de la table `RenduGroupe`
 --
 
-INSERT INTO `rendugroupe` (`idRendu`, `idGroupe`, `fichier`) VALUES
-(1, 1, 'groupeA_rendu.pdf'),
-(2, 2, 'groupeB_rendu.pdf');
+INSERT INTO `RenduGroupe` (`idRendu`, `idGroupe`, `fichier`) VALUES
+(1, 1, 'groupeA_Rendu.pdf'),
+(2, 2, 'groupeB_Rendu.pdf');
 
 -- --------------------------------------------------------
 
@@ -476,21 +476,21 @@ ALTER TABLE `champs`
 -- Contraintes pour la table `document`
 --
 ALTER TABLE `document`
-  ADD CONSTRAINT `fk_Document_Auteur` FOREIGN KEY (`idAuteur`) REFERENCES `personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_Document_Auteur` FOREIGN KEY (`idAuteur`) REFERENCES `Personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_Document_Groupe` FOREIGN KEY (`idGroupe`) REFERENCES `groupe` (`idgroupe`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Contraintes pour la table `etudiantgroupe`
+-- Contraintes pour la table `EtudiantGroupe`
 --
-ALTER TABLE `etudiantgroupe`
-  ADD CONSTRAINT `fk_EtudiantGroupe_Etudiant` FOREIGN KEY (`idEtudiant`) REFERENCES `personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ALTER TABLE `EtudiantGroupe`
+  ADD CONSTRAINT `fk_EtudiantGroupe_Etudiant` FOREIGN KEY (`idEtudiant`) REFERENCES `Personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_EtudiantGroupe_Groupe` FOREIGN KEY (`idGroupe`) REFERENCES `groupe` (`idgroupe`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `evaluation`
 --
 ALTER TABLE `evaluation`
-  ADD CONSTRAINT `responsableEvaluation` FOREIGN KEY (`responsableEvaluation`) REFERENCES `personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `responsableEvaluation` FOREIGN KEY (`responsableEvaluation`) REFERENCES `Personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `groupe`
@@ -502,29 +502,29 @@ ALTER TABLE `groupe`
 -- Contraintes pour la table `message`
 --
 ALTER TABLE `message`
-  ADD CONSTRAINT `fk_Message_Auteur` FOREIGN KEY (`idAuteur`) REFERENCES `personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_Message_Auteur` FOREIGN KEY (`idAuteur`) REFERENCES `Personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_Message_Groupe` FOREIGN KEY (`idGroupe`) REFERENCES `groupe` (`idgroupe`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `note`
 --
 ALTER TABLE `note`
-  ADD CONSTRAINT `idEleve` FOREIGN KEY (`idEleve`) REFERENCES `personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `idEleve` FOREIGN KEY (`idEleve`) REFERENCES `Personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `idEval` FOREIGN KEY (`idEval`) REFERENCES `evaluation` (`idEvaluation`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Contraintes pour la table `rendu`
+-- Contraintes pour la table `Rendu`
 --
-ALTER TABLE `rendu`
+ALTER TABLE `Rendu`
   ADD CONSTRAINT `fk_Rendu_Evaluation` FOREIGN KEY (`idEvaluation`) REFERENCES `evaluation` (`idEvaluation`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_Rendu_SAE` FOREIGN KEY (`idSAE`) REFERENCES `sae` (`idSAE`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Contraintes pour la table `rendugroupe`
+-- Contraintes pour la table `RenduGroupe`
 --
-ALTER TABLE `rendugroupe`
+ALTER TABLE `RenduGroupe`
   ADD CONSTRAINT `fk_RenduGroupe_Groupe` FOREIGN KEY (`idGroupe`) REFERENCES `groupe` (`idgroupe`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_RenduGroupe_Rendu` FOREIGN KEY (`idRendu`) REFERENCES `rendu` (`idRendu`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_RenduGroupe_Rendu` FOREIGN KEY (`idRendu`) REFERENCES `Rendu` (`idRendu`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `reponseschamp`
@@ -551,7 +551,7 @@ ALTER TABLE `ressourcestheme`
 -- Contraintes pour la table `sae`
 --
 ALTER TABLE `sae`
-  ADD CONSTRAINT `idResponsable` FOREIGN KEY (`idResponsable`) REFERENCES `personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `idResponsable` FOREIGN KEY (`idResponsable`) REFERENCES `Personne` (`idPersonne`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `soutenance`

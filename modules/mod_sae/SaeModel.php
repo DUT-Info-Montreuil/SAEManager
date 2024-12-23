@@ -1,18 +1,18 @@
 <?php
 
-class SaeModel extends Connexion
+class SAEModel extends Connexion
 {
 
     // GET
 
-    public function getSaesByPersonneId($idPersonne)
+    public function getSAEsByPersonneId($idPersonne)
     {
-        $req = "SELECT sae.nom, sae.idSAE
-                FROM personne
-                INNER JOIN etudiantgroupe ON personne.idPersonne = etudiantgroupe.idEtudiant
-                INNER JOIN groupe ON groupe.idGroupe = etudiantgroupe.idGroupe
-                INNER JOIN sae ON sae.idSae = groupe.idSae
-                WHERE personne.idPersonne = :idPersonne
+        $req = "SELECT SAE.nomSae, SAE.idSAE
+                FROM Personne
+                INNER JOIN EtudiantGroupe ON Personne.idPersonne = EtudiantGroupe.idEtudiant
+                INNER JOIN Groupe ON Groupe.idGroupe = EtudiantGroupe.idGroupe
+                INNER JOIN SAE ON SAE.idSAE = Groupe.idSAE
+                WHERE Personne.idPersonne = :idPersonne
                 ";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
@@ -20,10 +20,10 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function getSaeById($idSAE)
+    public function getSAEById($idSAE)
     {
         $req = "SELECT *
-                FROM sae
+                FROM SAE
                 WHERE idSAE = :idSAE
                 ";
         $pdo_req = self::$bdd->prepare($req);
@@ -35,10 +35,10 @@ class SaeModel extends Connexion
     public function getRessourceBySAE($idSAE)
     {
         $req = "SELECT contenu
-                FROM ressource
-                INNER JOIN ressourcessae ON ressourcessae.idRessource = ressource.idRessource
-                INNER JOIN sae ON ressourcessae.idSAE = sae.idSAE
-                WHERE sae.idSAE = :idSAE";
+                FROM Ressource
+                INNER JOIN RessourcesSAE ON RessourcesSAE.idRessource = Ressource.idRessource
+                INNER JOIN SAE ON RessourcesSAE.idSAE = SAE.idSAE
+                WHERE SAE.idSAE = :idSAE";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
         $pdo_req->execute();
@@ -46,14 +46,14 @@ class SaeModel extends Connexion
     }
 
 
-    public function getRenduBySae($idSAE)
+    public function getRenduBySAE($idSAE)
     {
 
         $req = "
-                SELECT rendu.nom, rendu.dateLimite
-                FROM rendu
-                INNER JOIN sae ON sae.idSAE = rendu.idSAE
-                WHERE sae.idSAE = :idSAE
+                SELECT Rendu.nom, Rendu.dateLimite
+                FROM Rendu
+                INNER JOIN SAE ON SAE.idSAE = Rendu.idSAE
+                WHERE SAE.idSAE = :idSAE
         ";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
@@ -61,14 +61,64 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    function getSoutenanceBySae($idSAE)
+    function getSoutenanceBySAE($idSAE)
     {
-        $req = "SELECT soutenance.titre, soutenance.date, soutenance.salle
-                FROM soutenance
-                INNER JOIN sae ON sae.idSAE = soutenance.idSAE
-                WHERE sae.idSAE = :idSAE";
+        $req = "SELECT Soutenance.titre, Soutenance.date, Soutenance.salle
+                FROM Soutenance
+                INNER JOIN SAE ON SAE.idSAE = Soutenance.idSAE
+                WHERE SAE.idSAE = :idSAE";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    function getMyGroupId($idSAE)
+    {
+
+        // Changer l'idPersonne
+
+        $req = "SELECT g.idGroupe
+                FROM Personne
+                INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
+                INNER JOIN Groupe g ON g.idGroupe = EtudiantGroupe.idGroupe
+                WHERE g.idSAE = :idSAE AND Personne.idPersonne = :idPersonne";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idPersonne", 1);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    function getMyGroup($idSAE, $GroupeID)
+    {
+        foreach ($GroupeID as $id) {
+            $idGroupe = $id['idGroupe'];
+        }
+
+        $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE
+                FROM Personne p
+                INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = p.idPersonne
+                INNER JOIN Groupe g ON EtudiantGroupe.idGroupe = g.idGroupe
+                WHERE g.idSAE = :idSAE AND g.idGroupe = :idGroupe";
+
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    function getSAEResponsable($idSAE)
+    {
+
+        $req = "SELECT p.idPersonne, p.nom, p.prenom
+                FROM Personne p
+                INNER JOIN SAE ON p.idPersonne = SAE.idResponsable
+                WHERE SAE.idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
