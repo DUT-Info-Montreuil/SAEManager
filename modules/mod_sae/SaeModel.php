@@ -122,4 +122,45 @@ class SAEModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
+
+    function getNote($idSAE,  $groupeID)
+    {
+
+        foreach ($groupeID as $id) {
+            $idGroupe = $id['idGroupe'];
+        }
+        $req = "SELECT r.nom, note, coeff
+                FROM Note
+                INNER JOIN Evaluation ON Evaluation.idEvaluation = Note.idEval
+                INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
+                INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEvaluation
+                WHERE EtudiantGroupe.idGroupe = :groupeID AND r.idSAE = :idSAE";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":groupeID", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    function getNoteSoutenance($idSAE, $groupeID)
+    {
+
+        foreach ($groupeID as $id) {
+            $idGroupe = $id['idGroupe'];
+        }
+
+        $req = "SELECT s.titre, note, coeff
+                FROM Note
+                INNER JOIN Evaluation ON Evaluation.idEvaluation = Note.idEval
+                INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
+                INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEvaluation
+                WHERE EtudiantGroupe.idGroupe = :groupeID AND s.idSAE = :idSAE";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":groupeID", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
 }

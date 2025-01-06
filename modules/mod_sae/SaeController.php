@@ -27,6 +27,9 @@ class SaeController
             case "groupe":
                 $this->initGroup();
                 break;
+            case "note":
+                $this->initNote();
+                break;
         }
     }
 
@@ -61,11 +64,23 @@ class SaeController
 
     private function initGroup()
     {
-        $sae = $this->model->getSaeById($_GET['saeID']);
-        $groupeID = $this->model->getMyGroupId($_GET['saeID']);
-        $groupe = $this->model->getMyGroup($_GET['saeID'], $groupeID);
-        $responsable = $this->model->getSaeResponsable($_GET['saeID']);
+        $sae = $this->model->getSaeById($_GET['id']);
+        $groupeID = $this->model->getMyGroupId($_GET['id']);
+        $groupe = $this->model->getMyGroup($_GET['id'], $groupeID);
+        $responsable = $this->model->getSaeResponsable($_GET['id']);
 
         $this->view->initGroupPage($sae, $groupe, $responsable);
+    }
+
+    private function initNote()
+    {
+
+        $groupeID = $this->model->getMyGroupId($_GET['id']);
+
+        $notes = $this->model->getNote($_GET['id'], $groupeID);
+        $sae = $this->model->getSaeById($_GET['id']);
+        $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
+
+        $this->view->initNotePage($notes, $sae, $noteSoutenance);
     }
 }
