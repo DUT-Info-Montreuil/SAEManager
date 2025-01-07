@@ -8,9 +8,12 @@ class Site
 
 	public function __construct()
 	{
-		$this->moduleName = isset($_GET['module']) ? $_GET['module'] : "home";
+		$this->moduleName = isset($_GET['module']) ? $_GET['module'] : "connexion";
 
 		switch ($this->moduleName) {
+			case "connexion":
+				require_once 'modules/mod_connexion/ConnexionModule.php';
+				break;
 			case "home":
 				require_once 'modules/mod_home/HomeModule.php';
 				break;
