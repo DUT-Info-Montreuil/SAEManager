@@ -55,8 +55,9 @@ class SaeController
             $ressource = $this->model->getRessourceBySAE($_GET['id']);
             $rendus = $this->model->getRenduBySae($_GET['id']);
             $soutenance = $this->model->getSoutenanceBySae($_GET['id']);
+            $champs = $this->model->getChampBySae($_GET['id']);
 
-            $this->view->initSaeDetails($saes, $ressource, $rendus, $soutenance);
+            $this->view->initSaeDetails($saes,$champs , $ressource, $rendus, $soutenance);
         } else {
             header('Location: index.php');
         }

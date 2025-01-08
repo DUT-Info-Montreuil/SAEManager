@@ -32,6 +32,18 @@ class SAEModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
+    public function getChampBySAE($idSAE)
+    {
+        $req = "SELECT nomchamp
+                FROM Champs
+                INNER JOIN SAE ON Champs.idSAE = SAE.idSAE
+                WHERE SAE.idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
     public function getRessourceBySAE($idSAE)
     {
         $req = "SELECT contenu

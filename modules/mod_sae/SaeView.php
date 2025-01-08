@@ -58,7 +58,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($sae, $ressource, $rendus, $soutenance)
+    function initSaeDetails($sae, $champs, $ressource, $rendus, $soutenance)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -81,6 +81,31 @@ HTML;
         echo '<p>' . $sujet . '</p>';
         echo <<<HTML
             </div>
+HTML;
+
+        // Champs
+        echo <<<HTML
+        <!-- Champ(s) -->
+        <div class="mb-5">
+            <h3 class="fw-bold d-flex align-items-center">
+                <svg class="me-2" width="25" height="25">
+                    <use xlink:href="#arrow-icon"></use>
+                </svg>
+                Champ(s)
+            </h3>
+            <div class="d-flex flex-column">
+HTML;
+        if (!empty($champs)) {
+            foreach ($champs as $c) {
+                $nomChamps = htmlspecialchars($c['nomchamp']);
+                echo $this->lineChamp($nomChamps);
+            }
+        } else {
+            echo $this->lineChamp("default");
+        }
+        echo <<<HTML
+            </div>
+        </div>
 HTML;
 
         // Ressources
@@ -162,6 +187,26 @@ HTML;
         </div>
     </div>
 HTML;
+    }
+
+    function lineChamp($nomChamp)
+    {
+
+        if ($nomChamp == "default") {
+            return <<<HTML
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                    <span>Aucun champ disponible</span>
+                </div>
+        HTML;
+        }
+
+        return <<<HTML
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                    <span>$nomChamp</span>
+                        <a href="#" class="ms-auto text-decoration-none text-primary">fichier.pdf</a>
+                    </div>
+
+        HTML;
     }
 
     function lineRessource($nomRessource)
