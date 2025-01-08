@@ -34,7 +34,7 @@ class SAEModel extends Connexion
 
     public function getChampBySAE($idSAE)
     {
-        $req = "SELECT nomchamp
+        $req = "SELECT nomchamp, idChamps
                 FROM Champs
                 INNER JOIN SAE ON Champs.idSAE = SAE.idSAE
                 WHERE SAE.idSAE = :idSAE";
@@ -42,6 +42,15 @@ class SAEModel extends Connexion
         $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
+    }
+
+    public function getReponseIdBySAE($idChamp)
+    {
+        $req = "SELECT idChamp
+                FROM reponsesChamp";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->execute();
+        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
     }
 
     public function getRessourceBySAE($idSAE)
@@ -175,4 +184,19 @@ class SAEModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
+
+    // POST
+
+    public function ajoutChamp ($idChamp, $idEleve, $reponse) {
+		$req = "INSERT INTO reponsesChamp (idChamp, idEleve, reponse) VALUES (:idChamp, :idEleve, :reponse)";
+		$pdo_req = self::$bdd->prepare($req);
+		$pdo_req->bindValue("idChamp", $idChamp);
+		$pdo_req->bindValue("idEleve", $idEleve);
+        $pdo_req->bindValue("reponse", $reponse);
+		$pdo_req->execute();
+		if ($pdo_req->rowCount() == 0)
+			return false;
+		else 
+			return true;
+	}
 }

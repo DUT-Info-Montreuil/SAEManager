@@ -58,7 +58,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($sae, $champs, $ressource, $rendus, $soutenance)
+    function initSaeDetails($sae, $champs, $repId, $ressource, $rendus, $soutenance)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -98,10 +98,10 @@ HTML;
         if (!empty($champs)) {
             foreach ($champs as $c) {
                 $nomChamps = htmlspecialchars($c['nomchamp']);
-                echo $this->lineChamp($nomChamps);
+                echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId));
             }
         } else {
-            echo $this->lineChamp("default");
+            echo $this->lineChamp("default","");
         }
         echo <<<HTML
             </div>
@@ -155,7 +155,7 @@ HTML;
             echo $this->lineRendus("default", "default");
         }
         echo <<<HTML
-                </div>
+                </div>idChamp
             </div>
 HTML;
 
@@ -189,7 +189,7 @@ HTML;
 HTML;
     }
 
-    function lineChamp($nomChamp)
+    function lineChamp($nomChamp, $idChamps, $param)
     {
 
         if ($nomChamp == "default") {
@@ -199,12 +199,23 @@ HTML;
                 </div>
         HTML;
         }
+        
+        $area = '<label>Ce champ a déjà été rendu</label>';
+        $input = '';
+     
+        if ($param){
+            $area = '<textarea name="reponse'.$idChamps.'" cols="100" class="zone-texte" placeholder="Ecrire ici..."></textarea>';
+            $input = '<input class="ms-auto text-decoration-none text-primary" text="envoyer" type="submit"/>';
+        }
 
         return <<<HTML
-            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>$nomChamp</span>
-                        <a href="#" class="ms-auto text-decoration-none text-primary">fichier.pdf</a>
-                    </div>
+            <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=ajout_champ&id=1&idchamp=$idChamps">
+                <div class="d-flex flex-column">
+                    <span>$nomChamp</span> 
+                    $area
+                </div>
+                $input
+            </form>
 
         HTML;
     }
