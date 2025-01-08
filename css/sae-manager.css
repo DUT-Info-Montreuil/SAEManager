@@ -51,7 +51,7 @@
 }
 
 .min-h75 {
-    min-height: 75%;
+    min-height: 75% !important;
 }
 
 /* Left Nav Bar */
@@ -91,4 +91,23 @@
 
 .w-200px {
     min-width: 200px;
+}
+
+.container {
+    height: 100vh;
+}
+
+.flex-container {
+    flex-direction: row;
+}
+
+@media (max-width: 991px) {
+    .flex-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .flex-container > div {
+        margin-bottom: 20px;
+    }
 }

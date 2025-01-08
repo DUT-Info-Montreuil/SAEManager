@@ -47,24 +47,33 @@ HTML;
     }
 
     function lineRendus($renduNom, $saeNom, $dateLimite, $idSAE)
-    {
+{
+    $currentDate = new DateTime();
+    $limitDate = new DateTime($dateLimite);
 
-        return <<<HTML
-        <div class="px-5 mx-5 my-4">
-            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100">
+    $html = <<<HTML
+    <div class="px-5 mx-5 my-4">
+        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100">
             <div class="align-items-center">
                 <span class="fw-bold mx-1 d-flex">$renduNom</span>
                 <span class="fst-italic mx-1 d-flex">$saeNom</span>
             </div>
             <div class="text-end">
-                <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
+HTML;
+
+    if ($currentDate > $limitDate) {
+        $html .= '<p class="text-danger mb-0">Date limite dépassée : ' . $dateLimite . '</p>';
+    } else {
+        $html .= '<p class="text-success mb-0">A déposer avant le : ' . $dateLimite . '</p>';
+    }
+
+    $html .= <<<HTML
                 <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
             </div>
-            
-            </div>
         </div>
+    </div>
+HTML;
 
-
-        HTML;
-    }
+    return $html;
+}
 }
