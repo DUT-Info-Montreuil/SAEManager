@@ -7,6 +7,7 @@ require_once 'Site.php';
 include_once 'protectionCSRF.php';
 
 
+session_start();
 
 Connexion::initConnexion();
 $site = new Site();
