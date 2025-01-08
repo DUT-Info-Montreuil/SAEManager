@@ -1,4 +1,5 @@
 <?php
+require_once "depot.php";
 
 class SAEModel extends Connexion
 {
@@ -31,6 +32,34 @@ class SAEModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
+
+    public function uploadFichier($fileName, $fileInput, $color, $id) {
+        $dossier = './files/';
+
+        // Vérifiez ou créez le dossier
+        if (!file_exists($dossier)) {
+            if (!mkdir($dossier, 0777, false)) {
+                echo "Impossible de créer le dossier : $dossier";
+                return;
+            }
+        }
+
+        // Vérifiez si le fichier est valide
+        if (!is_uploaded_file($fileInput)) {
+            echo "Le fichier n'est pas valide.";
+            return;
+        }
+    
+        // Déplacez le fichier téléchargé
+        if (move_uploaded_file($fileInput, $dossier . $fileName)) {
+            echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' !<br>";
+            echo "Nom entré par l'utilisateur : '$fileName'<br>";
+            echo "Couleur choisie : '$color'<br>";
+        } else {
+            echo "Erreur lors du déplacement du fichier.";
+        }
+}
+
 
     public function getRessourceBySAE($idSAE)
     {

@@ -30,7 +30,7 @@ HTML;
         foreach ($saes as $sae) {
             echo $this->lineSae($sae);
         }
-        echo $this->ajouterFichierCloud();
+        
         echo <<<HTML
             </div>
         </div>
@@ -64,6 +64,7 @@ HTML;
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
         $sujet = htmlspecialchars($sae[0]['sujet']);
+        $idSAE = htmlspecialchars($sae[0]['idSAE']);
 
         echo <<<HTML
     <div class="container mt-5">
@@ -80,6 +81,7 @@ HTML;
 HTML;
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
+        echo $this->ajouterFichierCloud($idSAE);
         echo <<<HTML
             </div>
 HTML;
@@ -485,7 +487,7 @@ HTML;
 HTML;
     }
     
-    function ajouterFichierCloud(){
+    function ajouterFichierCloud($idSae){
         return <<<HTML
         <div class="d-block modal" tabindex="-1" id="modalAjouterFichierCloud">
             <div class="modal-dialog">
@@ -494,13 +496,13 @@ HTML;
                         <h5 class="modal-title fw-bolder text-center w-100">Déposer un support</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="fileUploadForm" enctype="multipart/form-data">
+                    <form action="index.php?module=sae&action=uploadFichier&id=$idSae" id="fileUploadForm" method="POST" enctype="multipart/form-data">
                         <div class="modal-body d-flex flex-column text-center">
                         <div class="form-group mb-3">
-                            <input type="text" class="form-control" id="fileName" placeholder="Entrer le nom du fichier">
+                            <input type="text" class="form-control" name="fileName" id="fileName" placeholder="Entrer le nom du fichier">
                             <small class="form-text text-muted">Veilliez à choisir un nom qui n'existe pas déjà dans le cloud de cette SAE.</small>
                         </div>
-                            <input type="color" class="form-control form-control-color" id="colorChoice" value="#563d7c" title="Choisissez votre couleur">
+                            <input type="color" class="form-control form-control-color" name="colorChoice" id="colorChoice" value="#563d7c" title="Choisissez votre couleur">
                             <div class="card border rounded-3 mb-3">
                                 <div class="card-body d-flex flex-column align-items-center">
                                     <svg class="icon" width="100" height="100" style="fill: #0AF;">
@@ -508,7 +510,7 @@ HTML;
                                     </svg>
                                     <p>Déposer ou glisser un fichier ici</p>
                                     <p class="fs-10 fw-light">Taille max : 20 Mo</p>
-                                    <input type="file" class="form-control-file" id="fileInput" required style="display: none;">
+                                    <input type="file" class="form-control-file" name="fileInput" id="fileInput" required style="display: none;">
                                     <button type="button" class="btn btn-light w-50" id="selectFileButton">Sélectionner fichier</button>
                                 </div>
                             </div>

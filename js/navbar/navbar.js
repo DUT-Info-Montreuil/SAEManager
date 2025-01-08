@@ -20,12 +20,5 @@ document.getElementById('selectFileButton').addEventListener('click', function()
   document.getElementById('fileInput').click();
 });
 
-document.getElementById('fileUploadForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  alert('Fichier envoyé avec succès !');
-  var modal = bootstrap.Modal.getInstance(document.getElementById('modalDeposerSupport'));
-  modal.hide();
-});
-
 
             

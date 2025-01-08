@@ -30,6 +30,9 @@ class SaeController
             case "note":
                 $this->initNote();
                 break;
+            case "uploadFichier":
+                $this->uploadFichier();
+                break;
         }
     }
 
@@ -82,5 +85,16 @@ class SaeController
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
+    }
+
+    private function uploadFichier() {
+        $fileName = isset($_POST['fileName']) ? $_POST["fileName"] : (isset($_FILES['fileInput']['name']) ? basename($_FILES['fileInput']['name']) : null);
+    
+        if (!isset($_FILES['fileInput'])) {
+            echo "Erreur lors du téléchargement du fichier.";
+            exit;
+        }
+
+        $this->model->uploadFichier($fileName, $_FILES['fileInput']['tmp_name'], $_POST['colorChoice'], $_GET["id"]);
     }
 }
