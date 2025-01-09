@@ -28,8 +28,6 @@ class SaeView extends GenericView
 HTML;
         foreach ($saes as $sae) {
             echo $this->lineSae($sae);
-
-
         }
 
         echo <<<HTML

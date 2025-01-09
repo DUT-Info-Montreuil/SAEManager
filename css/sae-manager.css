@@ -1,4 +1,3 @@
-
 :root {
     --menu-color: #0D1117;
     --sae-color: #7171FF;
@@ -11,6 +10,10 @@
 
 .flex-1 {
     flex: 1;
+}
+
+body {
+    overflow-x: hidden;
 }
 
 .icon {
@@ -28,7 +31,6 @@
 
 .card-sae {
     background: var(--sae-color);
-    
 }
 
 .card-rendus {
@@ -93,21 +95,82 @@
     min-width: 200px;
 }
 
-.container {
-    height: 100vh;
-}
-
 .flex-container {
     flex-direction: row;
 }
+
+/* Ecran moyen */
 
 @media (max-width: 991px) {
     .flex-container {
         flex-direction: column;
         align-items: center;
+        gap: 20px;
     }
 
-    .flex-container > div {
-        margin-bottom: 20px;
+    .card-rendus-content, .card-sae-content {
+        width: 90% !important;
+        height: auto !important;
+        min-height: 250px !important;
+        max-height: 350px !important;
     }
+
+    .card-rendus, .card-sae {
+        height: 40% !important;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .navbar-logout {
+        display: none;
+    }
+
+    .sae-list .px-5, .rendu-list .px-5{
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .sae-list .d-flex, .rendu-list {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sae-list .text-primary, .rendu-list .text-primary {
+        font-size: 0.9rem;
+    }
+}
+
+/* Ecran petit */
+
+@media (max-width: 576px) {
+    .card {
+        padding: 10px;
+    }
+
+    h1, h3 {
+        font-size: 1.25rem;
+    }
+
+    .px-5 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .me-3 {
+        margin-right: 0.5rem;
+    }
+
+    .sae-list .d-flex, .rendu-list .d-flex{
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sae-list .fw-bold, .rendu-list .fw-bold {
+        font-size: 1rem;
+    }
+
 }

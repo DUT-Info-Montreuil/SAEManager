@@ -17,7 +17,7 @@ class NavBarView extends GenericComponentView
       </div>
       <div class="d-flex">
         <button class="my-auto btn btn-link"><svg class="icon" width="24" height="24"><use xlink:href="#logout-icon"></use></svg></button>
-        <p class="my-auto mx-2"><a href="" class="text-decoration-none text-reset">Se déconnecter</a></p>
+        <p class="my-auto mx-2"><a href="" class="text-decoration-none text-reset navbar-logout" >Se déconnecter</a></p>
       </div>
     </div>
 
