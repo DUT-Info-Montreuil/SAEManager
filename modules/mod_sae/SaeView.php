@@ -81,7 +81,8 @@ HTML;
 HTML;
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
-        echo $this->ajouterFichierCloud($idSAE);
+        echo $this->popUpDepot("Rendu");
+        echo $this->popUpDepot("Support");
         echo <<<HTML
             </div>
 HTML;
@@ -127,10 +128,11 @@ HTML;
             foreach ($rendus as $r) {
                 $nomRendu = htmlspecialchars($r['nom']);
                 $dateLimite = htmlspecialchars($r['dateLimite']);
-                echo $this->lineRendus($nomRendu, $dateLimite);
+                $idRendu = htmlspecialchars($r['idRendu']);
+                echo $this->lineRendus($nomRendu, $dateLimite, $idRendu);
             }
         } else {
-            echo $this->lineRendus("default", "default");
+            echo $this->lineRendus("default", "default", 0);
         }
         echo <<<HTML
                 </div>
@@ -154,7 +156,8 @@ HTML;
                 $titre = htmlspecialchars($s['titre'] ?? "default");
                 $dateSoutenance = htmlspecialchars($s['date'] ?? "default");
                 $salle = htmlspecialchars($s['salle'] ?? "default");
-                echo $this->lineSoutenance($titre, $dateSoutenance, $salle);
+                $idSoutenance = htmlspecialchars($s['idSoutenance'] ?? "default");
+                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance);
             }
         } else {
             echo $this->lineSoutenance("default", "default", "default");
@@ -187,7 +190,7 @@ HTML;
         HTML;
     }
 
-    function lineRendus($nom, $dateLimite)
+    function lineRendus($nom, $dateLimite, $id)
     {
 
         if ($nom == "default") {
@@ -206,14 +209,14 @@ HTML;
                 </div>
                 <div class="text-end">
                 <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
-                    <a href="#" class="text-primary text-decoration-none fw-bold">Déposer le rendu</a>
+                    <a href="#" class="text-primary text-decoration-none fw-bold rendudrop-$id">Déposer le rendu</a>
                 </div>
             </div>
 
         HTML;
     }
 
-    function lineSoutenance($titre, $dateSoutenance, $salle)
+    function lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance)
     {
 
         if ($titre == "default") {
@@ -232,7 +235,7 @@ HTML;
         <div class="text-end">
             <p class="text-muted mb-0">Votre date de passage : $dateSoutenance</p>
             <p class="text-muted mb-1">Salle : $salle</p>
-            <a href="#" class="text-primary text-decoration-none fw-bold">Déposer un support</a>
+            <a href="#" class="text-primary text-decoration-none fw-bold supportdrop-$idSoutenance">Déposer un support</a>
         </div>
     </div>
     HTML;
@@ -453,16 +456,18 @@ HTML;
     }
 
     // Pop up pour les dépots / rendus
+    // TO-DO : lié une action au form vers le controller SAE, pour ensuite insérer dans la base de données le dépot + placer le fichier
     function popUpDepot($typeDepot){
         return <<<HTML
-        <div class="d-block modal" tabindex="-1" id="modalDeposerSupport">
+        <div class="modal" tabindex="-1" id="modalDepot$typeDepot">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title fw-bolder text-center w-100">Déposer un support</h5>
+                        <h5 class="modal-title fw-bolder text-center w-100">Déposer un $typeDepot</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form id="fileUploadForm" enctype="multipart/form-data">
+                        <input type="hidden" id="idSaeDepot$typeDepot" name="idSaeDepot$typeDepot" value="">
                         <div class="modal-body d-flex flex-column text-center">
                             <div class="card border rounded-3 mb-3">
                                 <div class="card-body d-flex flex-column align-items-center">
@@ -471,13 +476,13 @@ HTML;
                                     </svg>
                                     <p>Déposer ou glisser un fichier ici</p>
                                     <p class="fs-10 fw-light">Taille max : 20 Mo</p>
-                                    <input type="file" class="form-control-file" id="fileInput" required style="display: none;">
-                                    <button type="button" class="btn btn-light w-50" id="selectFileButton">Sélectionner fichier</button>
+                                    <input type="file" class="form-control-file" id="fileInput$typeDepot" required style="display: none;">
+                                    <button type="button" class="btn btn-light w-50" id="selectFileButton$typeDepot">Sélectionner fichier</button>
                                 </div>
                             </div>
                             <div>
                                 <button type="submit" class="btn btn-success m-3">Valider</button>
-                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-danger m-3" id="depotCancelButton$typeDepot" data-bs-dismiss="modal">Annuler</button>
                             </div>
                         </div>
                     </form>
@@ -486,14 +491,15 @@ HTML;
         </div>
 HTML;
     }
-    
+
+    // A continuer lorsque la page "Cloud" des SAE sera réalisé.
     function ajouterFichierCloud($idSae){
         return <<<HTML
         <div class="d-block modal" tabindex="-1" id="modalAjouterFichierCloud">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title fw-bolder text-center w-100">Déposer un support</h5>
+                        <h5 class="modal-title fw-bolder text-center w-100">Déposer un fichier</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form action="index.php?module=sae&action=uploadFichier&id=$idSae" id="fileUploadForm" method="POST" enctype="multipart/form-data">
@@ -516,7 +522,7 @@ HTML;
                             </div>
                             <div>
                                 <button type="submit" class="btn btn-success m-3">Valider</button>
-                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-danger m-3" id="addFileToCloudCancelButton" data-bs-dismiss="modal">Annuler</button>
                             </div>
                         </div>
                     </form>

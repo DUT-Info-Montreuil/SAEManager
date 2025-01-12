@@ -79,7 +79,7 @@ class SAEModel extends Connexion
     {
 
         $req = "
-                SELECT Rendu.nom, Rendu.dateLimite
+                SELECT Rendu.idRendu, Rendu.nom, Rendu.dateLimite
                 FROM Rendu
                 INNER JOIN SAE ON SAE.idSAE = Rendu.idSAE
                 WHERE SAE.idSAE = :idSAE
@@ -92,7 +92,7 @@ class SAEModel extends Connexion
 
     function getSoutenanceBySAE($idSAE)
     {
-        $req = "SELECT Soutenance.titre, Soutenance.date, Soutenance.salle
+        $req = "SELECT Soutenance.idSoutenance, Soutenance.titre, Soutenance.date, Soutenance.salle
                 FROM Soutenance
                 INNER JOIN SAE ON SAE.idSAE = Soutenance.idSAE
                 WHERE SAE.idSAE = :idSAE";

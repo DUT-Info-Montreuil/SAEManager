@@ -33,12 +33,16 @@ class SaeController
             case "uploadFichier":
                 $this->uploadFichier();
                 break;
+            case "ajoutDepotRendu":
+                $this->depotRendu();
+                break;
+            case "ajoutDepotSupport":
+                break;
         }
     }
 
     private function initSae()
     {
-
         $saes = $this->model->getSaesByPersonneId(1);
         $this->view->initSaePage($saes);
     }
@@ -96,5 +100,13 @@ class SaeController
         }
 
         $this->model->uploadFichier($fileName, $_FILES['fileInput']['tmp_name'], $_POST['colorChoice'], $_GET["id"]);
+    }
+
+    private function depotRendu(){
+        $idSae = !isset($_GET['idSaeDepotRendu']) ? $_GET['idSaeDepotRendu'] : exit("idSae not set");
+        $file = !isset($_FILES['fileInputRendu']) ? $_FILES['fileInputRendu'] : exit("file not set");
+
+        var_dump($idSae);
+        // TO-DO : Faire une fonction dans le model qui insère un rendu (+ comment récupérer l'id de l'utilisateur actuelle ? pour ajouter le rendu au bon groupe)
     }
 }
