@@ -16,7 +16,6 @@
     <main><?= $module ?></main>
 
     <script src="js/navbar/navbar.js"></script>
-
 </body>
 
 </html>

@@ -53,6 +53,33 @@ class SAEModel extends Connexion
         return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
     }
 
+    public function uploadFichier($fileName, $fileInput, $color, $id) {
+        $dossier = './files/';
+
+        // Vérifiez ou créez le dossier
+        if (!file_exists($dossier)) {
+            if (!mkdir($dossier, 0777, false)) {
+                echo "Impossible de créer le dossier : $dossier";
+                return false;
+            }
+        }
+
+        if(file_exists($dossier . $fileName))
+            $fileName = "_".$fileName;
+
+        // Déplacez le fichier téléchargé
+        if (move_uploaded_file($fileInput['tmp_name'], $dossier . $fileName)) {
+            echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' !<br>";
+            echo "Nom entré par l'utilisateur : '$fileName'<br>";
+            echo "Couleur choisie : '$color'<br>";
+            return $fileName;
+        } else {
+            echo "Erreur lors du déplacement du fichier.";
+            return false;
+        }
+    }
+
+
     public function getRessourceBySAE($idSAE)
     {
         $req = "SELECT contenu
@@ -71,7 +98,7 @@ class SAEModel extends Connexion
     {
 
         $req = "
-                SELECT Rendu.nom, Rendu.dateLimite
+                SELECT Rendu.idRendu, Rendu.nom, Rendu.dateLimite
                 FROM Rendu
                 INNER JOIN SAE ON SAE.idSAE = Rendu.idSAE
                 WHERE SAE.idSAE = :idSAE
@@ -84,7 +111,7 @@ class SAEModel extends Connexion
 
     function getSoutenanceBySAE($idSAE)
     {
-        $req = "SELECT Soutenance.titre, Soutenance.date, Soutenance.salle
+        $req = "SELECT Soutenance.idSoutenance, Soutenance.titre, Soutenance.date, Soutenance.salle
                 FROM Soutenance
                 INNER JOIN SAE ON SAE.idSAE = Soutenance.idSAE
                 WHERE SAE.idSAE = :idSAE";
@@ -96,9 +123,6 @@ class SAEModel extends Connexion
 
     function getMyGroupId($idSAE)
     {
-
-        // Changer l'idPersonne
-
         $req = "SELECT g.idGroupe
                 FROM Personne
                 INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
@@ -196,7 +220,26 @@ class SAEModel extends Connexion
 		$pdo_req->execute();
 		if ($pdo_req->rowCount() == 0)
 			return false;
-		else 
+		else
 			return true;
 	}
+
+    function uploadFileRendu($file, $idSae, $fileName, $idRendu){
+        $newFileName = $this->uploadFichier($fileName, $file, "none", $idSae);
+        if($newFileName){
+            $idGroupe = $this->getMyGroupId($idSae);
+            $req = "INSERT INTO RenduGroupe VALUES (:idRendu, :idGroupe, :fichier, :dateDepot)";
+
+            $currentDateTime = date('Y-m-d H:i:s');
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idRendu", $idRendu);
+            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
+            $pdo_req->bindValue(":fichier", $newFileName);
+            $pdo_req->bindValue(":dateDepot", $currentDateTime);
+            $pdo_req->execute();
+            return true;
+        }
+        return false;
+    }
 }
