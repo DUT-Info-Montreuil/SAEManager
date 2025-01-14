@@ -40,25 +40,24 @@ class SAEModel extends Connexion
         if (!file_exists($dossier)) {
             if (!mkdir($dossier, 0777, false)) {
                 echo "Impossible de créer le dossier : $dossier";
-                return;
+                return false;
             }
         }
 
-        // Vérifiez si le fichier est valide
-        if (!is_uploaded_file($fileInput)) {
-            echo "Le fichier n'est pas valide.";
-            return;
-        }
+        if(file_exists($dossier . $fileName))
+            $fileName = "_".$fileName;
     
         // Déplacez le fichier téléchargé
-        if (move_uploaded_file($fileInput, $dossier . $fileName)) {
+        if (move_uploaded_file($fileInput['tmp_name'], $dossier . $fileName)) {
             echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' !<br>";
             echo "Nom entré par l'utilisateur : '$fileName'<br>";
             echo "Couleur choisie : '$color'<br>";
+            return $fileName;
         } else {
             echo "Erreur lors du déplacement du fichier.";
+            return false;
         }
-}
+    }
 
 
     public function getRessourceBySAE($idSAE)
@@ -90,6 +89,24 @@ class SAEModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
+    public function getRenduEleve($idRendu, $idSae){
+        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
+        $req = "
+                SELECT RenduGroupe.idRendu, RenduGroupe.dateDepot, RenduGroupe.fichier
+                FROM RenduGroupe
+                WHERE idRendu = :idRendu AND idGroupe = :idGroupe
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idRendu", $idRendu);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function didGroupDropRendu($idRendu, $idSae){
+        return count($this->getRenduEleve($idRendu, $idSae))!=0;
+    }
+
     function getSoutenanceBySAE($idSAE)
     {
         $req = "SELECT Soutenance.idSoutenance, Soutenance.titre, Soutenance.date, Soutenance.salle
@@ -104,9 +121,6 @@ class SAEModel extends Connexion
 
     function getMyGroupId($idSAE)
     {
-
-        // Changer l'idPersonne
-
         $req = "SELECT g.idGroupe
                 FROM Personne
                 INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
@@ -191,5 +205,24 @@ class SAEModel extends Connexion
         $pdo_req->bindValue(":groupeID", $idGroupe);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
+    }
+
+    function uploadFileRendu($file, $idSae, $fileName, $idRendu){
+        $newFileName = $this->uploadFichier($fileName, $file, "none", $idSae);
+        if($newFileName){
+            $idGroupe = $this->getMyGroupId($idSae);
+            $req = "INSERT INTO RenduGroupe VALUES (:idRendu, :idGroupe, :fichier, :dateDepot)";
+
+            $currentDateTime = date('Y-m-d H:i:s');
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idRendu", $idRendu);
+            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
+            $pdo_req->bindValue(":fichier", $newFileName);
+            $pdo_req->bindValue(":dateDepot", $currentDateTime);
+            $pdo_req->execute();
+            return true;
+        }
+        return false;
     }
 }

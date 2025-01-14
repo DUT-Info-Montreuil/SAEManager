@@ -59,7 +59,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($sae, $ressource, $rendus, $soutenance)
+    function initSaeDetails($sae, $ressource, $rendus, $soutenance, $rendusDeposer)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -81,8 +81,8 @@ HTML;
 HTML;
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
-        echo $this->popUpDepot("Rendu");
-        echo $this->popUpDepot("Support");
+        echo $this->popUpDepot("Rendu", $idSAE);
+        echo $this->popUpDepot("Support", $idSAE);
         echo <<<HTML
             </div>
 HTML;
@@ -129,10 +129,18 @@ HTML;
                 $nomRendu = htmlspecialchars($r['nom']);
                 $dateLimite = htmlspecialchars($r['dateLimite']);
                 $idRendu = htmlspecialchars($r['idRendu']);
-                echo $this->lineRendus($nomRendu, $dateLimite, $idRendu);
+                $aDeposerRendu = false;
+                $listeRenduDeposer = array_keys($rendusDeposer);
+                foreach($listeRenduDeposer as $renduDeposer)
+                    if($renduDeposer == $idRendu){
+                        $aDeposerRendu = true;
+                        $dateLimite = $rendusDeposer[$idRendu];
+                    }
+                
+                echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
             }
         } else {
-            echo $this->lineRendus("default", "default", 0);
+            echo $this->lineRendus("default", "default", 0, false);
         }
         echo <<<HTML
                 </div>
@@ -166,6 +174,7 @@ HTML;
                 </div>
             </div>
         </div>
+        <script src="js/navbar/saeview.js"></script>
     </div>
 HTML;
     }
@@ -190,7 +199,7 @@ HTML;
         HTML;
     }
 
-    function lineRendus($nom, $dateLimite, $id)
+    function lineRendus($nom, $dateLimite, $id, $renduDeposer)
     {
 
         if ($nom == "default") {
@@ -200,6 +209,15 @@ HTML;
                 </div>
         HTML;
         }
+        if($renduDeposer){
+            $color = "success";
+            $phrase = "Déposer le : ";
+        }
+        else{
+            $color = "danger";
+            $phrase = "A déposer avant le : ";
+        }
+
 
         return <<<HTML
 
@@ -208,7 +226,7 @@ HTML;
                     <p class="mb-0">$nom</p>
                 </div>
                 <div class="text-end">
-                <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
+                <p class="text-$color mb-0">$phrase $dateLimite</p>
                     <a href="#" class="text-primary text-decoration-none fw-bold rendudrop-$id">Déposer le rendu</a>
                 </div>
             </div>
@@ -457,7 +475,7 @@ HTML;
 
     // Pop up pour les dépots / rendus
     // TO-DO : lié une action au form vers le controller SAE, pour ensuite insérer dans la base de données le dépot + placer le fichier
-    function popUpDepot($typeDepot){
+    function popUpDepot($typeDepot, $idSae){
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalDepot$typeDepot">
             <div class="modal-dialog">
@@ -466,7 +484,7 @@ HTML;
                         <h5 class="modal-title fw-bolder text-center w-100">Déposer un $typeDepot</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="fileUploadForm" enctype="multipart/form-data">
+                    <form action="index.php?module=sae&action=ajoutDepot$typeDepot&id=$idSae" method="POST" id="fileUploadForm" enctype="multipart/form-data">
                         <input type="hidden" id="idSaeDepot$typeDepot" name="idSaeDepot$typeDepot" value="">
                         <div class="modal-body d-flex flex-column text-center">
                             <div class="card border rounded-3 mb-3">
@@ -476,7 +494,7 @@ HTML;
                                     </svg>
                                     <p>Déposer ou glisser un fichier ici</p>
                                     <p class="fs-10 fw-light">Taille max : 20 Mo</p>
-                                    <input type="file" class="form-control-file" id="fileInput$typeDepot" required style="display: none;">
+                                    <input type="file" class="form-control-file" id="fileInput$typeDepot" name="fileInput$typeDepot" required style="display: none;">
                                     <button type="button" class="btn btn-light w-50" id="selectFileButton$typeDepot">Sélectionner fichier</button>
                                 </div>
                             </div>

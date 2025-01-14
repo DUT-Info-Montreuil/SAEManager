@@ -62,8 +62,14 @@ class SaeController
             $ressource = $this->model->getRessourceBySAE($_GET['id']);
             $rendus = $this->model->getRenduBySae($_GET['id']);
             $soutenance = $this->model->getSoutenanceBySae($_GET['id']);
+            $rendusDeposer = [];
+            foreach ($rendus as $rendu)
+                if($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])){
+                    $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
+                    $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
+                }
 
-            $this->view->initSaeDetails($saes, $ressource, $rendus, $soutenance);
+            $this->view->initSaeDetails($saes, $ressource, $rendus, $soutenance, $rendusDeposer);
         } else {
             header('Location: index.php');
         }
@@ -103,10 +109,12 @@ class SaeController
     }
 
     private function depotRendu(){
-        $idSae = !isset($_GET['idSaeDepotRendu']) ? $_GET['idSaeDepotRendu'] : exit("idSae not set");
-        $file = !isset($_FILES['fileInputRendu']) ? $_FILES['fileInputRendu'] : exit("file not set");
-
-        var_dump($idSae);
-        // TO-DO : Faire une fonction dans le model qui insère un rendu (+ comment récupérer l'id de l'utilisateur actuelle ? pour ajouter le rendu au bon groupe)
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $idRendu = isset($_POST['idSaeDepotRendu']) ? $_POST['idSaeDepotRendu'] : exit("idRendu not set");
+        $file = isset($_FILES['fileInputRendu']) ? $_FILES['fileInputRendu'] : exit("file not set");
+        $fileName = $_FILES['fileInputRendu']['name'];
+        
+        $depotreussi = $this->model->uploadFileRendu($file, $idSae, $fileName, $idRendu);
+        header("Location: index.php?module=sae&action=details&id=".$idSae);
     }
 }
