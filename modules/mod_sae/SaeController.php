@@ -36,13 +36,13 @@ class SaeController
     private function initSae()
     {
 
-        $saes = $this->model->getSaesByPersonneId(1);
+        $saes = $this->model->getSaesByPersonneId($_SESSION['idUtilisateur']);
         $this->view->initSaePage($saes);
     }
 
     private function initDetails()
     {
-        $mySAE = $this->model->getSaesByPersonneId(1);
+        $mySAE = $this->model->getSaesByPersonneId($_SESSION['idUtilisateur']);
         $acces = false;
         foreach ($mySAE as $sae) {
             if ($sae['idSAE'] == $_GET['id']) {

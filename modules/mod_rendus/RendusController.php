@@ -26,7 +26,7 @@ class RendusController
 
     private function initRendus()
     {
-        $rendus = $this->model->getRendusByPersonne(1);
+        $rendus = $this->model->getRendusByPersonne($_SESSION['idUtilisateur']);
 
         $this->view->initRendusPage($rendus);
     }
