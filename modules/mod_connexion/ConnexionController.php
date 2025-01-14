@@ -35,7 +35,7 @@ class ConnexionController
                 if($this->model->essaieConnexion()){ //connexion réussite
                     header('Location: index.php?module=home');
                 }
-                else{ //erreur connexion
+                else{
                     $this->msg_erreur = "identifiant ou mot de passe incorrect !";
                     $this->view->connexionPage($this->msg_erreur);
                 }

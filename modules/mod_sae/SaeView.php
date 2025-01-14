@@ -192,7 +192,7 @@ HTML;
                 echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance);
             }
         } else {
-            echo $this->lineSoutenance("default", "default", "default");
+            echo $this->lineSoutenance("default", "default", "default", "default");
         }
         echo <<<HTML
                 </div>

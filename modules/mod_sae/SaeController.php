@@ -46,14 +46,13 @@ class SaeController
 
     private function initSae()
     {
-
-        $saes = $this->model->getSaesByPersonneId($_SESSION['idUtilisateur']);
+        $saes = $this->model->getSaesByPersonneId(1);
         $this->view->initSaePage($saes);
     }
 
     private function initDetails()
     {
-        $mySAE = $this->model->getSaesByPersonneId($_SESSION['idUtilisateur']);
+        $mySAE = $this->model->getSaesByPersonneId(1);
         $acces = false;
         foreach ($mySAE as $sae) {
             if ($sae['idSAE'] == $_GET['id']) {
@@ -75,7 +74,7 @@ class SaeController
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
 
-            $this->view->initSaeDetails($saes ,$champs ,$repId , $ressource, $rendus, $soutenance, $rendusDeposer);
+            $this->view->initSaeDetails($saes, $champs ,$repId, $ressource, $rendus, $soutenance, $rendusDeposer);
         } else {
             header('Location: index.php');
         }
@@ -103,16 +102,6 @@ class SaeController
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
     }
 
-    private function ajout(){
-        $idChamp = $_GET["idchamp"];
-        if (isset ($_POST["reponse".$idChamp])){
-            $reponse = $_POST["reponse".$idChamp];
-
-            $this->model->ajoutChamp($idChamp,$_SESSION['idUtilisateur'],$reponse);
-        }
-        header("Location: index.php?module=sae&action=details&id=".$_GET['id']);
-    }
-
     private function uploadFichier() {
         $fileName = isset($_POST['fileName']) ? $_POST["fileName"] : (isset($_FILES['fileInput']['name']) ? basename($_FILES['fileInput']['name']) : null);
 
@@ -132,5 +121,15 @@ class SaeController
 
         $depotreussi = $this->model->uploadFileRendu($file, $idSae, $fileName, $idRendu);
         header("Location: index.php?module=sae&action=details&id=".$idSae);
+    }
+
+    private function ajout(){
+        $idChamp = $_GET["idchamp"];
+        if (isset ($_POST["reponse".$idChamp])){
+            $reponse = $_POST["reponse".$idChamp];
+
+            $this->model->ajoutChamp($idChamp,$_SESSION['idUtilisateur'],$reponse);
+        }
+        header("Location: index.php?module=sae&action=details&id=".$_GET['id']);
     }
 }

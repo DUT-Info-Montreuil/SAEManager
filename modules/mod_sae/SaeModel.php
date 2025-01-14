@@ -1,10 +1,6 @@
 <?php
-
-class SAEModel extends Connexion
+class SaeModel extends Connexion
 {
-
-    // GET
-
     public function getSAEsByPersonneId($idPersonne)
     {
         $req = "SELECT SAE.nomSae, SAE.idSAE
@@ -30,27 +26,6 @@ class SAEModel extends Connexion
         $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
-    }
-
-    public function getChampBySAE($idSAE)
-    {
-        $req = "SELECT nomchamp, idChamps
-                FROM Champs
-                INNER JOIN SAE ON Champs.idSAE = SAE.idSAE
-                WHERE SAE.idSAE = :idSAE";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
-        $pdo_req->execute();
-        return $pdo_req->fetchAll();
-    }
-
-    public function getReponseIdBySAE($idChamp)
-    {
-        $req = "SELECT idChamp
-                FROM reponsesChamp";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->execute();
-        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
     }
 
     public function uploadFichier($fileName, $fileInput, $color, $id) {
@@ -92,6 +67,29 @@ class SAEModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
+    public function getChampBySAE($idSAE)
+    {
+        $req = "SELECT nomchamp, idChamps
+                FROM Champs
+                INNER JOIN SAE ON Champs.idSAE = SAE.idSAE
+                WHERE SAE.idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+    public function ajoutChamp ($idChamp, $idEleve, $reponse) {
+        $req = "INSERT INTO reponsesChamp (idChamp, idEleve, reponse) VALUES (:idChamp, :idEleve, :reponse)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue("idChamp", $idChamp);
+        $pdo_req->bindValue("idEleve", $idEleve);
+        $pdo_req->bindValue("reponse", $reponse);
+        $pdo_req->execute();
+        if ($pdo_req->rowCount() == 0)
+            return false;
+        else
+            return true;
+    }
 
 
     public function getRenduBySAE($idSAE)
@@ -107,6 +105,24 @@ class SAEModel extends Connexion
         $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
+    }
+
+    public function getRenduEleve($idRendu, $idSae){
+        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
+        $req = "
+                SELECT RenduGroupe.idRendu, RenduGroupe.dateDepot, RenduGroupe.fichier
+                FROM RenduGroupe
+                WHERE idRendu = :idRendu AND idGroupe = :idGroupe
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idRendu", $idRendu);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function didGroupDropRendu($idRendu, $idSae){
+        return count($this->getRenduEleve($idRendu, $idSae))!=0;
     }
 
     function getSoutenanceBySAE($idSAE)
@@ -209,21 +225,6 @@ class SAEModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    // POST
-
-    public function ajoutChamp ($idChamp, $idEleve, $reponse) {
-		$req = "INSERT INTO reponsesChamp (idChamp, idEleve, reponse) VALUES (:idChamp, :idEleve, :reponse)";
-		$pdo_req = self::$bdd->prepare($req);
-		$pdo_req->bindValue("idChamp", $idChamp);
-		$pdo_req->bindValue("idEleve", $idEleve);
-        $pdo_req->bindValue("reponse", $reponse);
-		$pdo_req->execute();
-		if ($pdo_req->rowCount() == 0)
-			return false;
-		else
-			return true;
-	}
-
     function uploadFileRendu($file, $idSae, $fileName, $idRendu){
         $newFileName = $this->uploadFichier($fileName, $file, "none", $idSae);
         if($newFileName){
@@ -241,5 +242,14 @@ class SAEModel extends Connexion
             return true;
         }
         return false;
+    }
+
+    public function getReponseIdBySAE($idChamp)
+    {
+        $req = "SELECT idChamp
+                FROM reponsesChamp";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->execute();
+        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
     }
 }

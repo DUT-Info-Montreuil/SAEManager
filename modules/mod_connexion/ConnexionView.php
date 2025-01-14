@@ -100,53 +100,5 @@ HTML .
 </style>
 HTML;
 
-
-
     }
 }
-
-?>
-
-
-<!-- <div class="container mt-5">
-            <h1 class="fw-bold">CONNEXION</h1>
-            <div class="card shadow bg-white rounded w-100 h-75 d-flex">
-                <div style="position:relative; background-color:red; width:100%; height:100%;" class="bg-red">
-                    <img style="position:absolute;" src="assets/img/RectangleJoliePageConnexion.png" />
-                    <img style="position:absolute;" src="assets/img/Vector1.png" />
-                    <img style="position:absolute;" src="assets/img/Saly-13.png" />
-                </div>
-                <div class="d-flex w-100 h-75 justify-content-center m-auto">
-                    
-                    
-                    <form action="index.php?module=connexion&infoConnexion=essaieConnexion" id="formConnexion" method="POST">
-                        <div style="">
-                            <span style="">Bienvenue sur </span>
-                            <span style="background: linear-gradient(90deg, #E54C91 0%, #F48B7B 50%, #F7AD50 100%);-webkit-background-clip: text;-webkit-text-fill-color: transparent;">SAÉ MANAGER</span>
-                            <span style="">, l’outil qui va te changer la vie !</span>
-                        </div>
-
-                        <p> 
-    HTML . 
-                            $msg_erreur 
-                        . <<<HTML
-                        </p>
-                        <div>
-                            <div>
-                                <label for="" name="login">identifiant : </label>
-                                <input type="text" name="login">
-                                <label for="" name="password">mot de passe : </label>
-                                <input type="password" name="password" required>
-    HTML .
-                                protectionCSRF::genererTokenInput()
-
-                            .<<<HTML
-                            </div>
-                        </div>
-                        <button type="submit">Se connecter</button> <br>
-                    </form>
-                </div>
-                
-            </div>
-
-        </div> -->
