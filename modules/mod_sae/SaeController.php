@@ -30,6 +30,9 @@ class SaeController
             case "note":
                 $this->initNote();
                 break;
+            case "ajout_champ":
+                $this->ajout();
+                break;
         }
     }
 
@@ -55,8 +58,10 @@ class SaeController
             $ressource = $this->model->getRessourceBySAE($_GET['id']);
             $rendus = $this->model->getRenduBySae($_GET['id']);
             $soutenance = $this->model->getSoutenanceBySae($_GET['id']);
+            $champs = $this->model->getChampBySae($_GET['id']);
+            $repId = $this->model->getReponseIdBySAE($_GET['id']);
 
-            $this->view->initSaeDetails($saes, $ressource, $rendus, $soutenance);
+            $this->view->initSaeDetails($saes ,$champs ,$repId , $ressource, $rendus, $soutenance);
         } else {
             header('Location: index.php');
         }
@@ -82,5 +87,15 @@ class SaeController
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
+    }
+
+    private function ajout(){
+        $idChamp = $_GET["idchamp"];
+        if (isset ($_POST["reponse".$idChamp])){
+            $reponse = $_POST["reponse".$idChamp];
+
+            $this->model->ajoutChamp($idChamp,1,$reponse);
+        }
+        header("Location: index.php?module=sae&action=details&id=".$_GET['id']);
     }
 }

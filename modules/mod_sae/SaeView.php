@@ -58,7 +58,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($sae, $ressource, $rendus, $soutenance)
+    function initSaeDetails($sae, $champs, $repId, $ressource, $rendus, $soutenance)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -81,6 +81,31 @@ HTML;
         echo '<p>' . $sujet . '</p>';
         echo <<<HTML
             </div>
+HTML;
+
+        // Champs
+        echo <<<HTML
+        <!-- Champ(s) -->
+        <div class="mb-5">
+            <h3 class="fw-bold d-flex align-items-center">
+                <svg class="me-2" width="25" height="25">
+                    <use xlink:href="#arrow-icon"></use>
+                </svg>
+                Champ(s)
+            </h3>
+            <div class="d-flex flex-column">
+HTML;
+        if (!empty($champs)) {
+            foreach ($champs as $c) {
+                $nomChamps = htmlspecialchars($c['nomchamp']);
+                echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId));
+            }
+        } else {
+            echo $this->lineChamp("default","");
+        }
+        echo <<<HTML
+            </div>
+        </div>
 HTML;
 
         // Ressources
@@ -130,7 +155,7 @@ HTML;
             echo $this->lineRendus("default", "default");
         }
         echo <<<HTML
-                </div>
+                </div>idChamp
             </div>
 HTML;
 
@@ -162,6 +187,37 @@ HTML;
         </div>
     </div>
 HTML;
+    }
+
+    function lineChamp($nomChamp, $idChamps, $param)
+    {
+
+        if ($nomChamp == "default") {
+            return <<<HTML
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                    <span>Aucun champ disponible</span>
+                </div>
+        HTML;
+        }
+        
+        $area = '<label>Ce champ a déjà été rendu</label>';
+        $input = '';
+     
+        if ($param){
+            $area = '<textarea name="reponse'.$idChamps.'" cols="100" class="zone-texte" placeholder="Ecrire ici..."></textarea>';
+            $input = '<input class="ms-auto text-decoration-none text-primary" text="envoyer" type="submit"/>';
+        }
+
+        return <<<HTML
+            <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=ajout_champ&id=1&idchamp=$idChamps">
+                <div class="d-flex flex-column">
+                    <span>$nomChamp</span> 
+                    $area
+                </div>
+                $input
+            </form>
+
+        HTML;
     }
 
     function lineRessource($nomRessource)
