@@ -155,7 +155,7 @@ HTML;
             echo $this->lineRendus("default", "default");
         }
         echo <<<HTML
-                </div>idChamp
+                </div>
             </div>
 HTML;
 
