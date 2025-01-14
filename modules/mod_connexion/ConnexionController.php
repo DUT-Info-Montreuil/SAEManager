@@ -14,20 +14,28 @@ class ConnexionController
 
     public function __construct(){
         $this->infoConnexion = isset($_GET['infoConnexion']) ? $_GET['infoConnexion'] : "connexionPage";
+
         $this->view = new ConnexionView();
         $this->model = new ConnexionModel();
         $this->msg_erreur="";
     }
 
     public function exec(){
+
         switch($this->infoConnexion){
             case "connexionPage":
                 $this->view->connexionPage($this->msg_erreur);
                 break;
 
             case "deconnexion":
-                $this->view->deconnexionPage();
-                $this->model->deconnexion();        
+                $var = $this->model->deconnexion();
+                var_dump($var);
+                if($var){
+                    $this->view->deconnexionPage('<p>Vous êtes bien déconnecter, pour vous connecter : <a href="index.php?module=connexion">cliquer ici</a></p>');
+                }else{
+                    $this->view->deconnexionPage('<p>Vous n\'êtes pas connecté ! Pour se connecter : <a href="index.php"> Se connecter</a></p>');
+                }
+                
                 break;
             case "essaieConnexion" :
                 if($this->model->essaieConnexion()){ //connexion réussite

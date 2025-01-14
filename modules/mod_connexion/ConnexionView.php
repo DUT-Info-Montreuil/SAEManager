@@ -9,13 +9,13 @@ class ConnexionView extends GenericView
         parent::__construct();
     }
 
-    function deconnexionPage(){
+    function deconnexionPage($msg){
         echo <<<HTML
         <div class="container mt-5">
             <h1 class="fw-bold">DÉCONNEXION</h1>
             <div class="card shadow bg-white rounded w-100 h-75">
                 <div class="d-flex w-100 h-75 justify-content-center m-auto">
-                <p>Vous êtes bien déconnecter, pour vous connecter : <a href="index.php?module=connexion">cliquer ici</a></p>
+                $msg
                 </div>
                 
             </div>

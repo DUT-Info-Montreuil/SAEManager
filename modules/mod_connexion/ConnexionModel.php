@@ -22,13 +22,24 @@ class ConnexionModel extends Connexion {
     }
 
     function deconnexion(){
+        var_dump("test");
+        var_dump($_SESSION['loginUtilisateur']);
+
         if(isset($_SESSION['loginUtilisateur'])){
+            var_dump("test1");
+
             unset($_SESSION['loginUtilisateur']);
+            var_dump("test2");
+
             protectionCSRF::supprimerToken();
-            echo "Vous êtes bien déconnecté";
+            var_dump("test3");
+
+            return true; //La déconnexion c'est bien faite
         }
         else{
-            echo 'Vous n\'êtes pas connecté ! Pour se connecter : <a href="index.php">Se connecter</a>';
+            var_dump("test4");
+
+            return false; //l'utilisateur essaie d'accéder à "deconnexion" sachant qu'il est déjà déconnecté
         }
         
     }

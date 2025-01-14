@@ -41,7 +41,7 @@ HTML;
 		if (isset($_SESSION['loginUtilisateur'])) {
 			$this->affichage .= <<<HTML
 			<div class="d-flex">
-				<a href="index.php?module=connexion&infoConnexion=deconnexion" class="my-auto btn btn-link mx-2 text-decoration-none text-reset">
+				<a href="index.php?infoConnexion=deconnexion" class="my-auto btn btn-link mx-2 text-decoration-none text-reset">
 					<svg class="icon" width="24" height="24">
 						<use xlink:href="#logout-icon"></use>
 					</svg> Se déconnecter
