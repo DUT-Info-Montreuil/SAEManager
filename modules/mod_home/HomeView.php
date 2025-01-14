@@ -4,13 +4,15 @@ require_once 'GenericView.php';
 
 class HomeView extends GenericView
 {
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
     }
 
-    function initHomePage(){
+    function initHomePage()
+    {
 
-        if ($_SESSION["estProfUtilisateur"]==1){ //Est un prof
+        if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
             echo <<<HTML
             <div class="container mt-5">
                 <h1 class="fw-bold">ACCUEIL</h1>
@@ -21,14 +23,14 @@ class HomeView extends GenericView
                     </div>
                 </div>
             </div>
-        HTML;   
-            
-        }else{ //Est un élève
+        HTML;
+        } else { //Est un élève
             echo <<<HTML
             <div class="container mt-5">
                 <h1 class="fw-bold">ACCUEIL</h1>
                 <div class="card shadow bg-white rounded w-100 h-75">
                     <div class="d-flex w-100 h-75 justify-content-center m-auto">
+                        {$this->cardSAE()}
                         {$this->cardRendus()}
                     </div>
                     
@@ -40,7 +42,8 @@ class HomeView extends GenericView
         }
     }
 
-    function cardSAE(){
+    function cardSAE()
+    {
 
         return <<<HTML
         <div class="card shadow px-3 rounded w-25 h-75 card-sae-content">

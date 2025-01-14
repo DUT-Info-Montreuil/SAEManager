@@ -46,13 +46,13 @@ class SaeController
 
     private function initSae()
     {
-        $saes = $this->model->getSaesByPersonneId(1);
+        $saes = $this->model->getSaesByPersonneId($_SESSION['idUtilisateur']);
         $this->view->initSaePage($saes);
     }
 
     private function initDetails()
     {
-        $mySAE = $this->model->getSaesByPersonneId(1);
+        $mySAE = $this->model->getSaesByPersonneId($_SESSION['idUtilisateur']);
         $acces = false;
         foreach ($mySAE as $sae) {
             if ($sae['idSAE'] == $_GET['id']) {
@@ -69,12 +69,12 @@ class SaeController
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
             $rendusDeposer = [];
             foreach ($rendus as $rendu)
-                if($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])){
+                if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
 
-            $this->view->initSaeDetails($saes, $champs ,$repId, $ressource, $rendus, $soutenance, $rendusDeposer);
+            $this->view->initSaeDetails($saes, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer);
         } else {
             header('Location: index.php');
         }
@@ -102,7 +102,8 @@ class SaeController
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
     }
 
-    private function uploadFichier() {
+    private function uploadFichier()
+    {
         $fileName = isset($_POST['fileName']) ? $_POST["fileName"] : (isset($_FILES['fileInput']['name']) ? basename($_FILES['fileInput']['name']) : null);
 
         if (!isset($_FILES['fileInput'])) {
@@ -113,23 +114,25 @@ class SaeController
         $this->model->uploadFichier($fileName, $_FILES['fileInput']['tmp_name'], $_POST['colorChoice'], $_GET["id"]);
     }
 
-    private function depotRendu(){
+    private function depotRendu()
+    {
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $idRendu = isset($_POST['idSaeDepotRendu']) ? $_POST['idSaeDepotRendu'] : exit("idRendu not set");
         $file = isset($_FILES['fileInputRendu']) ? $_FILES['fileInputRendu'] : exit("file not set");
         $fileName = $_FILES['fileInputRendu']['name'];
 
         $depotreussi = $this->model->uploadFileRendu($file, $idSae, $fileName, $idRendu);
-        header("Location: index.php?module=sae&action=details&id=".$idSae);
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
-    private function ajout(){
+    private function ajout()
+    {
         $idChamp = $_GET["idchamp"];
-        if (isset ($_POST["reponse".$idChamp])){
-            $reponse = $_POST["reponse".$idChamp];
+        if (isset($_POST["reponse" . $idChamp])) {
+            $reponse = $_POST["reponse" . $idChamp];
 
-            $this->model->ajoutChamp($idChamp,$_SESSION['idUtilisateur'],$reponse);
+            $this->model->ajoutChamp($idChamp, $_SESSION['idUtilisateur'], $reponse);
         }
-        header("Location: index.php?module=sae&action=details&id=".$_GET['id']);
+        header("Location: index.php?module=sae&action=details&id=" . $_GET['id']);
     }
 }

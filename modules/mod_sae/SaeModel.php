@@ -28,7 +28,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function uploadFichier($fileName, $fileInput, $color, $id) {
+    public function uploadFichier($fileName, $fileInput, $color, $id)
+    {
         $dossier = './files/';
 
         // Vérifiez ou créez le dossier
@@ -39,8 +40,8 @@ class SaeModel extends Connexion
             }
         }
 
-        if(file_exists($dossier . $fileName))
-            $fileName = "_".$fileName;
+        if (file_exists($dossier . $fileName))
+            $fileName = "_" . $fileName;
 
         // Déplacez le fichier téléchargé
         if (move_uploaded_file($fileInput['tmp_name'], $dossier . $fileName)) {
@@ -78,7 +79,8 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
-    public function ajoutChamp ($idChamp, $idEleve, $reponse) {
+    public function ajoutChamp($idChamp, $idEleve, $reponse)
+    {
         $req = "INSERT INTO reponsesChamp (idChamp, idEleve, reponse) VALUES (:idChamp, :idEleve, :reponse)";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue("idChamp", $idChamp);
@@ -107,7 +109,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function getRenduEleve($idRendu, $idSae){
+    public function getRenduEleve($idRendu, $idSae)
+    {
         $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
         $req = "
                 SELECT RenduGroupe.idRendu, RenduGroupe.dateDepot, RenduGroupe.fichier
@@ -121,8 +124,9 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function didGroupDropRendu($idRendu, $idSae){
-        return count($this->getRenduEleve($idRendu, $idSae))!=0;
+    public function didGroupDropRendu($idRendu, $idSae)
+    {
+        return count($this->getRenduEleve($idRendu, $idSae)) != 0;
     }
 
     function getSoutenanceBySAE($idSAE)
@@ -146,7 +150,7 @@ class SaeModel extends Connexion
                 WHERE g.idSAE = :idSAE AND Personne.idPersonne = :idPersonne";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":idPersonne", 1);
+        $pdo_req->bindValue(":idPersonne", $_SESSION['idUtilisateur']);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
@@ -225,9 +229,10 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    function uploadFileRendu($file, $idSae, $fileName, $idRendu){
+    function uploadFileRendu($file, $idSae, $fileName, $idRendu)
+    {
         $newFileName = $this->uploadFichier($fileName, $file, "none", $idSae);
-        if($newFileName){
+        if ($newFileName) {
             $idGroupe = $this->getMyGroupId($idSae);
             $req = "INSERT INTO RenduGroupe VALUES (:idRendu, :idGroupe, :fichier, :dateDepot)";
 
