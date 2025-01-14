@@ -96,6 +96,6 @@ class SaeController
 
             $this->model->ajoutChamp($idChamp,1,$reponse);
         }
-        $this->initDetails();
+        header("Location: index.php?module=sae&action=details&id=".$_GET['id']);
     }
 }
