@@ -20,6 +20,8 @@ class ConnexionModel extends Connexion {
         if($result && password_verify($_POST['password'],$result['password'])&&protectionCSRF::validerToken($_POST['token_csrf'])){
             $_SESSION['loginUtilisateur'] = $result['login'];
             $_SESSION['idUtilisateur'] = $result['idPersonne'];
+            $_SESSION['estProfUtilisateur'] = $result['estProf'];
+
 
             return true;
         } else{
