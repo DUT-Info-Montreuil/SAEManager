@@ -94,7 +94,7 @@ class SaeController
         if (isset ($_POST["reponse".$idChamp])){
             $reponse = $_POST["reponse".$idChamp];
 
-            $this->model->ajoutChamp($idChamp,1,$reponse);
+            $this->model->ajoutChamp($idChamp,$_SESSION['idUtilisateur'],$reponse);
         }
         header("Location: index.php?module=sae&action=details&id=".$_GET['id']);
     }

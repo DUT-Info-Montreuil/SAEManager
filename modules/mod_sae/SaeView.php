@@ -101,7 +101,7 @@ HTML;
                 echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId));
             }
         } else {
-            echo $this->lineChamp("default","");
+            echo $this->lineChamp("default","", "");
         }
         echo <<<HTML
             </div>
@@ -200,7 +200,7 @@ HTML;
         HTML;
         }
         
-        $area = '<label>Ce champ a déjà été rendu</label>';
+        $area = '<label class="text-success">Ce champ a déjà été rendu</label>';
         $input = '';
      
         if ($param){
