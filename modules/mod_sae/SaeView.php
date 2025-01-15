@@ -81,7 +81,9 @@ HTML;
         if ($_SESSION['estProfUtilisateur']) {
             echo <<<HTML
             <div class="d-flex">
-                <button class="btn btn-link btn-sm shadow-none p-0">Modifier le sujet</button>
+                <button class="btn btn-link btn-sm shadow-none p-0">Modifier le sujet </button>
+                <span> - </span>
+                <button class="btn btn-link btn-sm shadow-none p-0">Supprimer</button>
             </div>
 HTML;
         }
@@ -90,6 +92,9 @@ HTML;
         echo $this->popUpDepot("Rendu", $idSAE);
         echo $this->popUpDepot("Support", $idSAE);
         echo $this->popUpCreateRendu($idSAE);
+        echo $this->popUpModifierRendu($idSAE);
+        echo $this->popUpCreateSoutenance($idSAE);
+        echo $this->popUpModifierSoutenance($idSAE);
         echo <<<HTML
             </div>
 HTML;
@@ -237,7 +242,7 @@ HTML;
 
             echo <<<HTML
             <div class="p-3">
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3">Créer une soutenance</button>
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-soutenance">Créer une soutenance</button>
             </div>
 HTML;
         }
@@ -334,11 +339,9 @@ HTML;
         <div class="d-flex align-items-center bg-light rounded-3 shadow-sm mb-2 px-2">
             <span>$nom</span>
             <div class="ms-auto p-2 d-flex gap-2">
-            <form method="POST" action="index.php?module=sae&action=modifierRendu&id=$id">
-                <button type="submit" class="btn btn-secondary btn-sm">Modifier</button>
-            </form>
+            <button type="button" class="btn btn-secondary btn-sm modalModifierRendu$id" id="edit-rendu-btn" data-bs-toggle="modal">Modifier</button>
             <form method="POST" action="index.php?module=sae&action=supprimerRendu&id=$id">
-                <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+            <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
             </form>
             </div>
         </div>
@@ -385,8 +388,10 @@ HTML;
         <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
             <span>$titre</span>
             <div class="ms-auto d-flex gap-2">
-                <button class="btn btn-secondary btn-sm">Modifer</button>
-                <button class="btn btn-secondary btn-sm">Supprimer</button>
+            <button class="btn btn-secondary btn-sm modalModifierSoutenance$idSoutenance" id="edit-soutenance-btn">Modifier</button>
+            <form method="POST" action="index.php?module=sae&action=supprimerSoutenance&id=$idSoutenance">
+                <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+            </form>
             </div>
         </div>
         HTML;
@@ -657,6 +662,7 @@ HTML;
         </div>
 HTML;
     }
+
     function popUpCreateRendu($idSae)
     {
         return <<<HTML
@@ -678,9 +684,130 @@ HTML;
                             <div class="form-group mb-3">
                                 <input type="time" class="form-control" name="heureLimiteRendu" id="heureLimiteRendu" required>
                             </div>
+                            <div class="form-group mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" name="renduNote" id="renduNote">
+                                <label class="form-check-label" for="renduNote">Rendu noté</label>
+                            </div>
+                            <div class="form-group mb-3" id="coeffInput" style="display: none;">
+                                <input type="number" class="form-control" name="coeff" id="coeff" placeholder="Coefficient" min="1" max="10">
+                            </div>
                             <div>
                                 <button type="submit" class="btn btn-success m-3">Valider</button>
                                 <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-rendu-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    HTML;
+    }
+    
+    function popUpCreateSoutenance($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateSoutenance">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer une soutenance</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createSoutenance&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreSoutenance" id="titreSoutenance" placeholder="Titre de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="salleSoutenance" id="salleSoutenance" placeholder="Salle de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateSoutenance" id="dateSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureSoutenance" id="heureSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="number" class="form-control" name="dureeSoutenance" id="dureeSoutenance" placeholder="Durée (en minutes)" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-soutenance-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpModifierSoutenance($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierSoutenance">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Modifier la soutenance</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierSoutenance&id=$idSae" method="POST">
+                        <input type="hidden" id="idSoutenanceAModifier" name="idSoutenanceAModifier" value="">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreSoutenance" id="titreSoutenance" placeholder="Titre de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="salleSoutenance" id="salleSoutenance" placeholder="Salle de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateSoutenance" id="dateSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureSoutenance" id="heureSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="number" class="form-control" name="dureeSoutenance" id="dureeSoutenance" placeholder="Durée (en minutes)" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-soutenance-edit-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpModifierRendu($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierRendu">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Modifier le rendu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierRendu&id=$idSae" method="POST">
+                    <input type="hidden" id="idRenduAModifier" name="idRenduAModifier" value="">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreRendu" id="titreRendu" placeholder="Titre du rendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateLimiteRendu" id="dateLimiteRendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureLimiteRendu" id="heureLimiteRendu" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-rendu-edit-cancel">Annuler</button>
                             </div>
                         </div>
                     </form>
@@ -691,7 +818,7 @@ HTML;
     }
 
 
-    // A continuer lorsque la page "Cloud" des SAE sera réalisé.
+    // A continuer lorsque laidRendu page "Cloud" des SAE sera réalisé.
     function ajouterFichierCloud($idSae)
     {
         return <<<HTML

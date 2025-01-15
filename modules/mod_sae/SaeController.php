@@ -50,6 +50,18 @@ class SaeController
             case "supprimerRessource":
                 $this->delRessource();
                 break;
+            case "modifierRendu":
+                $this->updateRendu();
+                break;
+            case "createSoutenance":
+                $this->createSoutenance();
+                break;
+            case "supprimerSoutenance":
+                $this->delSoutenance();
+                break;
+            case "modifierSoutenance":
+                $this->updateSoutenance();
+                break;
         }
     }
 
@@ -150,8 +162,10 @@ class SaeController
         $idSae = $_GET['id'];
         $titre = $_POST['titreRendu'];
         $dateLimite = $_POST['dateLimiteRendu'];
+        $estNote = $_POST['renduNote'];
+        $coeff = $_POST['coeff'];
 
-        $this->model->createRendu($titre, $dateLimite, $idSae);
+        $this->model->createRendu($titre, $dateLimite, $idSae, $estNote, $coeff);
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
@@ -171,4 +185,45 @@ class SaeController
         $this->model->delRessourceSAE($idSAE, $idRessource);
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
+
+
+    private function updateRendu() {
+        $titre = $_POST['titreRendu'];
+        $dateLimite = $_POST['dateLimiteRendu'];
+        $idRendu = $_POST['idRenduAModifier'];
+
+        $this->model->updateRendu($idRendu, $titre, $dateLimite);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function createSoutenance() {
+        $idSAE = $_GET['id'];
+        $titre = $_POST['titreSoutenance'];
+        $date = $_POST['dateSoutenance'];
+        $duree = $_POST['dureeSoutenance'];
+        $salle = $_POST['salleSoutenance'];
+        
+        $this->model->createSoutenance($titre, $date, $salle, $duree, $idSAE);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function delSoutenance() {
+        $idSoutenance = $_GET['id'];
+
+        $this->model->delSoutenance($idSoutenance);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function updateSoutenance() {
+        $idSoutenance = $_POST['idSoutenanceAModifier'];
+        $titre = $_POST['titreSoutenance'];
+        $date = $_POST['dateSoutenance'];
+        $duree = $_POST['dureeSoutenance'];
+        $salle = $_POST['salleSoutenance'];
+
+        $this->model->updateSoutenance($idSoutenance, $titre, $date, $salle, $duree);
+        var_dump($_POST);
+        //header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
 }

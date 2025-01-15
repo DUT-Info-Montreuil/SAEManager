@@ -260,12 +260,24 @@ class SaeModel extends Connexion
 
     // POST
 
-    function createRendu($titre, $date, $idSAE)
+    function createRendu($titre, $date, $idSAE, $estNote)
     {
         $req = "INSERT INTO Rendu (nom, dateLimite, idSAE, idEvaluation) VALUES (:titreRendu, :dateLimite, :idSAE, 1)";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":titreRendu", $titre);
         $pdo_req->bindValue(":dateLimite", $date);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+    }
+
+    function createSoutenance($titre, $date, $salle, $duree, $idSAE)
+    {
+        $req = "INSERT INTO Soutenance (dureeMinutes, titre, date, salle, idSAE, idEvaluation) VALUES (:dureeMinutes, :titre, :date, :salle, :idSAE, NULL)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":dureeMinutes", $duree);
+        $pdo_req->bindValue(":titre", $titre);
+        $pdo_req->bindValue(":date", $date);
+        $pdo_req->bindValue(":salle", $salle);
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->execute();
     }
@@ -288,4 +300,39 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idRessource", $idRessource);
         $pdo_req->execute();
     }
+
+    function delSoutenance($idSoutenance)
+    {
+        $req = "DELETE FROM Soutenance WHERE idSoutenance = :idSou";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSou", $idSoutenance);
+        $pdo_req->execute();
+    }
+
+
+    // PUT
+
+    function updateRendu($idRendu, $titre, $date)
+    {
+        $req = "UPDATE Rendu SET nom = :titreRendu, dateLimite = :dateLimite WHERE idRendu = :idRendu";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":titreRendu", $titre);
+        $pdo_req->bindValue(":dateLimite", $date);
+        $pdo_req->bindValue(":idRendu", $idRendu);
+        $pdo_req->execute();
+    }
+    
+
+    function updateSoutenance($idSoutenance, $duree, $titre, $salle, $date) {
+        $req = "UPDATE Soutenance SET dureeMinutes = :dureeMinutes, titre = :titre, salle = :salle, date = :date WHERE idSoutenance = :idSoutenance";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":dureeMinutes", $duree);
+        $pdo_req->bindValue(":titre", $titre);
+        $pdo_req->bindValue(":salle", $salle);
+        $pdo_req->bindValue(":date", $date);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->execute();
+    }
+
+    
 }

@@ -85,3 +85,86 @@ createRenduBtn.addEventListener("click", function () {
       document.querySelector("#modalCreateRendu").classList.remove("d-block");
     });
 });
+
+const editRenduBtn = document.querySelectorAll("#edit-rendu-btn");
+
+editRenduBtn.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      document.querySelector("#modalModifierRendu").classList.add("d-block");
+      const matches = btn.className.match(/modalModifierRendu(\d+)/);
+      document.getElementById("idRenduAModifier").value = matches[1];
+      document
+        .querySelector("#modal-rendu-edit-cancel")
+        .addEventListener("click", function () {
+              
+              document.querySelector("#modalModifierRendu").classList.remove("d-block");
+          
+        });
+    });
+});
+
+// Ajout coeff
+
+document.addEventListener("DOMContentLoaded", () => {
+  const checkBox = document.getElementById("renduNote");
+  const coeffInput = document.getElementById("coeffInput");
+  const form = document.getElementById("formCreateRendu");
+
+  checkBox.addEventListener("change", () => {
+      if (checkBox.checked) {
+          coeffInput.style.display = "block";
+          document.getElementById("coeff").required = true;
+      } else {
+          coeffInput.style.display = "none";
+          document.getElementById("coeff").required = false;
+      }
+  });
+
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      const coeff = document.getElementById("coeff").value;
+      if (checkBox.checked && (coeff === "" || coeff <= 0)) {
+          alert("Veuillez remplir le coefficient pour un rendu noté.");
+          event.preventDefault();
+      }
+  });
+  }
+
+  
+});
+
+
+// soutenance
+
+const createSupportBtn = document.querySelector("#create-soutenance");
+
+createSupportBtn.addEventListener("click", function () {
+  document.querySelector("#modalCreateSoutenance").classList.add("d-block");
+
+  document
+    .querySelector("#modal-soutenance-cancel")
+    .addEventListener("click", function () {
+      document.querySelector("#modalCreateSoutenance").classList.remove("d-block");
+    });
+}
+);
+
+
+const editSoutenanceBtn = document.querySelectorAll("#edit-soutenance-btn");
+
+editSoutenanceBtn.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      document.querySelector("#modalModifierSoutenance").classList.add("d-block");
+      const matches = btn.className.match(/modalModifierSoutenance(\d+)/);
+      document.getElementById("idRenduAModifier").value = matches[1];
+      document
+        .querySelector("#modal-soutenance-edit-cancel")
+        .addEventListener("click", function () {
+              
+              document.querySelector("#modalModifierSoutenance").classList.remove("d-block");
+          
+        });
+    });
+});
+
+
