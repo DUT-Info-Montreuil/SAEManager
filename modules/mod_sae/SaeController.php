@@ -30,14 +30,17 @@ class SaeController
             case "note":
                 $this->initNote();
                 break;
-            case "ajout_champ":
-                $this->ajout();
+            case "input_champ":
+                $this->inputChamp();
                 break;
             case "uploadFichier":
                 $this->uploadFichier();
                 break;
             case "ajoutDepotRendu":
                 $this->depotRendu();
+                break;
+            case "ajoutProf":
+                $this->ajoutProf();
                 break;
             case "ajoutDepotSupport":
                 break;
@@ -73,8 +76,9 @@ class SaeController
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
+            $profs = $this->model->getProfsBySAE($_GET['id']);
 
-            $this->view->initSaeDetails($saes, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer);
+            $this->view->initSaeDetails($profs, $saes, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer);
         } else {
             header('Location: index.php');
         }
@@ -125,7 +129,7 @@ class SaeController
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
-    private function ajout()
+    private function inputChamp()
     {
         $idChamp = $_GET["idchamp"];
         if (isset($_POST["reponse" . $idChamp])) {
@@ -134,5 +138,19 @@ class SaeController
             $this->model->ajoutChamp($idChamp, $_SESSION['idUtilisateur'], $reponse);
         }
         header("Location: index.php?module=sae&action=details&id=" . $_GET['id']);
+    }
+
+    private function ajoutProf(){
+        $idProf = $_POST['idPers'];
+        $idSAE = $_GET['id'];
+        var_dump($idProf);
+        var_dump($_POST['poste']);  
+        if ($_POST['poste'] == 'inter'){
+            $this->model->ajoutIntervenant($idSAE, $idProf);
+        }
+        else {
+            $this->model->ajoutCResponsables($idSAE, $idProf);
+        }
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }

@@ -58,8 +58,8 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer)
-    {
+    function initSaeDetails($profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer)
+    {   
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
         $sujet = htmlspecialchars($sae[0]['sujet']);
@@ -85,7 +85,9 @@ HTML;
         echo <<<HTML
             </div>
 HTML;
-
+        if ($_SESSION['estProfUtilisateur']) {
+            echo $this->initAjoutProf($profs, $idSAE);
+        }
         // Champs
         echo <<<HTML
         <!-- Champ(s) -->
@@ -101,10 +103,10 @@ HTML;
         if (!empty($champs)) {
             foreach ($champs as $c) {
                 $nomChamps = htmlspecialchars($c['nomchamp']);
-                echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId));
+                echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId), $idSAE);
             }
         } else {
-            echo $this->lineChamp("default","", "");
+            echo $this->lineChamp("default","", "", "");
         }
         echo <<<HTML
             </div>
@@ -203,7 +205,27 @@ HTML;
 HTML;
     }
 
-    function lineChamp($nomChamp, $idChamps, $param)
+    function initAjoutProf($noms, $idSAE) {
+        $html = '<form method="POST" action="index.php?module=sae&action=ajoutProf&id=1">
+        <label for="nom">Ajouter un professeur à la SAE : </label>';
+        $html .= '<select name="idPers">';
+        foreach ($noms as $row) {
+            $id = htmlspecialchars($row['idPersonne']);
+            $nom = htmlspecialchars($row['nom']);
+            $prenom = htmlspecialchars($row['prenom']);
+            $html .= "<option value=\"$id\">$nom $prenom</option>";
+        }
+        $html .= '</select>';
+        $html .= '<select name="poste">
+        <option value="resp">CoResponsable</option>
+        <option value="inter">Intervenant</option>
+        </select>';
+        $html .= '<button type="submit">Valider</button>
+        </form>';
+        return $html;
+    }
+
+    function lineChamp($nomChamp, $idChamps, $param, $idSAE)
     {
 
         if ($nomChamp == "default") {
@@ -223,7 +245,7 @@ HTML;
         }
 
         return <<<HTML
-            <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=ajout_champ&id=1&idchamp=$idChamps">
+            <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=input_champ&id=$idSAE&idchamp=$idChamps">
                 <div class="d-flex flex-column">
                     <span>$nomChamp</span> 
                     $area
@@ -353,7 +375,7 @@ HTML;
                     <svg class="me-2" width="25" height="25">
                         <use xlink:href="#arrow-icon"></use>
                     </svg>
-                    Responsable(s) et intervetant(e)
+                    Responsable(s) et intervenant(e)
                 </h3>
                 <div class="d-flex flex-wrap">
 HTML;
@@ -366,7 +388,7 @@ HTML;
                 </div>
             </div>
 
-            <!-- MESSAGE -->
+            <!-- MESSA E -->
             <div class="mb-5">
                 <h3 class="d-flex align-items-center">
                     <svg class="me-2" width="25" height="25">

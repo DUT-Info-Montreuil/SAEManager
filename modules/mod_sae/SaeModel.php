@@ -181,7 +181,17 @@ class SaeModel extends Connexion
         $req = "SELECT p.idPersonne, p.nom, p.prenom
                 FROM Personne p
                 INNER JOIN SAE ON p.idPersonne = SAE.idResponsable
-                WHERE SAE.idSAE = :idSAE";
+                WHERE SAE.idSAE = :idSAE
+                UNION
+                SELECT p.idPersonne, p.nom, p.prenom
+                FROM Personne p
+                INNER JOIN IntervenantSAE ON p.idPersonne = IntervenantSAE.idIntervenant
+                WHERE IntervenantSAE.idSAE = :idSAE
+                UNION
+                SELECT p.idPersonne, p.nom, p.prenom
+                FROM Personne p
+                INNER JOIN ResponsablesSAE ON p.idPersonne = ResponsablesSAE.idResp
+                WHERE ResponsablesSAE.idSAE = :idSAE";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->execute();
@@ -256,5 +266,53 @@ class SaeModel extends Connexion
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->execute();
         return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
+    }
+
+    public function getProfsBySAE($idSAE){
+        $req = "SELECT idPersonne, prenom, nom
+                FROM Personne
+                WHERE estProf = 1
+                AND idPersonne not in (
+                                        SELECT idResp
+                                        FROM ResponsablesSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idIntervenant
+                                        FROM IntervenantSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idResponsable
+                                        FROM SAE
+                                        WHERE idSAE = :idSAE)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function ajoutIntervenant($idSAE, $idIntervenant)
+    {
+        $req = "INSERT INTO IntervenantSAE (idSAE, idIntervenant) VALUES (:idSAE, :idIntervenant)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idIntervenant", $idIntervenant);
+        $pdo_req->execute();
+        if ($pdo_req->rowCount() == 0)
+            return false;
+        else
+            return true;
+    }
+
+    public function ajoutCResponsables($idSAE, $idResp)
+    {
+        $req = "INSERT INTO ResponsablesSAE (idSAE, idResp) VALUES (:idSAE, :idResp)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idResp", $idResp);
+        $pdo_req->execute();
+        if ($pdo_req->rowCount() == 0)
+            return false;
+        else
+            return true;
     }
 }
