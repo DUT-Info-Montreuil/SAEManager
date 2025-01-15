@@ -32,6 +32,84 @@ class SAEModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
+    function uploadFileRendu($file, $idSae, $fileName, $idRendu){
+        $newFileName = $this->uploadFichier($fileName, $file, "none");
+        if($newFileName){
+            $idGroupe = $this->getMyGroupId($idSae);
+            $req = "INSERT INTO RenduGroupe VALUES (:idRendu, :idGroupe, :fichier, :dateDepot)";
+
+            $currentDateTime = date('Y-m-d H:i:s');
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idRendu", $idRendu);
+            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
+            $pdo_req->bindValue(":fichier", $newFileName);
+            $pdo_req->bindValue(":dateDepot", $currentDateTime);
+            $pdo_req->execute();
+            return true;
+        }
+        return false;
+    }
+
+    function uploadFileSupport($file, $idSoutenance, $fileName, $idSae){
+        $newFileName = $this->uploadFichier($fileName, $file, "none");
+        if($newFileName){
+            $idGroupe = $this->getMyGroupId($idSae);
+            $req = "INSERT INTO SupportSoutenance VALUES (:idSoutenance, :idGroupe, :fichier)";
+
+            $currentDateTime = date('Y-m-d H:i:s');
+            var_dump($idGroupe);
+            var_dump($idSoutenance);
+            var_dump($fileName);
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
+            $pdo_req->bindValue(":fichier", $fileName);
+            $pdo_req->execute();
+            return true;
+        }
+        return false;
+    }
+
+    public function uploadFichier($fileName, $fileInput, $color) {
+        $dossier = './files/';
+
+        // Vérifiez ou créez le dossier
+        if (!file_exists($dossier)) {
+            if (!mkdir($dossier, 0777, false)) {
+                echo "Impossible de créer le dossier : $dossier";
+                return false;
+            }
+        }
+
+        if(file_exists($dossier . $fileName))
+            $fileName = "_".$fileName;
+    
+        // Déplacez le fichier téléchargé
+        if (move_uploaded_file($fileInput['tmp_name'], $dossier . $fileName)) {
+            echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' !<br>";
+            echo "Nom entré par l'utilisateur : '$fileName'<br>";
+            echo "Couleur choisie : '$color'<br>";
+            return $fileName;
+        } else {
+            echo "Erreur lors du déplacement du fichier.";
+            return false;
+        }
+    }
+
+    public function deleteFichier($fileName){
+        $dossier = './files/';
+
+            if (!file_exists($dossier)) 
+                if (!mkdir($dossier, 0777, false)) {
+                    echo "Impossible de créer le dossier : $dossier";
+                    return false;
+                }
+            if(file_exists($dossier.$fileName))
+                return unlink($dossier.$fileName);
+        return false;
+    }
+
     public function getChampBySAE($idSAE)
     {
         $req = "SELECT nomchamp, idChamps
@@ -71,7 +149,7 @@ class SAEModel extends Connexion
     {
 
         $req = "
-                SELECT Rendu.nom, Rendu.dateLimite
+                SELECT Rendu.nom, Rendu.dateLimite, Rendu.idRendu
                 FROM Rendu
                 INNER JOIN SAE ON SAE.idSAE = Rendu.idSAE
                 WHERE SAE.idSAE = :idSAE
@@ -84,7 +162,7 @@ class SAEModel extends Connexion
 
     function getSoutenanceBySAE($idSAE)
     {
-        $req = "SELECT Soutenance.titre, Soutenance.date, Soutenance.salle
+        $req = "SELECT Soutenance.idSoutenance, Soutenance.titre, Soutenance.date, Soutenance.salle
                 FROM Soutenance
                 INNER JOIN SAE ON SAE.idSAE = Soutenance.idSAE
                 WHERE SAE.idSAE = :idSAE";
@@ -106,7 +184,7 @@ class SAEModel extends Connexion
                 WHERE g.idSAE = :idSAE AND Personne.idPersonne = :idPersonne";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":idPersonne", 1);
+        $pdo_req->bindValue(":idPersonne", $_SESSION['idUtilisateur']);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
@@ -199,4 +277,74 @@ class SAEModel extends Connexion
 		else 
 			return true;
 	}
+
+    public function getRenduEleve($idRendu, $idSae){
+        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
+        $req = "
+                SELECT RenduGroupe.idRendu, RenduGroupe.dateDepot, RenduGroupe.fichier
+                FROM RenduGroupe
+                WHERE idRendu = :idRendu AND idGroupe = :idGroupe
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idRendu", $idRendu);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function getSupportEleve($idSoutenance, $idSae){
+        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
+        $req = "
+                SELECT SupportSoutenance.idSoutenance, SupportSoutenance.idGroupe, SupportSoutenance.support
+                FROM SupportSoutenance
+                WHERE idSoutenance = :idSoutenance AND idGroupe = :idGroupe
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function suprimmerDepotGroupeRendu($idDepot, $idGroupe){
+        $idSae = $this->getSAEById($_SESSION['idUtilisateur'])[0]['idSAE'];
+        $rendu = $this->getRenduEleve($idDepot, $idSae);
+        $fileName = $rendu[0]['fichier'];
+        $req = "
+                DELETE FROM RenduGroupe
+                WHERE RenduGroupe.idRendu = :idRendu AND RenduGroupe.idGroupe = :idGroupe        
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idRendu", $idDepot);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        if($pdo_req->execute()){
+            return $this->deleteFichier($fileName);
+        }
+        return false;
+    }
+    
+    public function suprimmerDepotGroupeSupport($idDepot, $idGroupe){
+        $idSae = $this->getSAEById($_SESSION['idUtilisateur'])[0]['idSAE'];
+        $support = $this->getSupportEleve($idDepot, $idSae);
+        $fileName = $support[0]['support'];
+        $req = "
+                DELETE FROM SupportSoutenance
+                WHERE SupportSoutenance.idSoutenance = :idSoutenance AND SupportSoutenance.idGroupe = :idGroupe        
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idDepot);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        if($pdo_req->execute()){
+            return $this->deleteFichier($fileName);
+        }
+        return false;
+    }
+
+    public function didGroupDropRendu($idRendu, $idSae){
+        return count($this->getRenduEleve($idRendu, $idSae))!=0;
+    }
+
+    public function didGroupeDropSupport($idSoutenance, $idSae){
+        return count($this->getSupportEleve($idSoutenance, $idSae))!=0;
+    }
 }

@@ -29,6 +29,7 @@ class HomeView extends GenericView
                 <h1 class="fw-bold">ACCUEIL</h1>
                 <div class="card shadow bg-white rounded w-100 h-75">
                     <div class="d-flex w-100 h-75 justify-content-center m-auto">
+                        {$this->cardSAE()}
                         {$this->cardRendus()}
                     </div>
                     
