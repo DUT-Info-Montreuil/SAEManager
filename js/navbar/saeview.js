@@ -167,4 +167,18 @@ editSoutenanceBtn.forEach((btn) => {
     });
 });
 
+// Champ
+
+const createChampBtn = document.querySelector("#create-champ");
+
+createChampBtn.addEventListener("click", function () {
+  document.querySelector("#modalCreateChamp").classList.add("d-block");
+
+  document
+    .querySelector("#modal-champ-cancel")
+    .addEventListener("click", function () {
+      document.querySelector("#modalCreateChamp").classList.remove("d-block");
+    });
+}
+);
 

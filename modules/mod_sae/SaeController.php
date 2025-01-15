@@ -62,6 +62,9 @@ class SaeController
             case "modifierSoutenance":
                 $this->updateSoutenance();
                 break;
+            case "createChamp":
+                $this->createChamp();
+                break;
         }
     }
 
@@ -224,6 +227,14 @@ class SaeController
         $this->model->updateSoutenance($idSoutenance, $titre, $date, $salle, $duree);
         var_dump($_POST);
         //header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function createChamp() {
+        $idSae = $_GET['id'];
+        $nom = $_POST['nomChamp'];
+
+        $this->model->createChamp($idSae, $nom);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
 }

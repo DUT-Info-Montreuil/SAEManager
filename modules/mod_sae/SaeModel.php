@@ -282,6 +282,15 @@ class SaeModel extends Connexion
         $pdo_req->execute();
     }
 
+    function createChamp($idSAE, $nomChamp)
+    {
+        $req = "INSERT INTO Champs (nomChamp, idSAE) VALUES (:nomChamp, :idSAE)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":nomChamp", $nomChamp);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+    }
+
     // DEL
 
     function delRendu($idRendu)

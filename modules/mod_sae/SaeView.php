@@ -95,6 +95,7 @@ HTML;
         echo $this->popUpModifierRendu($idSAE);
         echo $this->popUpCreateSoutenance($idSAE);
         echo $this->popUpModifierSoutenance($idSAE);
+        echo $this->popUpCreateChamp($idSAE);
         echo <<<HTML
             </div>
 HTML;
@@ -124,7 +125,7 @@ HTML;
 
             echo <<<HTML
             <div class=" p-3">
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3">Ajouter un champ</button>
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-champ">Ajouter un champ</button>
             </div>
 HTML;
         }
@@ -701,6 +702,33 @@ HTML;
             </div>
         </div>
 
+    HTML;
+    }
+
+    function popUpCreateChamp($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateChamp">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer un champ</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createChamp&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="nomChamp" id="nomChamp" placeholder="Nom du champ" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-champ-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     HTML;
     }
     
