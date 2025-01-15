@@ -44,6 +44,22 @@ class SaeController
                 break;
             case "ajoutDepotSupport":
                 break;
+            case "uploadFichier":
+                $this->uploadFichier();
+                break;
+            case "ajoutDepotRendu":
+                $this->depotRendu();
+                break;
+            case "ajoutDepotSupport":
+                $this->depotSupport();
+                break;    
+            case "suprimmerDepotGroupeRendu":
+                $this->suprimmerDepotRenduGroupe();
+                break;
+            case "suprimmerDepotGroupeSupport":
+                $this->suprimmerDepotSupportGroupe();
+                break;
+
         }
     }
 
@@ -67,7 +83,7 @@ class SaeController
             $saes = $this->model->getSaeById($_GET['id']);
             $ressource = $this->model->getRessourceBySAE($_GET['id']);
             $rendus = $this->model->getRenduBySae($_GET['id']);
-            $soutenance = $this->model->getSoutenanceBySae($_GET['id']);
+            $soutenances = $this->model->getSoutenanceBySae($_GET['id']);
             $champs = $this->model->getChampBySae($_GET['id']);
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
             $rendusDeposer = [];
@@ -76,9 +92,20 @@ class SaeController
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
+                if($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])){
+                    $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
+                    $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
+                }
+            $supportsDeposer = [];
+            foreach($soutenances as $soutenance){
+                if($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))){
+                    $supportGroup = $this->model->getSupportEleve($soutenance['idSoutenance'], $saes[0]['idSAE']);
+                    $supportsDeposer[htmlspecialchars($supportGroup[0]['idSoutenance'])] = $supportGroup[0]['support'];
+                }
+            }
             $profs = $this->model->getProfsBySAE($_GET['id']);
 
-            $this->view->initSaeDetails($profs, $saes, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer);
+            $this->view->initSaeDetails($profs,$saes ,$champs ,$repId , $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer);
         } else {
             header('Location: index.php');
         }
@@ -150,5 +177,34 @@ class SaeController
             $this->model->ajoutCResponsables($idSAE, $idProf);
         }
         header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function depotSupport(){
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $idSoutenance = isset($_POST['idSaeDepotSupport']) ? $_POST['idSaeDepotSupport'] : exit("idSupport not set");
+        $file = isset($_FILES['fileInputSupport']) ? $_FILES['fileInputSupport'] : exit("file not set");
+        $fileName = $_FILES['fileInputSupport']['name'];
+        
+        $depotreussi = $this->model->uploadFileSupport($file, $idSoutenance, $fileName, $idSae);
+        header("Location: index.php?module=sae&action=details&id=".$idSae);
+
+    }
+
+    private function suprimmerDepotRenduGroupe(){
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
+        $idDepot = isset($_POST['idDepotSupressionRendu']) ? $_POST['idDepotSupressionRendu'] : exit("idDepot not set");
+
+        $this->model->suprimmerDepotGroupeRendu($idDepot, $idGroupe);
+        header("Location: index.php?module=sae&action=details&id=".$idSae);
+    }
+
+    private function suprimmerDepotSupportGroupe(){
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
+        $idDepot = isset($_POST['idDepotSupressionSupport']) ? $_POST['idDepotSupressionSupport'] : exit("idSupport not set");
+
+        $this->model->suprimmerDepotGroupeSupport($idDepot, $idGroupe);
+        header("Location: index.php?module=sae&action=details&id=".$idSae);
     }
 }

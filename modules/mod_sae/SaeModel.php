@@ -28,8 +28,46 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function uploadFichier($fileName, $fileInput, $color, $id)
-    {
+    function uploadFileRendu($file, $idSae, $fileName, $idRendu){
+        $newFileName = $this->uploadFichier($fileName, $file, "none");
+        if($newFileName){
+            $idGroupe = $this->getMyGroupId($idSae);
+            $req = "INSERT INTO RenduGroupe VALUES (:idRendu, :idGroupe, :fichier, :dateDepot)";
+
+            $currentDateTime = date('Y-m-d H:i:s');
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idRendu", $idRendu);
+            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
+            $pdo_req->bindValue(":fichier", $newFileName);
+            $pdo_req->bindValue(":dateDepot", $currentDateTime);
+            $pdo_req->execute();
+            return true;
+        }
+        return false;
+    }
+
+    function uploadFileSupport($file, $idSoutenance, $fileName, $idSae){
+        $newFileName = $this->uploadFichier($fileName, $file, "none");
+        if($newFileName){
+            $idGroupe = $this->getMyGroupId($idSae);
+            $req = "INSERT INTO SupportSoutenance VALUES (:idSoutenance, :idGroupe, :fichier)";
+
+            $currentDateTime = date('Y-m-d H:i:s');
+            var_dump($idGroupe);
+            var_dump($idSoutenance);
+            var_dump($fileName);
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
+            $pdo_req->bindValue(":fichier", $fileName);
+            $pdo_req->execute();
+            return true;
+        }
+        return false;
+    }
+
+    public function uploadFichier($fileName, $fileInput, $color) {
         $dossier = './files/';
 
         // Vérifiez ou créez le dossier
@@ -40,9 +78,9 @@ class SaeModel extends Connexion
             }
         }
 
-        if (file_exists($dossier . $fileName))
-            $fileName = "_" . $fileName;
-
+        if(file_exists($dossier . $fileName))
+            $fileName = "_".$fileName;
+    
         // Déplacez le fichier téléchargé
         if (move_uploaded_file($fileInput['tmp_name'], $dossier . $fileName)) {
             echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' !<br>";
@@ -53,6 +91,19 @@ class SaeModel extends Connexion
             echo "Erreur lors du déplacement du fichier.";
             return false;
         }
+    }
+
+    public function deleteFichier($fileName){
+        $dossier = './files/';
+
+            if (!file_exists($dossier)) 
+                if (!mkdir($dossier, 0777, false)) {
+                    echo "Impossible de créer le dossier : $dossier";
+                    return false;
+                }
+            if(file_exists($dossier.$fileName))
+                return unlink($dossier.$fileName);
+        return false;
     }
 
 
@@ -93,12 +144,11 @@ class SaeModel extends Connexion
             return true;
     }
 
-
     public function getRenduBySAE($idSAE)
     {
 
         $req = "
-                SELECT Rendu.idRendu, Rendu.nom, Rendu.dateLimite
+                SELECT Rendu.nom, Rendu.dateLimite, Rendu.idRendu
                 FROM Rendu
                 INNER JOIN SAE ON SAE.idSAE = Rendu.idSAE
                 WHERE SAE.idSAE = :idSAE
@@ -239,80 +289,7 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    function uploadFileRendu($file, $idSae, $fileName, $idRendu)
-    {
-        $newFileName = $this->uploadFichier($fileName, $file, "none", $idSae);
-        if ($newFileName) {
-            $idGroupe = $this->getMyGroupId($idSae);
-            $req = "INSERT INTO RenduGroupe VALUES (:idRendu, :idGroupe, :fichier, :dateDepot)";
+    // POST
 
-            $currentDateTime = date('Y-m-d H:i:s');
-
-            $pdo_req = self::$bdd->prepare($req);
-            $pdo_req->bindValue(":idRendu", $idRendu);
-            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
-            $pdo_req->bindValue(":fichier", $newFileName);
-            $pdo_req->bindValue(":dateDepot", $currentDateTime);
-            $pdo_req->execute();
-            return true;
-        }
-        return false;
-    }
-
-    public function getReponseIdBySAE($idChamp)
-    {
-        $req = "SELECT idChamp
-                FROM reponsesChamp";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->execute();
-        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
-    }
-
-    public function getProfsBySAE($idSAE){
-        $req = "SELECT idPersonne, prenom, nom
-                FROM Personne
-                WHERE estProf = 1
-                AND idPersonne not in (
-                                        SELECT idResp
-                                        FROM ResponsablesSAE
-                                        WHERE idSAE = :idSAE
-                                        UNION
-                                        SELECT idIntervenant
-                                        FROM IntervenantSAE
-                                        WHERE idSAE = :idSAE
-                                        UNION
-                                        SELECT idResponsable
-                                        FROM SAE
-                                        WHERE idSAE = :idSAE)";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->execute();
-        return $pdo_req->fetchAll();
-    }
-
-    public function ajoutIntervenant($idSAE, $idIntervenant)
-    {
-        $req = "INSERT INTO IntervenantSAE (idSAE, idIntervenant) VALUES (:idSAE, :idIntervenant)";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":idIntervenant", $idIntervenant);
-        $pdo_req->execute();
-        if ($pdo_req->rowCount() == 0)
-            return false;
-        else
-            return true;
-    }
-
-    public function ajoutCResponsables($idSAE, $idResp)
-    {
-        $req = "INSERT INTO ResponsablesSAE (idSAE, idResp) VALUES (:idSAE, :idResp)";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":idResp", $idResp);
-        $pdo_req->execute();
-        if ($pdo_req->rowCount() == 0)
-            return false;
-        else
-            return true;
-    }
+    
 }

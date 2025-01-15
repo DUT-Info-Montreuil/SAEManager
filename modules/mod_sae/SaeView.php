@@ -58,8 +58,8 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer)
-    {   
+    function initSaeDetails($profs,$sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer)
+    {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
         $sujet = htmlspecialchars($sae[0]['sujet']);
@@ -81,7 +81,10 @@ HTML;
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
         echo $this->popUpDepot("Rendu", $idSAE);
-        echo $this->popUpDepot("Support", $idSAE);
+        echo $this->popUpDepot("Support", $idSAE); 
+        echo $this->popUpSupressionDepot("Rendu", $idSAE);
+        echo $this->popUpSupressionDepot("Support", $idSAE);
+
         echo <<<HTML
             </div>
 HTML;
@@ -187,15 +190,21 @@ HTML;
 HTML;
         if (!empty($soutenance)) {
             foreach ($soutenance as $s) {
+                $id = htmlspecialchars($s['idSoutenance'] ?? "default");
                 $titre = htmlspecialchars($s['titre'] ?? "default");
                 $dateSoutenance = htmlspecialchars($s['date'] ?? "default");
                 $salle = htmlspecialchars($s['salle'] ?? "default");
+
                 $idSoutenance = htmlspecialchars($s['idSoutenance'] ?? "default");
                 echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance);
             }
         } else {
             echo $this->lineSoutenance("default", "default", "default", "default");
-        }
+
+                $supportDeposer = $supportsDeposer[$id] ?? false;
+                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $id, $supportDeposer);
+            }
+
         echo <<<HTML
                 </div>
             </div>
@@ -241,7 +250,7 @@ HTML;
 
         if ($param){
             $area = '<textarea name="reponse'.$idChamps.'" cols="100" class="zone-texte" placeholder="Ecrire ici..."></textarea>';
-            $input = '<input class="ms-auto text-decoration-none text-primary" text="envoyer" type="submit"/>';
+            $input = '<input class="ms-auto btn btn-primary text-decoration-none" text="envoyer" type="submit"/>';
         }
 
         return <<<HTML
@@ -249,8 +258,8 @@ HTML;
                 <div class="d-flex flex-column">
                     <span>$nomChamp</span> 
                     $area
+                    $input
                 </div>
-                $input
             </form>
 
         HTML;
@@ -289,31 +298,34 @@ HTML;
         if($renduDeposer){
             $color = "success";
             $phrase = "Déposer le : ";
+            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressRenduButton-'.$id.'">Suprimmer le rendu déposer</a>';
+
         }
         else{
             $color = "danger";
             $phrase = "A déposer avant le : ";
+            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendudrop-'.$id.'">Déposer le rendu</a>';
         }
 
-
         return <<<HTML
-
-        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
                 <div class="d-flex align-items-center">
                     <p class="mb-0">$nom</p>
                 </div>
                 <div class="text-end">
                 <p class="text-$color mb-0">$phrase $dateLimite</p>
-                    <a href="#" class="text-primary text-decoration-none fw-bold rendudrop-$id">Déposer le rendu</a>
+                    <div class="d-flex flex-column">
+                        $depotousupression
+                    </div>
                 </div>
             </div>
 
         HTML;
     }
 
-    function lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance)
+    function lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance, $supportsDeposer)
     {
-
+            
         if ($titre == "default") {
             return <<<HTML
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
@@ -321,6 +333,12 @@ HTML;
                 </div>
         HTML;
         }
+
+        if($supportsDeposer)
+            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressSupportButton-'.$idSoutenance.'">Suprimmer le support déposé</a>';
+        else
+            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendusoutenance-'.$idSoutenance.'">Déposer un support</a>';
+        
 
         return <<<HTML
     <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
@@ -330,7 +348,7 @@ HTML;
         <div class="text-end">
             <p class="text-muted mb-0">Votre date de passage : $dateSoutenance</p>
             <p class="text-muted mb-1">Salle : $salle</p>
-            <a href="#" class="text-primary text-decoration-none fw-bold supportdrop-$idSoutenance">Déposer un support</a>
+            $depotousupression
         </div>
     </div>
     HTML;
@@ -550,8 +568,8 @@ HTML;
         HTML;
     }
 
-    // Pop up pour les dépots / rendus
-    // TO-DO : lié une action au form vers le controller SAE, pour ensuite insérer dans la base de données le dépot + placer le fichier
+    // Pop up pour les support / rendus
+   
     function popUpDepot($typeDepot, $idSae){
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalDepot$typeDepot">
@@ -587,17 +605,40 @@ HTML;
 HTML;
     }
 
+    function popUpSupressionDepot($typeDepot, $idSae){
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalSupressionDepot$typeDepot">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Suprimmer un $typeDepot</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=suprimmerDepotGroupe$typeDepot&id=$idSae" method="POST" id="fileUploadForm" enctype="multipart/form-data">
+                    <input type="hidden" id="idDepotSupression$typeDepot" name="idDepotSupression$typeDepot" value="">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <p class="h4">Etes vous sur de vouloir suprimmer votre $typeDepot ?<p>   
+                            <button type="submit" class="btn btn-success mx-3 mt-4">Valider</button>
+                            <button type="button" class="btn btn-danger mx-3 mt-4" id="modalSupressionDepot$typeDepot" data-bs-dismiss="modal">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+HTML;
+    }
+
     // A continuer lorsque la page "Cloud" des SAE sera réalisé.
     function ajouterFichierCloud($idSae){
         return <<<HTML
-        <div class="d-block modal" tabindex="-1" id="modalAjouterFichierCloud">
+        <div class="modal" tabindex="-1" id="modalAjouterFichierCloud">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100">Déposer un fichier</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="index.php?module=sae&action=uploadFichier&id=$idSae" id="fileUploadForm" method="POST" enctype="multipart/form-data">
+                    <form action="index.php?module=sae&action=uploadFichierCloud&id=$idSae" id="fileUploadForm" method="POST" enctype="multipart/form-data">
                         <div class="modal-body d-flex flex-column text-center">
                         <div class="form-group mb-3">
                             <input type="text" class="form-control" name="fileName" id="fileName" placeholder="Entrer le nom du fichier">
