@@ -20,6 +20,7 @@ class HomeView extends GenericView
                     <div class="d-flex w-100 h-75 justify-content-center m-auto">
                         {$this->cardSAE()}
                         {$this->cardRendus()}
+                        {$this->cardCreerSAE()}
                     </div>
                 </div>
             </div>
@@ -46,7 +47,7 @@ class HomeView extends GenericView
     {
 
         return <<<HTML
-        <div class="card shadow px-3 rounded w-25 h-75 card-sae-content">
+        <div class="card shadow px-3 mx-5  rounded w-25 h-75 card-sae-content">
             <a href="index.php?module=sae&action=home" class="text-decoration-none text-reset">
                 <div class="card card-sae shadow w-100 h-100"></div>
                 <div class="m-4">
@@ -67,6 +68,20 @@ class HomeView extends GenericView
                 <div class="m-4">
                     <h4>Rendus</h4>
                     <p>Retrouvez ici la liste de tous les rendus (ceux à rendre et ceux déjà rendus)</p>
+                </div>
+            </a>
+        </div>
+        HTML;
+    }
+    function cardCreerSAE()
+    {
+        return <<<HTML
+        <div class="card shadow px-3 mx-5 rounded-bottom w-25 h-75 card-rendus-content">
+            <a href="index.php?module=creerSae&action=home" class="text-decoration-none text-reset">
+                <div style="background: #B2B2FD;" class="card card-rendus shadow w-100 h-100"></div>
+                <div class="m-4">
+                    <h4>Créer une SAÉ</h4>
+                    <p>Créer un nouveau sujet de SAE.</p>
                 </div>
             </a>
         </div>
