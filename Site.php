@@ -49,6 +49,12 @@ class Site
 						require_once 'modules/mod_rendus/RendusModule.php';
 					}
 					break;
+				case "creerSae":
+					if(isset($_SESSION['loginUtilisateur'])){
+						require_once 'modules/mod_creerSae/CreerSaeModule.php';
+					}
+					break;
+
 				default:
 					if(isset($_SESSION['loginUtilisateur'])){
 						die("Module inexistant");

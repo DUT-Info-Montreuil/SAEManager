@@ -1,15 +1,37 @@
 <?php
 class SaeModel extends Connexion
 {
-    public function getSAEsByPersonneId($idPersonne)
-    {
-        $req = "SELECT SAE.nomSae, SAE.idSAE
-                FROM Personne
-                INNER JOIN EtudiantGroupe ON Personne.idPersonne = EtudiantGroupe.idEtudiant
-                INNER JOIN Groupe ON Groupe.idGroupe = EtudiantGroupe.idGroupe
-                INNER JOIN SAE ON SAE.idSAE = Groupe.idSAE
-                WHERE Personne.idPersonne = :idPersonne
-                ";
+
+    public function getSAEsByPersonneId($idPersonne){
+        if($_SESSION['estProfUtilisateur']){
+            $req = "SELECT SAE.nomSae, SAE.idSAE
+            FROM SAE
+            WHERE SAE.idResponsable = :idPersonne
+
+            UNION
+
+            SELECT DISTINCT SAE.nomSae, SAE.idSAE
+            FROM SAE
+            INNER JOIN ResponsablesSAE ON SAE.idSAE = ResponsablesSAE.idSAE
+            INNER JOIN Personne ON Personne.idPersonne = ResponsablesSAE.idResp
+            WHERE Personne.idPersonne = :idPersonne
+
+            UNION
+
+            SELECT DISTINCT SAE.nomSae, SAE.idSAE
+            FROM SAE
+            INNER JOIN IntervenantSAE ON SAE.idSAE = IntervenantSAE.idSAE
+            INNER JOIN Personne ON Personne.idPersonne = IntervenantSAE.idIntervenant
+            WHERE Personne.idPersonne = :idPersonne";
+        }else{
+            $req = "SELECT SAE.nomSae, SAE.idSAE
+                        FROM Personne
+                        INNER JOIN EleveInscritSae ON Personne.idPersonne = EleveInscritSae.idEleve
+                        INNER JOIN SAE ON SAE.idSAE = EleveInscritSae.idSAE
+                        WHERE Personne.idPersonne = :idPersonne
+                        ";
+        }
+        
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
         $pdo_req->execute();
