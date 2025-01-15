@@ -27,13 +27,12 @@ HTML;
 		if (isset($_SESSION['loginUtilisateur'])) {
 			$this->affichage .= <<<HTML
 			<div class="flex-1 d-flex">
-				<div class="my-auto icon">
-					<svg class="icon" width="24" height="24">
-						<use xlink:href="#icon-profile"></use>
-					</svg>
-				</div>
+				
 				<div class="my-auto mx-4">
-					<a href="index.php?module=home" class="text-decoration-none text-reset">Accueil</a>
+					<a href="index.php?module=home" class="text-decoration-none text-reset">
+						<svg class="icon" width="24" height="24"><use xlink:href="#icon-profile"></use></svg> 
+						Accueil
+					</a>
 				</div>
 			</div>
 HTML;

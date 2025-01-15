@@ -27,7 +27,15 @@ class CreerSaeView extends GenericView
                     </div>
                     <div class="mb-3">
                         <label for="semestre" class="form-label fw-bold">Semestre</label>
-                        <input type="text" class="form-control" id="semestre" name="semestre" placeholder="Entrez le semestre" required>
+                        <select class="form-control" name="semestre" id="semestre" required>
+                            <option disabled selected value="">Choisissez un semestre</option>
+                            <option value="1">Semestre 1</option>
+                            <option value="2">Semestre 2</option>
+                            <option value="3">Semestre 3</option>
+                            <option value="4">Semestre 4</option>
+                            <option value="5">Semestre 5</option>
+                            <option value="6">Semestre 6</option>
+                        </select>                        
                     </div>
                     <div class="mb-3">
                         <label for="sujet" class="form-label fw-bold">Sujet</label>

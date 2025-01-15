@@ -79,7 +79,7 @@ class SaeController
             $champs = $this->model->getChampBySae($_GET['id']);
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
             $rendusDeposer = [];
-            foreach ($rendus as $rendu)
+            foreach ($rendus as $rendu){
                 if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
@@ -88,6 +88,7 @@ class SaeController
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
+            }
             $supportsDeposer = [];
             foreach($soutenances as $soutenance){
                 if($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))){

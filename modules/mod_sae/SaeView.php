@@ -160,12 +160,12 @@ HTML;
                 $idRendu = htmlspecialchars($r['idRendu']);
                 $aDeposerRendu = false;
                 $listeRenduDeposer = array_keys($rendusDeposer);
-                foreach($listeRenduDeposer as $renduDeposer)
+                foreach($listeRenduDeposer as $renduDeposer){
                     if($renduDeposer == $idRendu){
                         $aDeposerRendu = true;
                         $dateLimite = $rendusDeposer[$idRendu];
                     }
-
+                }
                 echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
             }
         } else {
@@ -212,9 +212,11 @@ HTML;
     }
 
     function initAjoutProf($noms, $idSAE) {
-        $html = '<form method="POST" action="index.php?module=sae&action=ajoutProf&id=' . $idSAE . '">
-        <label for="nom">Ajouter un professeur à la SAE : </label>';
-        $html .= '<select name="idPers">';
+        $html = '<form method="POST" action="index.php?module=sae&action=ajoutProf&id=' . $idSAE . '" class="p-3 border rounded shadow-sm bg-light">';
+        $html .= '<div class="mb-3">';
+        $html .= '<label for="nom" class="form-label fw-bold">Ajouter un professeur à la SAE :</label>';
+        $html .= '<select name="idPers" class="form-select" required>';
+        $html .= '<option value="" selected>Choisissez un professeur</option>';
         foreach ($noms as $row) {
             $id = htmlspecialchars($row['idPersonne']);
             $nom = htmlspecialchars($row['nom']);
@@ -222,14 +224,23 @@ HTML;
             $html .= "<option value=\"$id\">$nom $prenom</option>";
         }
         $html .= '</select>';
-        $html .= '<select name="poste">
-        <option value="resp">CoResponsable</option>
-        <option value="inter">Intervenant</option>
-        </select>';
-        $html .= '<button type="submit">Valider</button>
-        </form>';
+        $html .= '</div>';
+    
+        $html .= '<div class="mb-3">';
+        $html .= '<label for="poste" class="form-label fw-bold">Poste :</label>';
+        $html .= '<select name="poste" class="form-select" required>';
+        $html .= '<option value="resp">CoResponsable</option>';
+        $html .= '<option value="inter">Intervenant</option>';
+        $html .= '</select>';
+        $html .= '</div>';
+    
+        $html .= '<div class="d-flex justify-content-end">';
+        $html .= '<button type="submit" class="btn btn-primary">Valider</button>';
+        $html .= '</div>';
+        $html .= '</form>';
         return $html;
     }
+    
 
     function lineChamp($nomChamp, $idChamps, $param, $idSAE)
     {
