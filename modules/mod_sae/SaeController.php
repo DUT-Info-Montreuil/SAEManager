@@ -41,6 +41,15 @@ class SaeController
                 break;
             case "ajoutDepotSupport":
                 break;
+            case "createRendu":
+                $this->createRendu();
+                break;
+            case "supprimerRendu":
+                $this->delRendu();
+                break;
+            case "supprimerRessource":
+                $this->delRessource();
+                break;
         }
     }
 
@@ -134,5 +143,32 @@ class SaeController
             $this->model->ajoutChamp($idChamp, $_SESSION['idUtilisateur'], $reponse);
         }
         header("Location: index.php?module=sae&action=details&id=" . $_GET['id']);
+    }
+
+    private function createRendu()
+    {
+        $idSae = $_GET['id'];
+        $titre = $_POST['titreRendu'];
+        $dateLimite = $_POST['dateLimiteRendu'];
+
+        $this->model->createRendu($titre, $dateLimite, $idSae);
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+    }
+
+    private function delRendu()
+    {
+        $idRendu = $_GET['id'];
+
+        $this->model->delRendu($idRendu);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function delRessource()
+    {
+        $idRessource = $_GET['idRessource'];
+        $idSAE = $_GET['id'];
+
+        $this->model->delRessourceSAE($idSAE, $idRessource);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }

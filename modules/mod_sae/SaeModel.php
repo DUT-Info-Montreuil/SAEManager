@@ -58,7 +58,7 @@ class SaeModel extends Connexion
 
     public function getRessourceBySAE($idSAE)
     {
-        $req = "SELECT contenu
+        $req = "SELECT Ressource.idRessource, contenu
                 FROM Ressource
                 INNER JOIN RessourcesSAE ON RessourcesSAE.idRessource = Ressource.idRessource
                 INNER JOIN SAE ON RessourcesSAE.idSAE = SAE.idSAE
@@ -256,5 +256,36 @@ class SaeModel extends Connexion
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->execute();
         return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
+    }
+
+    // POST
+
+    function createRendu($titre, $date, $idSAE)
+    {
+        $req = "INSERT INTO Rendu (nom, dateLimite, idSAE, idEvaluation) VALUES (:titreRendu, :dateLimite, :idSAE, 1)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":titreRendu", $titre);
+        $pdo_req->bindValue(":dateLimite", $date);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+    }
+
+    // DEL
+
+    function delRendu($idRendu)
+    {
+        $req = "DELETE FROM Rendu WHERE idRendu = :idRendu";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idRendu", $idRendu);
+        $pdo_req->execute();
+    }
+
+    function delRessourceSAE($idSAE, $idRessource)
+    {
+        $req = "DELETE FROM RessourcesSAE WHERE idSAE = :idSAE AND idRessource = :idRessource";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idRessource", $idRessource);
+        $pdo_req->execute();
     }
 }

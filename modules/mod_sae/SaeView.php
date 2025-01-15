@@ -78,10 +78,18 @@ HTML;
                     Sujet
                 </h3>
 HTML;
+        if ($_SESSION['estProfUtilisateur']) {
+            echo <<<HTML
+            <div class="d-flex">
+                <button class="btn btn-link btn-sm shadow-none p-0">Modifier le sujet</button>
+            </div>
+HTML;
+        }
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
         echo $this->popUpDepot("Rendu", $idSAE);
         echo $this->popUpDepot("Support", $idSAE);
+        echo $this->popUpCreateRendu($idSAE);
         echo <<<HTML
             </div>
 HTML;
@@ -104,7 +112,16 @@ HTML;
                 echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId));
             }
         } else {
-            echo $this->lineChamp("default","", "");
+            echo $this->lineChamp("default", "", "");
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class=" p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3">Ajouter un champ</button>
+            </div>
+HTML;
         }
         echo <<<HTML
             </div>
@@ -126,15 +143,27 @@ HTML;
         if (!empty($ressource)) {
             foreach ($ressource as $r) {
                 $nomRessource = htmlspecialchars($r['contenu']);
-                echo $this->lineRessource($nomRessource);
+                echo $this->lineRessource($nomRessource, $sae[0]['idSAE'], $r['idRessource']);
             }
         } else {
-            echo $this->lineRessource("default");
+            echo $this->lineRessource("default", $sae[0]['idSAE'], "");
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class="d-flex gap-3 p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3">Ajouter une ressource</button>
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4">Créer une ressource</button>
+            </div>
+HTML;
         }
         echo <<<HTML
                 </div>
             </div>
 HTML;
+
+
 
         // Rendus
         echo <<<HTML
@@ -155,8 +184,8 @@ HTML;
                 $idRendu = htmlspecialchars($r['idRendu']);
                 $aDeposerRendu = false;
                 $listeRenduDeposer = array_keys($rendusDeposer);
-                foreach($listeRenduDeposer as $renduDeposer)
-                    if($renduDeposer == $idRendu){
+                foreach ($listeRenduDeposer as $renduDeposer)
+                    if ($renduDeposer == $idRendu) {
                         $aDeposerRendu = true;
                         $dateLimite = $rendusDeposer[$idRendu];
                     }
@@ -165,6 +194,15 @@ HTML;
             }
         } else {
             echo $this->lineRendus("default", "default", 0, false);
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class="p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-rendu">Créer un rendu</button>
+            </div>
+HTML;
         }
         echo <<<HTML
                 </div>
@@ -194,6 +232,16 @@ HTML;
         } else {
             echo $this->lineSoutenance("default", "default", "default", "default");
         }
+
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class="p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3">Créer une soutenance</button>
+            </div>
+HTML;
+        }
+
         echo <<<HTML
                 </div>
             </div>
@@ -217,8 +265,8 @@ HTML;
         $area = '<label class="text-success">Ce champ a déjà été rendu</label>';
         $input = '';
 
-        if ($param){
-            $area = '<textarea name="reponse'.$idChamps.'" cols="100" class="zone-texte" placeholder="Ecrire ici..."></textarea>';
+        if ($param) {
+            $area = '<textarea name="reponse' . $idChamps . '" cols="100" class="zone-texte" placeholder="Ecrire ici..."></textarea>';
             $input = '<input class="ms-auto text-decoration-none text-primary" text="envoyer" type="submit"/>';
         }
 
@@ -234,24 +282,40 @@ HTML;
         HTML;
     }
 
-    function lineRessource($nomRessource)
+    function lineRessource($nomRessource, $idSAE, $idRessource)
     {
 
         if ($nomRessource == "default") {
             return <<<HTML
-            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>Aucune ressource disponible</span>
-                </div>
+        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+            <span>Aucune ressource disponible</span>
+        </div>
+        HTML;
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
+        <div class="d-flex align-items-center p-2 bg-light rounded-3 shadow-sm mb-2">
+            <span>$nomRessource</span>
+            <div class="ms-auto d-flex gap-2">
+            <form method="POST" action="index.php?module=sae&action=modifierRessource">
+                <button type="submit" class="btn btn-secondary btn-sm">Modifier</button>
+            </form>
+            <form method="POST" action="index.php?module=sae&action=supprimerRessource&id=$idSAE&idRessource=$idRessource">
+                <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+            </form>
+            <a href="#" class="text-decoration-none text-primary align-self-center">fichier.pdf</a>
+            </div>
+        </div>
         HTML;
         }
 
         return <<<HTML
-            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>$nomRessource</span>
-                        <a href="#" class="ms-auto text-decoration-none text-primary">fichier.pdf</a>
-                    </div>
-
-        HTML;
+    <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+        <span>$nomRessource</span>
+        <a href="#" class="ms-auto text-decoration-none text-primary">fichier.pdf</a>
+    </div>
+    HTML;
     }
 
     function lineRendus($nom, $dateLimite, $id, $renduDeposer)
@@ -264,11 +328,27 @@ HTML;
                 </div>
         HTML;
         }
-        if($renduDeposer){
+
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
+        <div class="d-flex align-items-center bg-light rounded-3 shadow-sm mb-2 px-2">
+            <span>$nom</span>
+            <div class="ms-auto p-2 d-flex gap-2">
+            <form method="POST" action="index.php?module=sae&action=modifierRendu&id=$id">
+                <button type="submit" class="btn btn-secondary btn-sm">Modifier</button>
+            </form>
+            <form method="POST" action="index.php?module=sae&action=supprimerRendu&id=$id">
+                <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+            </form>
+            </div>
+        </div>
+        HTML;
+        }
+
+        if ($renduDeposer) {
             $color = "success";
             $phrase = "Déposer le : ";
-        }
-        else{
+        } else {
             $color = "danger";
             $phrase = "A déposer avant le : ";
         }
@@ -297,6 +377,18 @@ HTML;
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
                     <span>Aucune soutenance disponible</span>
                 </div>
+        HTML;
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
+        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+            <span>$titre</span>
+            <div class="ms-auto d-flex gap-2">
+                <button class="btn btn-secondary btn-sm">Modifer</button>
+                <button class="btn btn-secondary btn-sm">Supprimer</button>
+            </div>
+        </div>
         HTML;
         }
 
@@ -530,7 +622,8 @@ HTML;
 
     // Pop up pour les dépots / rendus
     // TO-DO : lié une action au form vers le controller SAE, pour ensuite insérer dans la base de données le dépot + placer le fichier
-    function popUpDepot($typeDepot, $idSae){
+    function popUpDepot($typeDepot, $idSae)
+    {
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalDepot$typeDepot">
             <div class="modal-dialog">
@@ -564,9 +657,43 @@ HTML;
         </div>
 HTML;
     }
+    function popUpCreateRendu($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateRendu">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer un rendu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createRendu&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreRendu" id="titreRendu" placeholder="Titre du rendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateLimiteRendu" id="dateLimiteRendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureLimiteRendu" id="heureLimiteRendu" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-rendu-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
 
     // A continuer lorsque la page "Cloud" des SAE sera réalisé.
-    function ajouterFichierCloud($idSae){
+    function ajouterFichierCloud($idSae)
+    {
         return <<<HTML
         <div class="d-block modal" tabindex="-1" id="modalAjouterFichierCloud">
             <div class="modal-dialog">
