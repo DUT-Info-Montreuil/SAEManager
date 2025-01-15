@@ -206,7 +206,7 @@ HTML;
     }
 
     function initAjoutProf($noms, $idSAE) {
-        $html = '<form method="POST" action="index.php?module=sae&action=ajoutProf&id=1">
+        $html = '<form method="POST" action="index.php?module=sae&action=ajoutProf&id=' . $idSAE . '">
         <label for="nom">Ajouter un professeur à la SAE : </label>';
         $html .= '<select name="idPers">';
         foreach ($noms as $row) {

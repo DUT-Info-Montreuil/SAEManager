@@ -143,8 +143,6 @@ class SaeController
     private function ajoutProf(){
         $idProf = $_POST['idPers'];
         $idSAE = $_GET['id'];
-        var_dump($idProf);
-        var_dump($_POST['poste']);  
         if ($_POST['poste'] == 'inter'){
             $this->model->ajoutIntervenant($idSAE, $idProf);
         }
