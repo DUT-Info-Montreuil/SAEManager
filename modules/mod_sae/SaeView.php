@@ -80,12 +80,13 @@ HTML;
 HTML;
         if ($_SESSION['estProfUtilisateur']) {
             echo <<<HTML
-            <div class="d-flex">
-                <button class="btn btn-link btn-sm shadow-none p-0">Modifier le sujet </button>
-                <span> - </span>
-                <button class="btn btn-link btn-sm shadow-none p-0">Supprimer</button>
-            </div>
-HTML;
+                <div class="d-flex align-items-center gap-2">
+                    <span class="btn btn-link btn-sm shadow-none p-0 text-decoration-none" id="edit-sujet">Modifier le sujet</span>
+                    <form method="POST" action="index.php?module=sae&action=supprimerSujet&id=$idSAE" style="margin: 0;">
+                        <button type="submit" class="btn btn-link btn-sm shadow-none p-0 text-decoration-none">Supprimer</button>
+                    </form>
+                </div>
+            HTML;
         }
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
@@ -96,6 +97,7 @@ HTML;
         echo $this->popUpCreateSoutenance($idSAE);
         echo $this->popUpModifierSoutenance($idSAE);
         echo $this->popUpCreateChamp($idSAE);
+        echo $this->popUpModifierSujet($idSAE);
         echo <<<HTML
             </div>
 HTML;
@@ -304,7 +306,7 @@ HTML;
         <div class="d-flex align-items-center p-2 bg-light rounded-3 shadow-sm mb-2">
             <span>$nomRessource</span>
             <div class="ms-auto d-flex gap-2">
-            <form method="POST" action="index.php?module=sae&action=modifierRessource">
+            <form method="POST" action="index.php?module=sae&action=modifierRessource&id=$idSAE">
                 <button type="submit" class="btn btn-secondary btn-sm">Modifier</button>
             </form>
             <form method="POST" action="index.php?module=sae&action=supprimerRessource&id=$idSAE&idRessource=$idRessource">
@@ -337,16 +339,16 @@ HTML;
 
         if ($_SESSION['estProfUtilisateur']) {
             return <<<HTML
-        <div class="d-flex align-items-center bg-light rounded-3 shadow-sm mb-2 px-2">
-            <span>$nom</span>
-            <div class="ms-auto p-2 d-flex gap-2">
-            <button type="button" class="btn btn-secondary btn-sm modalModifierRendu$id" id="edit-rendu-btn" data-bs-toggle="modal">Modifier</button>
-            <form method="POST" action="index.php?module=sae&action=supprimerRendu&id=$id">
-            <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
-            </form>
+            <div class="d-flex align-items-center bg-light rounded-3 shadow-sm mb-2 px-2">
+                <span>$nom</span>
+                <div class="ms-auto p-3 d-flex gap-2">
+                    <span class="btn btn-secondary btn-sm modalModifierRendu$id" id="edit-rendu-btn" data-bs-toggle="modal">Modifier</span>
+                    <form method="POST" action="index.php?module=sae&action=supprimerRendu&id=$id" style="margin: 0;">
+                        <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                    </form>
+                </div>
             </div>
-        </div>
-        HTML;
+            HTML;
         }
 
         if ($renduDeposer) {
@@ -386,20 +388,21 @@ HTML;
 
         if ($_SESSION['estProfUtilisateur']) {
             return <<<HTML
-        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-            <span>$titre</span>
-            <div class="ms-auto d-flex gap-2">
-            <button class="btn btn-secondary btn-sm modalModifierSoutenance$idSoutenance" id="edit-soutenance-btn">Modifier</button>
-            <form method="POST" action="index.php?module=sae&action=supprimerSoutenance&id=$idSoutenance">
-                <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
-            </form>
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                <span>$titre</span>
+                <div class="ms-auto d-flex gap-2">
+                    <span class="btn btn-secondary btn-sm modalModifierSoutenance$idSoutenance" id="edit-soutenance-btn" data-bs-toggle="modal">Modifier</span>
+                    <form method="POST" action="index.php?module=sae&action=supprimerSoutenance&id=$idSoutenance" style="margin: 0;">
+                        <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                    </form>
+                </div>
             </div>
-        </div>
-        HTML;
+            HTML;
         }
 
+
         return <<<HTML
-    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+    <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded-3 shadow-sm mb-2">
         <div class="d-flex align-items-center">
             <p class="mb-0">$titre</p>
         </div>
@@ -731,7 +734,7 @@ HTML;
         </div>
     HTML;
     }
-    
+
     function popUpCreateSoutenance($idSae)
     {
         return <<<HTML
@@ -836,6 +839,33 @@ HTML;
                             <div>
                                 <button type="submit" class="btn btn-success m-3">Valider</button>
                                 <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-rendu-edit-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpModifierSujet($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierSujet">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100" id="edit-sujet-btn">Modifier le sujet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierSujet&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" name="sujet" id="sujet" placeholder="Modifier le sujet" required></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-sujet-cancel">Annuler</button>
                             </div>
                         </div>
                     </form>

@@ -65,6 +65,12 @@ class SaeController
             case "createChamp":
                 $this->createChamp();
                 break;
+            case "modifierSujet":
+                $this->updateSujet();
+                break;
+            case "supprimerSujet":
+                $this->delSujet();
+                break;
         }
     }
 
@@ -190,7 +196,8 @@ class SaeController
     }
 
 
-    private function updateRendu() {
+    private function updateRendu()
+    {
         $titre = $_POST['titreRendu'];
         $dateLimite = $_POST['dateLimiteRendu'];
         $idRendu = $_POST['idRenduAModifier'];
@@ -199,37 +206,40 @@ class SaeController
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    private function createSoutenance() {
+    private function createSoutenance()
+    {
         $idSAE = $_GET['id'];
         $titre = $_POST['titreSoutenance'];
         $date = $_POST['dateSoutenance'];
         $duree = $_POST['dureeSoutenance'];
         $salle = $_POST['salleSoutenance'];
-        
+
         $this->model->createSoutenance($titre, $date, $salle, $duree, $idSAE);
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    private function delSoutenance() {
+    private function delSoutenance()
+    {
         $idSoutenance = $_GET['id'];
 
         $this->model->delSoutenance($idSoutenance);
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    private function updateSoutenance() {
+    private function updateSoutenance()
+    {
         $idSoutenance = $_POST['idSoutenanceAModifier'];
         $titre = $_POST['titreSoutenance'];
         $date = $_POST['dateSoutenance'];
         $duree = $_POST['dureeSoutenance'];
         $salle = $_POST['salleSoutenance'];
 
-        $this->model->updateSoutenance($idSoutenance, $titre, $date, $salle, $duree);
-        var_dump($_POST);
-        //header("Location: " . $_SERVER['HTTP_REFERER']);
+        $this->model->updateSoutenance($idSoutenance, $duree, $titre, $salle, $date);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    private function createChamp() {
+    private function createChamp()
+    {
         $idSae = $_GET['id'];
         $nom = $_POST['nomChamp'];
 
@@ -237,4 +247,20 @@ class SaeController
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
+    private function updateSujet()
+    {
+        $idSae = $_GET['id'];
+        $sujet = $_POST['sujet'];
+
+        $this->model->updateSujet($idSae, $sujet);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function delSujet()
+    {
+        $idSae = $_GET['id'];
+
+        $this->model->delSujet($idSae);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
 }

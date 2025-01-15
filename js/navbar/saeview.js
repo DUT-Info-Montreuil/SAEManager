@@ -89,18 +89,18 @@ createRenduBtn.addEventListener("click", function () {
 const editRenduBtn = document.querySelectorAll("#edit-rendu-btn");
 
 editRenduBtn.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      document.querySelector("#modalModifierRendu").classList.add("d-block");
-      const matches = btn.className.match(/modalModifierRendu(\d+)/);
-      document.getElementById("idRenduAModifier").value = matches[1];
-      document
-        .querySelector("#modal-rendu-edit-cancel")
-        .addEventListener("click", function () {
-              
-              document.querySelector("#modalModifierRendu").classList.remove("d-block");
-          
-        });
-    });
+  btn.addEventListener("click", function () {
+    document.querySelector("#modalModifierRendu").classList.add("d-block");
+    const matches = btn.className.match(/modalModifierRendu(\d+)/);
+    document.getElementById("idRenduAModifier").value = matches[1];
+    document
+      .querySelector("#modal-rendu-edit-cancel")
+      .addEventListener("click", function () {
+        document
+          .querySelector("#modalModifierRendu")
+          .classList.remove("d-block");
+      });
+  });
 });
 
 // Ajout coeff
@@ -111,28 +111,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("formCreateRendu");
 
   checkBox.addEventListener("change", () => {
-      if (checkBox.checked) {
-          coeffInput.style.display = "block";
-          document.getElementById("coeff").required = true;
-      } else {
-          coeffInput.style.display = "none";
-          document.getElementById("coeff").required = false;
-      }
+    if (checkBox.checked) {
+      coeffInput.style.display = "block";
+      document.getElementById("coeff").required = true;
+    } else {
+      coeffInput.style.display = "none";
+      document.getElementById("coeff").required = false;
+    }
   });
 
   if (form) {
     form.addEventListener("submit", (event) => {
       const coeff = document.getElementById("coeff").value;
       if (checkBox.checked && (coeff === "" || coeff <= 0)) {
-          alert("Veuillez remplir le coefficient pour un rendu noté.");
-          event.preventDefault();
+        alert("Veuillez remplir le coefficient pour un rendu noté.");
+        event.preventDefault();
       }
-  });
+    });
   }
-
-  
 });
-
 
 // soutenance
 
@@ -144,27 +141,27 @@ createSupportBtn.addEventListener("click", function () {
   document
     .querySelector("#modal-soutenance-cancel")
     .addEventListener("click", function () {
-      document.querySelector("#modalCreateSoutenance").classList.remove("d-block");
+      document
+        .querySelector("#modalCreateSoutenance")
+        .classList.remove("d-block");
     });
-}
-);
-
+});
 
 const editSoutenanceBtn = document.querySelectorAll("#edit-soutenance-btn");
 
 editSoutenanceBtn.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      document.querySelector("#modalModifierSoutenance").classList.add("d-block");
-      const matches = btn.className.match(/modalModifierSoutenance(\d+)/);
-      document.getElementById("idRenduAModifier").value = matches[1];
-      document
-        .querySelector("#modal-soutenance-edit-cancel")
-        .addEventListener("click", function () {
-              
-              document.querySelector("#modalModifierSoutenance").classList.remove("d-block");
-          
-        });
-    });
+  btn.addEventListener("click", function () {
+    document.querySelector("#modalModifierSoutenance").classList.add("d-block");
+    const matches = btn.className.match(/modalModifierSoutenance(\d+)/);
+    document.getElementById("idSoutenanceAModifier").value = matches[1];
+    document
+      .querySelector("#modal-soutenance-edit-cancel")
+      .addEventListener("click", function () {
+        document
+          .querySelector("#modalModifierSoutenance")
+          .classList.remove("d-block");
+      });
+  });
 });
 
 // Champ
@@ -179,6 +176,18 @@ createChampBtn.addEventListener("click", function () {
     .addEventListener("click", function () {
       document.querySelector("#modalCreateChamp").classList.remove("d-block");
     });
-}
-);
+});
 
+// SUJET
+
+const editSujetBtn = document.querySelector("#edit-sujet");
+
+editSujetBtn.addEventListener("click", function () {
+  document.querySelector("#modalModifierSujet").classList.add("d-block");
+
+  document
+    .querySelector("#modal-sujet-cancel")
+    .addEventListener("click", function () {
+      document.querySelector("#modalModifierSujet").classList.remove("d-block");
+    });
+});

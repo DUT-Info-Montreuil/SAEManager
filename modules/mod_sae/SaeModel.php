@@ -260,25 +260,53 @@ class SaeModel extends Connexion
 
     // POST
 
-    function createRendu($titre, $date, $idSAE, $estNote)
+    function createRendu($titre, $date, $idSAE, $estNote, $coeff)
     {
-        $req = "INSERT INTO Rendu (nom, dateLimite, idSAE, idEvaluation) VALUES (:titreRendu, :dateLimite, :idSAE, 1)";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":titreRendu", $titre);
-        $pdo_req->bindValue(":dateLimite", $date);
-        $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->execute();
+        if ($estNote) {
+            $reqEval = "INSERT INTO Evaluation (nom, coeff, responsableEvaluation) VALUES (:nom, :coeff, NULL)";
+            $pdo_reqEval = self::$bdd->prepare($reqEval);
+            $pdo_reqEval->bindValue(":nom", $titre);
+            $pdo_reqEval->bindValue(":coeff", $coeff);
+            $pdo_reqEval->execute();
+
+            $idEvaluation = self::$bdd->lastInsertId();
+
+            $reqRendu = "INSERT INTO Rendu (nom, dateLimite, idSAE, idEvaluation) VALUES (:titreRendu, :dateLimite, :idSAE, :idEval)";
+            $pdo_reqRendu = self::$bdd->prepare($reqRendu);
+            $pdo_reqRendu->bindValue(":titreRendu", $titre);
+            $pdo_reqRendu->bindValue(":dateLimite", $date);
+            $pdo_reqRendu->bindValue(":idSAE", $idSAE);
+            $pdo_reqRendu->bindValue(":idEval", $idEvaluation);
+            $pdo_reqRendu->execute();
+        } else {
+            $reqRendu = "INSERT INTO Rendu (nom, dateLimite, idSAE, idEvaluation) VALUES (:titreRendu, :dateLimite, :idSAE, NULL)";
+            $pdo_reqRendu = self::$bdd->prepare($reqRendu);
+            $pdo_reqRendu->bindValue(":titreRendu", $titre);
+            $pdo_reqRendu->bindValue(":dateLimite", $date);
+            $pdo_reqRendu->bindValue(":idSAE", $idSAE);
+            $pdo_reqRendu->execute();
+        }
     }
 
     function createSoutenance($titre, $date, $salle, $duree, $idSAE)
     {
-        $req = "INSERT INTO Soutenance (dureeMinutes, titre, date, salle, idSAE, idEvaluation) VALUES (:dureeMinutes, :titre, :date, :salle, :idSAE, NULL)";
+        $reqEval = "INSERT INTO Evaluation (nom, coeff, responsableEvaluation) VALUES (:nom, :coeff, NULL)";
+        $pdo_req_eval = self::$bdd->prepare($reqEval);
+        $pdo_req_eval->bindValue(":nom", $titre);
+        $pdo_req_eval->bindValue(":coeff", 1);
+        $pdo_req_eval->execute();
+
+        $idEvaluation = self::$bdd->lastInsertId();
+
+        $req = "INSERT INTO Soutenance (dureeMinutes, titre, date, salle, idSAE, idEvaluation) 
+            VALUES (:dureeMinutes, :titre, :date, :salle, :idSAE, :idEvaluation)";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":dureeMinutes", $duree);
         $pdo_req->bindValue(":titre", $titre);
         $pdo_req->bindValue(":date", $date);
         $pdo_req->bindValue(":salle", $salle);
         $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idEvaluation", $idEvaluation);
         $pdo_req->execute();
     }
 
@@ -318,6 +346,14 @@ class SaeModel extends Connexion
         $pdo_req->execute();
     }
 
+    function delSujet($idSAE)
+    {
+        $req = "UPDATE SAE SET sujet = '' WHERE idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+    }
+
 
     // PUT
 
@@ -330,9 +366,10 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idRendu", $idRendu);
         $pdo_req->execute();
     }
-    
 
-    function updateSoutenance($idSoutenance, $duree, $titre, $salle, $date) {
+
+    function updateSoutenance($idSoutenance, $duree, $titre, $salle, $date)
+    {
         $req = "UPDATE Soutenance SET dureeMinutes = :dureeMinutes, titre = :titre, salle = :salle, date = :date WHERE idSoutenance = :idSoutenance";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":dureeMinutes", $duree);
@@ -343,5 +380,12 @@ class SaeModel extends Connexion
         $pdo_req->execute();
     }
 
-    
+    function updateSujet($idSAE, $sujet)
+    {
+        $req = "UPDATE SAE SET sujet = :sujet WHERE idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":sujet", $sujet);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+    }
 }
