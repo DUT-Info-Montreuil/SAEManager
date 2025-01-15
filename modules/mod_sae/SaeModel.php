@@ -106,6 +106,23 @@ class SaeModel extends Connexion
         return false;
     }
 
+    public function suprimmerDepotGroupeRendu($idDepot, $idGroupe){
+        $idSae = $this->getSAEById($_SESSION['idUtilisateur'])[0]['idSAE'];
+        $rendu = $this->getRenduEleve($idDepot, $idSae);
+        $fileName = $rendu[0]['fichier'];
+        $req = "
+                DELETE FROM RenduGroupe
+                WHERE RenduGroupe.idRendu = :idRendu AND RenduGroupe.idGroupe = :idGroupe        
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idRendu", $idDepot);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        if($pdo_req->execute()){
+            return $this->deleteFichier($fileName);
+        }
+        return false;
+    }
+
 
     public function getRessourceBySAE($idSAE)
     {
@@ -144,6 +161,34 @@ class SaeModel extends Connexion
             return true;
     }
 
+    public function ajoutCResponsables($idSAE, $idResp)
+    {
+        $req = "INSERT INTO ResponsablesSAE (idSAE, idResp) VALUES (:idSAE, :idResp)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idResp", $idResp);
+        $pdo_req->execute();
+        if ($pdo_req->rowCount() == 0)
+            return false;
+        else
+            return true;
+    }
+    public function suprimmerDepotGroupeSupport($idDepot, $idGroupe){
+        $idSae = $this->getSAEById($_SESSION['idUtilisateur'])[0]['idSAE'];
+        $support = $this->getSupportEleve($idDepot, $idSae);
+        $fileName = $support[0]['support'];
+        $req = "
+                DELETE FROM SupportSoutenance
+                WHERE SupportSoutenance.idSoutenance = :idSoutenance AND SupportSoutenance.idGroupe = :idGroupe        
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idDepot);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        if($pdo_req->execute()){
+            return $this->deleteFichier($fileName);
+        }
+        return false;
+    }
     public function getRenduBySAE($idSAE)
     {
 
@@ -285,6 +330,51 @@ class SaeModel extends Connexion
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->bindValue(":groupeID", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+    public function getReponseIdBySAE($idChamp)
+    {
+        $req = "SELECT idChamp
+                FROM reponsesChamp";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->execute();
+        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
+    }
+    public function didGroupeDropSupport($idSoutenance, $idSae){
+        return count($this->getSupportEleve($idSoutenance, $idSae))!=0;
+    }
+    public function getSupportEleve($idSoutenance, $idSae){
+        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
+        $req = "
+                SELECT SupportSoutenance.idSoutenance, SupportSoutenance.idGroupe, SupportSoutenance.support
+                FROM SupportSoutenance
+                WHERE idSoutenance = :idSoutenance AND idGroupe = :idGroupe
+        ";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+    public function getProfsBySAE($idSAE){
+        $req = "SELECT idPersonne, prenom, nom
+                FROM Personne
+                WHERE estProf = 1
+                AND idPersonne not in (
+                                        SELECT idResp
+                                        FROM ResponsablesSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idIntervenant
+                                        FROM IntervenantSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idResponsable
+                                        FROM SAE
+                                        WHERE idSAE = :idSAE)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }

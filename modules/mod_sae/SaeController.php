@@ -36,16 +36,8 @@ class SaeController
             case "uploadFichier":
                 $this->uploadFichier();
                 break;
-            case "ajoutDepotRendu":
-                $this->depotRendu();
-                break;
             case "ajoutProf":
                 $this->ajoutProf();
-                break;
-            case "ajoutDepotSupport":
-                break;
-            case "uploadFichier":
-                $this->uploadFichier();
                 break;
             case "ajoutDepotRendu":
                 $this->depotRendu();
@@ -187,7 +179,6 @@ class SaeController
         
         $depotreussi = $this->model->uploadFileSupport($file, $idSoutenance, $fileName, $idSae);
         header("Location: index.php?module=sae&action=details&id=".$idSae);
-
     }
 
     private function suprimmerDepotRenduGroupe(){

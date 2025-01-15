@@ -194,16 +194,13 @@ HTML;
                 $titre = htmlspecialchars($s['titre'] ?? "default");
                 $dateSoutenance = htmlspecialchars($s['date'] ?? "default");
                 $salle = htmlspecialchars($s['salle'] ?? "default");
-
                 $idSoutenance = htmlspecialchars($s['idSoutenance'] ?? "default");
-                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance);
+                $supportDeposer = $supportsDeposer[$id] ?? false;
+                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance,$supportDeposer);
             }
         } else {
-            echo $this->lineSoutenance("default", "default", "default", "default");
-
-                $supportDeposer = $supportsDeposer[$id] ?? false;
-                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $id, $supportDeposer);
-            }
+            echo $this->lineSoutenance("default", "default", "default", "default", "default");
+        }
 
         echo <<<HTML
                 </div>
