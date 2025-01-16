@@ -3,6 +3,7 @@
     --menu-color: #0D1117;
     --sae-color: #7171FF;
     --rendus-color: #F1B2FD;
+    --create-sae-color: #B2B2FD;
 }
 
 .menu {
@@ -35,10 +36,15 @@
     background: var(--rendus-color);
 }
 
+.card-create-sae {
+    background: var(--create-sae-color);
+}
+
 .card-sae:hover,
 .card-sae-content:hover,
 .card-rendus:hover,
-.card-rendus-content:hover {
+.card-rendus-content:hover,
+.card-create-sae:hover {
     transform: scale(1.05);
 }
 
@@ -105,3 +111,4 @@
     font-size: 16px;
     resize: none;
   }
+

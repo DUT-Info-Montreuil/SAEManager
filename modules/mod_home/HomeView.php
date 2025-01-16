@@ -73,12 +73,14 @@ class HomeView extends GenericView
         </div>
         HTML;
     }
+
     function cardCreerSAE()
     {
+
         return <<<HTML
         <div class="card shadow px-3 mx-5 rounded-bottom w-25 h-75 card-rendus-content">
             <a href="index.php?module=creerSae&action=home" class="text-decoration-none text-reset">
-                <div style="background: #B2B2FD;" class="card card-rendus shadow w-100 h-100"></div>
+                <div style="min-height: 50px;" class="card card-create-sae shadow w-100 h-100"></div>
                 <div class="m-4">
                     <h4>Créer une SAÉ</h4>
                     <p>Créer un nouveau sujet de SAE.</p>
