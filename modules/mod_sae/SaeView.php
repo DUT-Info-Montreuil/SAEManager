@@ -58,8 +58,9 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($profs,$sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer)
+    function initSaeDetails($profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
     {
+
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
         $sujet = htmlspecialchars($sae[0]['sujet']);
@@ -78,13 +79,32 @@ HTML;
                     Sujet
                 </h3>
 HTML;
+        if ($_SESSION['estProfUtilisateur']) {
+            echo <<<HTML
+                <div class="d-flex align-items-center gap-2">
+                    <span class="btn btn-link btn-sm shadow-none p-0 text-decoration-none" id="edit-sujet">Modifier le sujet</span>
+                    <form method="POST" action="index.php?module=sae&action=supprimerSujet&id=$idSAE" style="margin: 0;">
+                        <button type="submit" class="btn btn-link btn-sm shadow-none p-0 text-decoration-none">Supprimer</button>
+                    </form>
+                </div>
+            HTML;
+        }
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
         echo $this->popUpDepot("Rendu", $idSAE);
-        echo $this->popUpDepot("Support", $idSAE); 
+        echo $this->popUpDepot("Support", $idSAE);
         echo $this->popUpSupressionDepot("Rendu", $idSAE);
         echo $this->popUpSupressionDepot("Support", $idSAE);
 
+        echo $this->popUpDepot("Support", $idSAE);
+        echo $this->popUpCreateRendu($idSAE);
+        echo $this->popUpModifierRendu($idSAE);
+        echo $this->popUpCreateSoutenance($idSAE);
+        echo $this->popUpModifierSoutenance($idSAE);
+        echo $this->popUpCreateChamp($idSAE);
+        echo $this->popUpModifierSujet($idSAE, $sae);
+        echo $this->popUpCreateRessource($idSAE);
+        echo $this->popUpAjouterRessource($idSAE, $ressources, $ressource);
         echo <<<HTML
             </div>
 HTML;
@@ -109,7 +129,16 @@ HTML;
                 echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId), $idSAE);
             }
         } else {
-            echo $this->lineChamp("default","", "", "");
+            echo $this->lineChamp("default", "", "", "");
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class=" p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-champ">Ajouter un champ</button>
+            </div>
+HTML;
         }
         echo <<<HTML
             </div>
@@ -130,16 +159,31 @@ HTML;
 HTML;
         if (!empty($ressource)) {
             foreach ($ressource as $r) {
-                $nomRessource = htmlspecialchars($r['contenu']);
-                echo $this->lineRessource($nomRessource);
+                $nomRessource = htmlspecialchars($r['nom']);
+                $idSAE = htmlspecialchars($sae[0]['idSAE']);
+                $idRessource = htmlspecialchars($r['idRessource']);
+                $contenue = htmlspecialchars($r['contenu']);
+                echo $this->lineRessource($nomRessource, $idSAE, $idRessource, $contenue);
             }
         } else {
-            echo $this->lineRessource("default");
+            echo $this->lineRessource("default", $sae[0]['idSAE'], "", "");
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class="d-flex gap-3 p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="btn-add-ressource">Ajouter une ressource</button>
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4" id="create-ressource">Créer une ressource</button>
+            </div>
+HTML;
         }
         echo <<<HTML
                 </div>
             </div>
 HTML;
+
+
 
         // Rendus
         echo <<<HTML
@@ -160,16 +204,24 @@ HTML;
                 $idRendu = htmlspecialchars($r['idRendu']);
                 $aDeposerRendu = false;
                 $listeRenduDeposer = array_keys($rendusDeposer);
-                foreach($listeRenduDeposer as $renduDeposer){
-                    if($renduDeposer == $idRendu){
+                foreach ($listeRenduDeposer as $renduDeposer)
+                    if ($renduDeposer == $idRendu) {
                         $aDeposerRendu = true;
                         $dateLimite = $rendusDeposer[$idRendu];
                     }
-                }
-                echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
             }
+            echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
         } else {
             echo $this->lineRendus("default", "default", 0, false);
+        }
+
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class="p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-rendu">Créer un rendu</button>
+            </div>
+HTML;
         }
         echo <<<HTML
                 </div>
@@ -196,22 +248,33 @@ HTML;
                 $salle = htmlspecialchars($s['salle'] ?? "default");
                 $idSoutenance = htmlspecialchars($s['idSoutenance'] ?? "default");
                 $supportDeposer = $supportsDeposer[$id] ?? false;
-                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance,$supportDeposer);
+                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance, $supportDeposer);
             }
         } else {
             echo $this->lineSoutenance("default", "default", "default", "default", "default");
         }
 
+        if ($_SESSION['estProfUtilisateur']) {
+
+            echo <<<HTML
+            <div class="p-3">
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-soutenance">Créer une soutenance</button>
+            </div>
+HTML;
+        }
+
+
         echo <<<HTML
                 </div>
             </div>
         </div>
-        <script src="js/navbar/saeview.js"></script>
+        <script src="js/saeview.js"></script>
     </div>
 HTML;
     }
 
-    function initAjoutProf($noms, $idSAE) {
+    function initAjoutProf($noms, $idSAE)
+    {
         $html = '<form method="POST" action="index.php?module=sae&action=ajoutProf&id=' . $idSAE . '" class="p-3 border rounded shadow-sm bg-light">';
         $html .= '<div class="mb-3">';
         $html .= '<label for="nom" class="form-label fw-bold">Ajouter un professeur à la SAE :</label>';
@@ -225,7 +288,7 @@ HTML;
         }
         $html .= '</select>';
         $html .= '</div>';
-    
+
         $html .= '<div class="mb-3">';
         $html .= '<label for="poste" class="form-label fw-bold">Poste :</label>';
         $html .= '<select name="poste" class="form-select" required>';
@@ -233,64 +296,92 @@ HTML;
         $html .= '<option value="inter">Intervenant</option>';
         $html .= '</select>';
         $html .= '</div>';
-    
+
         $html .= '<div class="d-flex justify-content-end">';
         $html .= '<button type="submit" class="btn btn-primary">Valider</button>';
         $html .= '</div>';
         $html .= '</form>';
         return $html;
     }
-    
+
 
     function lineChamp($nomChamp, $idChamps, $param, $idSAE)
     {
-
         if ($nomChamp == "default") {
             return <<<HTML
-            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>Aucun champ disponible</span>
-                </div>
+        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+            <span class="text-muted">Aucun champ disponible</span>
+        </div>
         HTML;
         }
 
-        $area = '<label class="text-success">Ce champ a déjà été rendu</label>';
-        $input = '';
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
+        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+            <span>$nomChamp</span>
+            <div class="ms-auto d-flex gap-2">
+                <form method="POST" action="index.php?module=sae&action=supprimerChamp&id=$idChamps" style="margin: 0;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                </form>
+            </div>
+        </div>
+        HTML;
+        }
 
-        if ($param){
-            $area = '<textarea name="reponse'.$idChamps.'" cols="100" class="zone-texte" placeholder="Ecrire ici..."></textarea>';
-            $input = '<input class="ms-auto btn btn-primary text-decoration-none" text="envoyer" type="submit"/>';
+        if ($param) {
+            $area = '<textarea name="reponse' . $idChamps . '" class="form-control mb-3 w-75" placeholder="Écrire ici..." rows="4"></textarea>';
+            $input = '<button type="submit" class="btn btn-primary ms-auto">Envoyer</button>';
+        } else {
+            $area = '<label class="text-warning">Ce champ a déjà été rendu</label>';
+            $input = '';
         }
 
         return <<<HTML
-            <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=input_champ&id=$idSAE&idchamp=$idChamps">
-                <div class="d-flex flex-column">
-                    <span>$nomChamp</span> 
-                    $area
-                    $input
-                </div>
-            </form>
-
-        HTML;
+    <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=ajout_champ&id=$idSAE&idchamp=$idChamps">
+        <div class="d-flex flex-column w-100">
+            <span class="mb-2">$nomChamp</span>
+            $area
+        </div>
+        $input
+    </form>
+    HTML;
     }
 
-    function lineRessource($nomRessource)
+
+
+
+
+    function lineRessource($nomRessource, $idSAE, $idRessource, $contenue)
     {
 
         if ($nomRessource == "default") {
             return <<<HTML
-            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>Aucune ressource disponible</span>
-                </div>
+        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+            <span>Aucune ressource disponible</span>
+        </div>
         HTML;
         }
 
-        return <<<HTML
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>$nomRessource</span>
-                        <a href="#" class="ms-auto text-decoration-none text-primary">fichier.pdf</a>
-                    </div>
+                <span>$nomRessource</span>
+                <div class="ms-auto d-flex gap-2">
+                    <form method="POST" action="index.php?module=sae&action=supprimerRessource&id=$idSAE&idRessource=$idRessource" class="m-0">
+                        <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                    </form>
+                    <a href="#" class="text-decoration-none text-primary align-self-center">Ouvrir la ressource</a>  <!-- TO-DO : Ajouter un lien pour voir le contenu -->
+                </div>
+            </div>
+            HTML;
+        }
 
-        HTML;
+        return <<<HTML
+    <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+        <span>$nomRessource</span> 
+        <a href="#" class="ms-auto text-decoration-none text-primary">Ouvrir la ressource</a> <!-- TO-DO : Ajouter un lien pour voir le contenu -->
+    </div>
+    HTML;
     }
 
     function lineRendus($nom, $dateLimite, $id, $renduDeposer)
@@ -303,16 +394,30 @@ HTML;
                 </div>
         HTML;
         }
-        if($renduDeposer){
+
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
+            <div class="d-flex align-items-center bg-light rounded-3 shadow-sm mb-2 px-2">
+                <span>$nom</span>
+                <div class="ms-auto p-3 d-flex gap-2">
+                    <span class="btn btn-secondary btn-sm modalModifierRendu$id" id="edit-rendu-btn" data-bs-toggle="modal">Modifier</span>
+                    <form method="POST" action="index.php?module=sae&action=supprimerRendu&id=$id" style="margin: 0;">
+                        <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+            HTML;
+        }
+
+        if ($renduDeposer) {
             $color = "success";
             $phrase = "Déposer le : ";
-            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressRenduButton-'.$id.'">Suprimmer le rendu déposer</a>';
+            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressRenduButton-' . $id . '">Suprimmer le rendu déposer</a>';
+        } else {
 
-        }
-        else{
             $color = "danger";
             $phrase = "A déposer avant le : ";
-            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendudrop-'.$id.'">Déposer le rendu</a>';
+            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendudrop-' . $id . '">Déposer le rendu</a>';
         }
 
         return <<<HTML
@@ -333,7 +438,7 @@ HTML;
 
     function lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance, $supportsDeposer)
     {
-            
+
         if ($titre == "default") {
             return <<<HTML
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
@@ -342,14 +447,29 @@ HTML;
         HTML;
         }
 
-        if($supportsDeposer)
-            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressSupportButton-'.$idSoutenance.'">Suprimmer le support déposé</a>';
+        if ($supportsDeposer)
+            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressSupportButton-' . $idSoutenance . '">Suprimmer le support déposé</a>';
         else
-            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendusoutenance-'.$idSoutenance.'">Déposer un support</a>';
-        
+            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendusoutenance-' . $idSoutenance . '">Déposer un support</a>';
+
+
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                <span>$titre</span>
+                <div class="ms-auto d-flex gap-2">
+                    <span class="btn btn-secondary btn-sm modalModifierSoutenance$idSoutenance" id="edit-soutenance-btn" data-bs-toggle="modal">Modifier</span>
+                    <form method="POST" action="index.php?module=sae&action=supprimerSoutenance&id=$idSoutenance" style="margin: 0;">
+                        <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+            HTML;
+        }
+
 
         return <<<HTML
-    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+    <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded-3 shadow-sm mb-2">
         <div class="d-flex align-items-center">
             <p class="mb-0">$titre</p>
         </div>
@@ -577,8 +697,9 @@ HTML;
     }
 
     // Pop up pour les support / rendus
-   
-    function popUpDepot($typeDepot, $idSae){
+
+    function popUpDepot($typeDepot, $idSae)
+    {
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalDepot$typeDepot">
             <div class="modal-dialog">
@@ -613,7 +734,8 @@ HTML;
 HTML;
     }
 
-    function popUpSupressionDepot($typeDepot, $idSae){
+    function popUpSupressionDepot($typeDepot, $idSae)
+    {
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalSupressionDepot$typeDepot">
             <div class="modal-dialog">
@@ -636,8 +758,296 @@ HTML;
 HTML;
     }
 
-    // A continuer lorsque la page "Cloud" des SAE sera réalisé.
-    function ajouterFichierCloud($idSae){
+    function popUpCreateRendu($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateRendu">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer un rendu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createRendu&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreRendu" id="titreRendu" placeholder="Titre du rendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateLimiteRendu" id="dateLimiteRendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureLimiteRendu" id="heureLimiteRendu" required>
+                            </div>
+                            <div class="form-group mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" name="renduNote" id="renduNote">
+                                <label class="form-check-label" for="renduNote">Rendu noté</label>
+                            </div>
+                            <div class="form-group mb-3" id="coeffInput" style="display: none;">
+                                <input type="number" class="form-control" name="coeff" id="coeff" placeholder="Coefficient" min="1" max="10">
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-rendu-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    HTML;
+    }
+
+    function popUpCreateRessource($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateRessource">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer une ressource</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createRessource&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="nomRessource" id="nomRessource" placeholder="Nom de la ressource" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" name="contenuRessource" id="contenuRessource" placeholder="Contenu de la ressource" required></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-ressource-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpAjouterRessource($idSae, $ressources, $ressourcesAssociees)
+    {
+        $options = '';
+
+        $idsRessourcesAssociees = array_map(fn($r) => $r['idRessource'], $ressourcesAssociees);
+
+        foreach ($ressources as $ressource) {
+            if (!in_array($ressource['idRessource'], $idsRessourcesAssociees)) {
+                $idRessource = htmlspecialchars($ressource['idRessource']);
+                $nomRessource = htmlspecialchars($ressource['nom']);
+                $options .= "<option value=\"$idRessource\">$nomRessource</option>";
+            }
+        }
+
+        if (empty($options)) {
+            $options = '<option value="" disabled>Aucune ressource disponible</option>';
+        }
+
+        return <<<HTML
+    <div class="modal" tabindex="-1" id="modalAjouterRessource">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bolder text-center w-100">Ajouter une ressource</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="index.php?module=sae&action=ajouterRessource&id=$idSae" method="POST">
+                    <div class="modal-body d-flex flex-column text-center">
+                        <div class="form-group mb-3">
+                            <label for="ressourceSelect">Sélectionner une ressource</label>
+                            <select class="form-control" id="ressourceSelect" name="ressourceSelect" required>
+                                $options
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-success m-3">Valider</button>
+                            <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-ressource-add-cancel">Annuler</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    HTML;
+    }
+
+    function popUpCreateChamp($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateChamp">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer un champ</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createChamp&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="nomChamp" id="nomChamp" placeholder="Nom du champ" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-champ-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpCreateSoutenance($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateSoutenance">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer une soutenance</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createSoutenance&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreSoutenance" id="titreSoutenance" placeholder="Titre de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="salleSoutenance" id="salleSoutenance" placeholder="Salle de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateSoutenance" id="dateSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureSoutenance" id="heureSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="number" class="form-control" name="dureeSoutenance" id="dureeSoutenance" placeholder="Durée (en minutes)" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-soutenance-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpModifierSoutenance($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierSoutenance">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Modifier la soutenance</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierSoutenance&id=$idSae" method="POST">
+                        <input type="hidden" id="idSoutenanceAModifier" name="idSoutenanceAModifier" value="">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreSoutenance" id="titreSoutenance" placeholder="Titre de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="salleSoutenance" id="salleSoutenance" placeholder="Salle de la soutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateSoutenance" id="dateSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureSoutenance" id="heureSoutenance" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="number" class="form-control" name="dureeSoutenance" id="dureeSoutenance" placeholder="Durée (en minutes)" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-soutenance-edit-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpModifierRendu($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierRendu">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Modifier le rendu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierRendu&id=$idSae" method="POST">
+                    <input type="hidden" id="idRenduAModifier" name="idRenduAModifier" value="">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="titreRendu" id="titreRendu" placeholder="Titre du rendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="date" class="form-control" name="dateLimiteRendu" id="dateLimiteRendu" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="time" class="form-control" name="heureLimiteRendu" id="heureLimiteRendu" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-rendu-edit-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpModifierSujet($idSae, $sae)
+    {
+
+        $sujet = htmlspecialchars($sae[0]['sujet']);
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierSujet">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100" id="edit-sujet-btn">Modifier le sujet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierSujet&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" name="sujet" id="sujet" placeholder="Modifier le sujet" required>$sujet</textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-sujet-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+
+    // A continuer lorsque laidRendu page "Cloud" des SAE sera réalisé.
+    function ajouterFichierCloud($idSae)
+    {
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalAjouterFichierCloud">
             <div class="modal-dialog">
