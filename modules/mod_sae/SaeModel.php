@@ -58,7 +58,7 @@ class SaeModel extends Connexion
 
     public function getRessourceBySAE($idSAE)
     {
-        $req = "SELECT Ressource.idRessource, contenu
+        $req = "SELECT Ressource.idRessource, contenu, nom
                 FROM Ressource
                 INNER JOIN RessourcesSAE ON RessourcesSAE.idRessource = Ressource.idRessource
                 INNER JOIN SAE ON RessourcesSAE.idSAE = SAE.idSAE
@@ -68,6 +68,15 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
+
+    public function getRessource()
+    {
+        $req = "SELECT * FROM Ressource";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
     public function getChampBySAE($idSAE)
     {
         $req = "SELECT nomchamp, idChamps
@@ -319,6 +328,25 @@ class SaeModel extends Connexion
         $pdo_req->execute();
     }
 
+    function createRessource($nom, $contenue)
+    {
+        $req = "INSERT INTO Ressource (nom, contenu, couleur) VALUES (:nom, :contenu, :couleur)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":nom", $nom);
+        $pdo_req->bindValue(":contenu", $contenue);
+        $pdo_req->bindValue(":couleur", NULL);
+        $pdo_req->execute();
+    }
+
+    function addRessourceSAE($idSAE, $idRessource)
+    {
+        $req = "INSERT INTO RessourcesSAE (idSAE, idRessource) VALUES (:idSAE, :idRessource)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idRessource", $idRessource);
+        $pdo_req->execute();
+    }
+
     // DEL
 
     function delRendu($idRendu)
@@ -351,6 +379,14 @@ class SaeModel extends Connexion
         $req = "UPDATE SAE SET sujet = '' WHERE idSAE = :idSAE";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+    }
+
+    function delChamp($idChamp)
+    {
+        $req = "DELETE FROM Champs WHERE idChamps = :idChamp";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idChamp", $idChamp);
         $pdo_req->execute();
     }
 

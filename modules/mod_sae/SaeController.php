@@ -71,6 +71,15 @@ class SaeController
             case "supprimerSujet":
                 $this->delSujet();
                 break;
+            case "createRessource":
+                $this->createRessource();
+                break;
+            case "ajouterRessource":
+                $this->addRessource();
+                break;
+            case "supprimerChamp":
+                $this->delChamps();
+                break;
         }
     }
 
@@ -97,6 +106,7 @@ class SaeController
             $soutenance = $this->model->getSoutenanceBySae($_GET['id']);
             $champs = $this->model->getChampBySae($_GET['id']);
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
+            $allRessource = $this->model->getRessource();
             $rendusDeposer = [];
             foreach ($rendus as $rendu)
                 if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
@@ -104,7 +114,7 @@ class SaeController
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
 
-            $this->view->initSaeDetails($saes, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer);
+            $this->view->initSaeDetails($saes, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $allRessource);
         } else {
             header('Location: index.php');
         }
@@ -171,10 +181,15 @@ class SaeController
         $idSae = $_GET['id'];
         $titre = $_POST['titreRendu'];
         $dateLimite = $_POST['dateLimiteRendu'];
-        $estNote = $_POST['renduNote'];
-        $coeff = $_POST['coeff'];
+        $heureLimite = $_POST['heureLimiteRendu'];
 
-        $this->model->createRendu($titre, $dateLimite, $idSae, $estNote, $coeff);
+        $dateLimiteComplete = $dateLimite . ' ' . $heureLimite;
+
+        $estNote = isset($_POST['renduNote']) ? true : false;
+        $coeff = isset($_POST['coeff']) ? $_POST['coeff'] : null;
+
+        $this->model->createRendu($titre, $dateLimiteComplete, $idSae, $estNote, $coeff);
+
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
@@ -200,11 +215,17 @@ class SaeController
     {
         $titre = $_POST['titreRendu'];
         $dateLimite = $_POST['dateLimiteRendu'];
+        $heureLimite = $_POST['heureLimiteRendu'];
+
+        $dateLimiteComplete = $dateLimite . ' ' . $heureLimite;
+
         $idRendu = $_POST['idRenduAModifier'];
 
-        $this->model->updateRendu($idRendu, $titre, $dateLimite);
+        $this->model->updateRendu($idRendu, $titre, $dateLimiteComplete);
+
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
+
 
     private function createSoutenance()
     {
@@ -261,6 +282,32 @@ class SaeController
         $idSae = $_GET['id'];
 
         $this->model->delSujet($idSae);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function createRessource()
+    {
+        $nom = $_POST['nomRessource'];
+        $contenue = $_POST['contenuRessource'];
+
+        $this->model->createRessource($nom, $contenue);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function addRessource()
+    {
+        $idSae = $_GET['id'];
+        $idRessource = $_POST['ressourceSelect'];
+
+        $this->model->addRessourceSAE($idSae, $idRessource);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function delChamps()
+    {
+        $idChamp = $_GET['id'];
+
+        $this->model->delChamp($idChamp);
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }

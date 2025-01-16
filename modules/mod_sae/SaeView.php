@@ -58,8 +58,9 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer)
+    function initSaeDetails($sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $ressources)
     {
+
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
         $sujet = htmlspecialchars($sae[0]['sujet']);
@@ -97,7 +98,9 @@ HTML;
         echo $this->popUpCreateSoutenance($idSAE);
         echo $this->popUpModifierSoutenance($idSAE);
         echo $this->popUpCreateChamp($idSAE);
-        echo $this->popUpModifierSujet($idSAE);
+        echo $this->popUpModifierSujet($idSAE, $sae);
+        echo $this->popUpCreateRessource($idSAE);
+        echo $this->popUpAjouterRessource($idSAE, $ressources, $ressource);
         echo <<<HTML
             </div>
 HTML;
@@ -117,10 +120,10 @@ HTML;
         if (!empty($champs)) {
             foreach ($champs as $c) {
                 $nomChamps = htmlspecialchars($c['nomchamp']);
-                echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId));
+                echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId), $idSAE);
             }
         } else {
-            echo $this->lineChamp("default", "", "");
+            echo $this->lineChamp("default", "", "", "");
         }
 
         if ($_SESSION['estProfUtilisateur']) {
@@ -150,19 +153,22 @@ HTML;
 HTML;
         if (!empty($ressource)) {
             foreach ($ressource as $r) {
-                $nomRessource = htmlspecialchars($r['contenu']);
-                echo $this->lineRessource($nomRessource, $sae[0]['idSAE'], $r['idRessource']);
+                $nomRessource = htmlspecialchars($r['nom']);
+                $idSAE = htmlspecialchars($sae[0]['idSAE']);
+                $idRessource = htmlspecialchars($r['idRessource']);
+                $contenue = htmlspecialchars($r['contenu']);
+                echo $this->lineRessource($nomRessource, $idSAE, $idRessource, $contenue);
             }
         } else {
-            echo $this->lineRessource("default", $sae[0]['idSAE'], "");
+            echo $this->lineRessource("default", $sae[0]['idSAE'], "", "");
         }
 
         if ($_SESSION['estProfUtilisateur']) {
 
             echo <<<HTML
             <div class="d-flex gap-3 p-3">
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3">Ajouter une ressource</button>
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4">Créer une ressource</button>
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="btn-add-ressource">Ajouter une ressource</button>
+                <button class="btn btn-secondary rounded-pill shadow-sm px-4" id="create-ressource">Créer une ressource</button>
             </div>
 HTML;
         }
@@ -259,38 +265,53 @@ HTML;
 HTML;
     }
 
-    function lineChamp($nomChamp, $idChamps, $param)
+    function lineChamp($nomChamp, $idChamps, $param, $idSAE)
     {
-
         if ($nomChamp == "default") {
             return <<<HTML
-            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>Aucun champ disponible</span>
-                </div>
+        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+            <span class="text-muted">Aucun champ disponible</span>
+        </div>
         HTML;
         }
 
-        $area = '<label class="text-success">Ce champ a déjà été rendu</label>';
-        $input = '';
+        if ($_SESSION['estProfUtilisateur']) {
+            return <<<HTML
+        <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+            <span>$nomChamp</span>
+            <div class="ms-auto d-flex gap-2">
+                <form method="POST" action="index.php?module=sae&action=supprimerChamp&id=$idChamps" style="margin: 0;">
+                    <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                </form>
+            </div>
+        </div>
+        HTML;
+        }
 
         if ($param) {
-            $area = '<textarea name="reponse' . $idChamps . '" cols="100" class="zone-texte" placeholder="Ecrire ici..."></textarea>';
-            $input = '<input class="ms-auto text-decoration-none text-primary" text="envoyer" type="submit"/>';
+            $area = '<textarea name="reponse' . $idChamps . '" class="form-control mb-3 w-75" placeholder="Écrire ici..." rows="4"></textarea>';
+            $input = '<button type="submit" class="btn btn-primary ms-auto">Envoyer</button>';
+        } else {
+            $area = '<label class="text-warning">Ce champ a déjà été rendu</label>';
+            $input = '';
         }
 
         return <<<HTML
-            <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=ajout_champ&id=1&idchamp=$idChamps">
-                <div class="d-flex flex-column">
-                    <span>$nomChamp</span> 
-                    $area
-                </div>
-                $input
-            </form>
-
-        HTML;
+    <form class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2" method="POST" action="index.php?module=sae&action=ajout_champ&id=$idSAE&idchamp=$idChamps">
+        <div class="d-flex flex-column w-100">
+            <span class="mb-2">$nomChamp</span>
+            $area
+        </div>
+        $input
+    </form>
+    HTML;
     }
 
-    function lineRessource($nomRessource, $idSAE, $idRessource)
+
+
+
+
+    function lineRessource($nomRessource, $idSAE, $idRessource, $contenue)
     {
 
         if ($nomRessource == "default") {
@@ -303,25 +324,22 @@ HTML;
 
         if ($_SESSION['estProfUtilisateur']) {
             return <<<HTML
-        <div class="d-flex align-items-center p-2 bg-light rounded-3 shadow-sm mb-2">
-            <span>$nomRessource</span>
-            <div class="ms-auto d-flex gap-2">
-            <form method="POST" action="index.php?module=sae&action=modifierRessource&id=$idSAE">
-                <button type="submit" class="btn btn-secondary btn-sm">Modifier</button>
-            </form>
-            <form method="POST" action="index.php?module=sae&action=supprimerRessource&id=$idSAE&idRessource=$idRessource">
-                <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
-            </form>
-            <a href="#" class="text-decoration-none text-primary align-self-center">fichier.pdf</a>
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                <span>$nomRessource</span>
+                <div class="ms-auto d-flex gap-2">
+                    <form method="POST" action="index.php?module=sae&action=supprimerRessource&id=$idSAE&idRessource=$idRessource" class="m-0">
+                        <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
+                    </form>
+                    <a href="#" class="text-decoration-none text-primary align-self-center">Ouvrir la ressource</a>  <!-- TO-DO : Ajouter un lien pour voir le contenu -->
+                </div>
             </div>
-        </div>
-        HTML;
+            HTML;
         }
 
         return <<<HTML
     <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-        <span>$nomRessource</span>
-        <a href="#" class="ms-auto text-decoration-none text-primary">fichier.pdf</a>
+        <span>$nomRessource</span> 
+        <a href="#" class="ms-auto text-decoration-none text-primary">Ouvrir la ressource</a> <!-- TO-DO : Ajouter un lien pour voir le contenu -->
     </div>
     HTML;
     }
@@ -708,6 +726,82 @@ HTML;
     HTML;
     }
 
+    function popUpCreateRessource($idSae)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalCreateRessource">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Créer une ressource</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=createRessource&id=$idSae" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="nomRessource" id="nomRessource" placeholder="Nom de la ressource" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" name="contenuRessource" id="contenuRessource" placeholder="Contenu de la ressource" required></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-ressource-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
+
+    function popUpAjouterRessource($idSae, $ressources, $ressourcesAssociees)
+    {
+        $options = '';
+
+        $idsRessourcesAssociees = array_map(fn($r) => $r['idRessource'], $ressourcesAssociees);
+
+        foreach ($ressources as $ressource) {
+            if (!in_array($ressource['idRessource'], $idsRessourcesAssociees)) {
+                $idRessource = htmlspecialchars($ressource['idRessource']);
+                $nomRessource = htmlspecialchars($ressource['nom']);
+                $options .= "<option value=\"$idRessource\">$nomRessource</option>";
+            }
+        }
+
+        if (empty($options)) {
+            $options = '<option value="" disabled>Aucune ressource disponible</option>';
+        }
+
+        return <<<HTML
+    <div class="modal" tabindex="-1" id="modalAjouterRessource">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bolder text-center w-100">Ajouter une ressource</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="index.php?module=sae&action=ajouterRessource&id=$idSae" method="POST">
+                    <div class="modal-body d-flex flex-column text-center">
+                        <div class="form-group mb-3">
+                            <label for="ressourceSelect">Sélectionner une ressource</label>
+                            <select class="form-control" id="ressourceSelect" name="ressourceSelect" required>
+                                $options
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-success m-3">Valider</button>
+                            <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-ressource-add-cancel">Annuler</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    HTML;
+    }
+
     function popUpCreateChamp($idSae)
     {
         return <<<HTML
@@ -848,8 +942,10 @@ HTML;
     HTML;
     }
 
-    function popUpModifierSujet($idSae)
+    function popUpModifierSujet($idSae, $sae)
     {
+
+        $sujet = htmlspecialchars($sae[0]['sujet']);
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalModifierSujet">
             <div class="modal-dialog">
@@ -861,7 +957,7 @@ HTML;
                     <form action="index.php?module=sae&action=modifierSujet&id=$idSae" method="POST">
                         <div class="modal-body d-flex flex-column text-center">
                             <div class="form-group mb-3">
-                                <textarea class="form-control" name="sujet" id="sujet" placeholder="Modifier le sujet" required></textarea>
+                                <textarea class="form-control" name="sujet" id="sujet" placeholder="Modifier le sujet" required>$sujet</textarea>
                             </div>
                             <div>
                                 <button type="submit" class="btn btn-success m-3">Valider</button>

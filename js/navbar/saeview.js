@@ -191,3 +191,33 @@ editSujetBtn.addEventListener("click", function () {
       document.querySelector("#modalModifierSujet").classList.remove("d-block");
     });
 });
+
+// Ressource
+
+const createRessourceBtn = document.querySelector("#create-ressource");
+
+createRessourceBtn.addEventListener("click", function () {
+  document.querySelector("#modalCreateRessource").classList.add("d-block");
+
+  document
+    .querySelector("#modal-ressource-cancel")
+    .addEventListener("click", function () {
+      document
+        .querySelector("#modalCreateRessource")
+        .classList.remove("d-block");
+    });
+});
+
+const addRessourceBtn = document.querySelector("#btn-add-ressource");
+
+addRessourceBtn.addEventListener("click", function () {
+  document.querySelector("#modalAjouterRessource").classList.add("d-block");
+
+  document
+    .querySelector("#modal-ressource-add-cancel")
+    .addEventListener("click", function () {
+      document
+        .querySelector("#modalAjouterRessource")
+        .classList.remove("d-block");
+    });
+});
