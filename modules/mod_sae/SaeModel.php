@@ -69,6 +69,17 @@ class SaeModel extends Connexion
         return false;
     }
 
+    function getSoutenanceById($idSoutenance){
+        $req = "SELECT *
+                FROM Soutenance
+                WHERE Soutenance.idSoutenance = :idSoutenance";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSoutenance", $idSoutenance);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
     function uploadFileSupport($file, $idSoutenance, $fileName, $idSae){
         $newFileName = $this->uploadFichier($fileName, $file, "none");
         if($newFileName){
@@ -383,7 +394,7 @@ class SaeModel extends Connexion
         $req = "SELECT idPersonne, prenom, nom
                 FROM Personne
                 WHERE estProf = 1
-                AND idPersonne not in (
+                AND idPersonne in (
                                         SELECT idResp
                                         FROM ResponsablesSAE
                                         WHERE idSAE = :idSAE
@@ -401,7 +412,126 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    // POST
+    public function estProfSae($idSae, $idPersonne){
+        $profsSae = $this->getProfsBySAE($idSae);
+        foreach($profsSae as $prof){
+            if($prof['idPersonne'] == $idPersonne){
+                return true;
+            }
+        }
+        return false;
+    }
 
-    
+    public function getGroupeSansPassageDeSoutenance($idSoutenance)
+    {
+        $req = "SELECT Groupe.idGroupe, Groupe.nom 
+        FROM Groupe
+        WHERE Groupe.idGroupe NOT IN (
+            SELECT distinct(PassageSoutenance.idGroupe)
+            FROM PassageSoutenance
+            WHERE idSoutenance = :idSoutenance
+        )";
+
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function getGroupeAvecPassageSoutenance($idSoutenance)
+    {
+        $req = "SELECT *
+                FROM PassageSoutenance
+                WHERE idSoutenance = :idSoutenance
+        ";
+
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function getGroupeDeLaSae($idSae){
+        $req = "SELECT *
+        FROM Groupe
+        WHERE Groupe.idSAE = :idSAE";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSae);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function creePassageSoutenance($date, $duration, $schedules, $idSoutenance)
+    {
+        $req = "SELECT Soutenance.dureeMinutes
+        FROM Soutenance
+        WHERE idSoutenance = :idSoutenance";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->execute();
+        $result = $pdo_req->fetch();
+
+        if($result["dureeMinutes"] == $duration) {
+            $req = "DELETE FROM PassageSoutenance
+                    WHERE DATE(PassageSoutenance.date) = :date";
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":date", $date);
+            $pdo_req->execute();
+
+            if($schedules) {
+                foreach ($schedules as $schedule) {
+                    $idGroupe = explode("|", $schedule)[0];
+                    $time = trim(explode("-", explode("|", $schedule)[1])[0]); # récupère l'heure de début du passage
+                    $datetime = $date . ' ' . $time . ":00";
+
+                    $req = "INSERT INTO PassageSoutenance VALUES(:idSoutenance, :idGroupe, :time)";
+                    $pdo_req = self::$bdd->prepare($req);
+                    $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+                    $pdo_req->bindValue(":idGroupe", $idGroupe);
+                    $pdo_req->bindValue(":time", $datetime);
+                    $pdo_req->execute();
+                }
+            }
+        }
+        else {
+            $req = "UPDATE Soutenance
+            SET Soutenance.dureeMinutes = :duration
+            WHERE Soutenance.idSoutenance = :idSoutenance";
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+            $pdo_req->bindValue(":duration", $duration);
+            $pdo_req->execute();
+
+            $req = "DELETE FROM PassageSoutenance
+                    WHERE 1=1";
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->execute();
+        }
+    }
+
+    public function listeSoutenanceOuEstJuryParSae($idSae, $idPersonne)
+    {
+        $req = "SELECT *
+                FROM Soutenance
+                WHERE Soutenance.idSoutenance IN (SELECT idSoutenance
+                                FROM JurySoutenance
+                                WHERE idPersonne = :idPersonne)
+                AND Soutenance.idSAE = :idSAE";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idPersonne", $idPersonne);
+        $pdo_req->bindValue(":idSAE", $idSae);
+        $pdo_req->execute();
+
+        return $pdo_req->fetchAll();
+    }
+
+
 }

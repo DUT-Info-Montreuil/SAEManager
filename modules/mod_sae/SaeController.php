@@ -51,6 +51,15 @@ class SaeController
             case "suprimmerDepotGroupeSupport":
                 $this->suprimmerDepotSupportGroupe();
                 break;
+            case "soutenance":
+                $this->initSoutenance();
+                break;
+            case "calendrierPassageSoutenance":
+                $this->initPageSoutenanceCalendrier();
+                break;
+            case "placerPassageSoutenance":
+                $this->placerPassageSoutenance();
+                break;
 
         }
     }
@@ -79,15 +88,16 @@ class SaeController
             $champs = $this->model->getChampBySae($_GET['id']);
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
             $rendusDeposer = [];
-            foreach ($rendus as $rendu)
+            foreach ($rendus as $rendu) {
                 if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
-                if($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])){
+                if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
+            }
             $supportsDeposer = [];
             foreach($soutenances as $soutenance){
                 if($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))){
@@ -101,6 +111,33 @@ class SaeController
         } else {
             header('Location: index.php');
         }
+    }
+
+    private function initPageSoutenanceCalendrier()
+    {
+        $idSoutenance = isset($_POST['idSoutenance']) ? $_POST['idSoutenance'] : exit("idSoutenance not set");
+        $soutenance =  $this->model->getSoutenanceById($idSoutenance)[0];
+        $titre = $soutenance['titre'];
+        $temps = $soutenance['dureeMinutes'];
+        $listeGroupe = $this->model->getGroupeDeLaSae($_GET['id']);
+        $listeGroupeAvecPassage = $this->model->getGroupeAvecPassageSoutenance($idSoutenance);
+
+        $firstcpt = 0;
+        foreach($listeGroupe as $groupe){
+            $find = false;
+            foreach($listeGroupeAvecPassage as $groupeAvecPassage){
+                if($groupe['idgroupe'] == $groupeAvecPassage['idGroupe']){
+                    $listeGroupe[$firstcpt]['passage'] = $groupeAvecPassage['date'];
+                    $find = true;
+                }
+            }
+            if(!$find) {
+                $listeGroupe[$firstcpt]['passage'] = null;
+            }
+            $firstcpt++;
+        }
+
+        $this->view->initPageSoutenance($titre, $idSoutenance, $_GET['id'], $listeGroupe, $temps);
     }
 
     private function initGroup()
@@ -123,6 +160,16 @@ class SaeController
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
+    }
+
+    private function initSoutenance()
+    {
+        $soutenances = $this->model->listeSoutenanceOuEstJuryParSae($_GET['id'], $_SESSION['idUtilisateur']);
+        $sae = $this->model->getSaeById($_GET['id']);
+        if($this->model->estProfSae($_GET['id'], $_SESSION['idUtilisateur']))
+            $this->view->initPageListeSoutenance($sae, $soutenances, $_GET['id']);
+        else
+            header("Location: index.php?module=sae&action=details&id=" . $_GET['id']);
     }
 
     private function uploadFichier()
@@ -198,4 +245,20 @@ class SaeController
         $this->model->suprimmerDepotGroupeSupport($idDepot, $idGroupe);
         header("Location: index.php?module=sae&action=details&id=".$idSae);
     }
+
+    private function placerPassageSoutenance()
+    {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $date = $_POST['date'] ?? exit("date not set");
+            $duration = $_POST['duration'] ?? exit("duration not set");
+            $schedules = $_POST['schedule'] ?? null;
+            $idSoutenance = $_GET['idsoutenance'] ?? exit("idSoutenance not set");
+
+            $this->model->creePassageSoutenance($date, $duration, $schedules, $idSoutenance);
+        }
+
+        header("Location: index.php?module=sae&action=soutenance&id=".$_GET['id']);
+    }
+
+
 }

@@ -522,7 +522,162 @@ HTML;
         HTML;
     }
 
+    function initPageListeSoutenance($sae, $soutenances, $idSae)
+    {
+        $nom = htmlspecialchars($sae[0]['nomSae']);
+        echo <<<HTML
+        <div class="container mt-5">
+            <h1 class="fw-bold">$nom</h1>
+            <div class="card shadow bg-white rounded p-4 min-h75">
+                <div class="mb-5">
+                    <h3 class="d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Soutenance(s) de la SAE que vous jugé
+                    </h3>
+                    <div>
+        HTML;
 
+
+        if (!empty($soutenances)) {
+            foreach ($soutenances as $soutenance) {
+                $id = htmlspecialchars($soutenance['idSoutenance']);
+                $titre = htmlspecialchars($soutenance['titre']);
+
+                echo $this->initLineSoutenance($titre, $id, $idSae);
+            }
+        } else {
+            echo "Vous n'êtes jury d'aucunes soutenances de cette SAE";
+        }
+
+    }
+    function initLineSoutenance($titre, $idsoutenance, $idSae)
+    {
+        return <<<HTML
+        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+                <div class="d-flex align-items-center">
+                    <p class="mb-0">$titre</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <form action="index.php?module=sae&action=calendrierPassageSoutenance&id=$idSae" method="POST" id="soutenanceCalendrier">
+                        <input type="hidden" name="idSoutenance" id="idSoutenance" value="$idsoutenance"/>
+                        <button type="submit" class="btn btn-primary">Définir le calendrier des passages</button>
+                    </form>
+                </div>
+            </div>
+        HTML;
+    }
+
+    function initPageSoutenance($titre, $idsoutenance, $idSae, $listeGroupe, $temps){
+        echo <<<HTML
+                <div class="container mt-5">
+                <h1 class="fw-bold">$titre</h1>
+                <div class="card shadow bg-white rounded p-4 min-h75">
+                    <div class="mb-5">
+                        <div class="alert alert-info mt-3">
+                            <p>
+                                Bienvenue sur l'outil de gestion des horaires de passage. Voici comment l'utiliser :
+                            </p>
+                            <ul>
+                                <li>Utilisez le sélecteur de date et configurez les heures de début, de fin, ainsi que la durée des plages horaires (vous pourez en créer plusieurs).</li>
+                                <li>Glissez et déposez les groupes de la section "Groupe sans horaire de passage" vers les plages horaires générées dans la section de planning.</li>
+                                <li>Lorsque tout est prêt, cliquez sur le bouton <strong>"Valider"</strong> pour enregistrer le planning.</li>
+                            </ul>
+                        </div>
+                        <div class="container mt-5 d-flex flex-column" style="height: 100vh;">
+                            <div class="row flex-fill">
+                                <div class="col-md-3">
+                                    <h4>Groupe sans horaire de passage</h4>
+                                    <div id="no-groups-message" class="d-none text-center text-muted">
+                                            <p>Aucuns groupes ne sont à placer dans le planning</p>
+                                        </div>
+                                    <div id="blocks" class="blocks overflow-auto border p-2 bg-light" style="max-height: 600px;">
+                                        
+        HTML;
+                                        foreach($listeGroupe as $groupe){
+                                            $nomGroupe = $groupe['nom'];
+                                            $idGroupe = $groupe['idgroupe'];
+                                            $passage = $groupe['passage'];
+                                            if($passage==null){
+                                                echo <<<HTML
+                                                    <div class="p-3 mb-2 bg-light border rounded block" draggable="true" data-id=$idGroupe>
+                                                        <input type="hidden" id="idgroupesoutenance" name="idgroupesoutenance" class="form-control block-input">$nomGroupe</input>
+                                                    </div>
+        HTML;
+                                            }
+                                            else{
+                                                echo <<<HTML
+                                                    <div type="hidden" class="groupeAvecPassage:$idGroupe:$nomGroupe:$passage"></div>
+        HTML;
+                                            }
+                                        }
+                                        echo <<<HTML
+                                    </div>
+
+                                    <!-- Nouvelle zone pour les groupes avec horaire -->
+                                    <h4 class="mt-4">Groupe avec horaire de passage</h4>
+                                    <div class="overflow-auto border p-2 bg-light" style="max-height: 400px;">
+                                        <!-- Affichage des groupes avec passage -->
+        HTML;
+                                    foreach ($listeGroupe as $groupe) {
+                                        $nomGroupe = $groupe['nom'];
+                                        $idGroupe = $groupe['idgroupe'];
+                                        $passage = $groupe['passage'];
+                                        if ($passage != null) {
+                                            echo <<<HTML
+                                                <div class="p-3 mb-2 bg-light border rounded" >
+                                                    <span><strong>$nomGroupe</strong></span><br>
+                                                    <span>Passage : $passage</span>
+                                                </div>
+        HTML;
+                                        }
+                                    }
+                                    echo <<<HTML
+                                    </div>
+                                </div>
+            
+                                <!-- Main Content: Planning -->
+                                <div class="col-md-9 d-flex flex-column">
+                                    <div class="mb-3">
+                                        <label for="date-picker" class="form-label">Sélectionnez une date :</label>
+                                        <input type="date" id="date-picker" class="form-control" />
+                                    </div>
+            
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 id="current-date">Date : <span></span></h4>
+                                    </div>
+            
+                                    <div class="mb-3">
+                                        <label for="start-time" class="form-label">Heure de début :</label>
+                                        <input type="time" id="start-time" class="form-control" value="09:00">
+                                    
+                                        <label for="end-time" class="form-label mt-3">Heure de fin :</label>
+                                        <input type="time" id="end-time" class="form-control" value="18:00">
+                                    
+                                    
+                                        <label for="slot-duration" class="form-label mt-3">Durée des plages (minutes) :</label>
+                                        <input type="number" id="slot-duration" class="form-control" value=$temps min="1">
+                                    
+                                        <p class="mt-2 text-muted">Pour changer la durée des plages, valider d'abord une première fois le changement en appuyant sur valider, puis re remplissez les plages (attention, tout les passages de la soutenance seront suprimmés).</p>
+                                        
+                                        <button id="generate-slots" class="btn btn-success mt-3">Générer les plages horaires</button>
+                                    </div>
+                                    <div id="time-slots" class="overflow-auto" style="max-height: 600px; width: 100%;"></div>
+                                    
+                                    <button id="validate" class="btn btn-success mt-2">Valider</button>
+                                    <form id="schedule-form" method="post" action="index.php?module=sae&action=placerPassageSoutenance&id=$idSae&idsoutenance=$idsoutenance" style="display: none;">
+                                        <div id="schedule-data"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script src="js/Sae/pageSoutenanceCalendrier/pageSoutenanceCalendrier.js"></script>
+        HTML;
+    }
 
     function lineNoteRendus($nom, $notes, $coeff)
     {
