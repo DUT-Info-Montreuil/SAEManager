@@ -44,7 +44,9 @@
 .card-sae-content:hover,
 .card-rendus:hover,
 .card-rendus-content:hover,
-.card-create-sae:hover {
+.card-create-sae:hover,
+.card-ressources:hover
+.card-ressources-content:hover {
     transform: scale(1.05);
 }
 

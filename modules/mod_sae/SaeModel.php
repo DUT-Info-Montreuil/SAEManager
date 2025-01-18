@@ -173,6 +173,18 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
+    public function getMySAE()
+    {
+        $req = "SELECT SAE.idSAE, SAE.nomSae
+                FROM SAE
+                INNER JOIN EleveInscritSae ON SAE.idSAE = EleveInscritSae.idSAE
+                WHERE EleveInscritSae.idEleve = :idEleve";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idEleve", $_SESSION['idUtilisateur'], PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
     public function getChampBySAE($idSAE)
     {
         $req = "SELECT nomchamp, idChamps

@@ -303,3 +303,5 @@ if (addRessourceBtn) {
       });
   });
 }
+
+// Ressource

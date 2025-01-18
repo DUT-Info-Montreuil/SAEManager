@@ -40,6 +40,7 @@ HTML;
 		if (isset($_SESSION['loginUtilisateur'])) {
 			$this->affichage .= <<<HTML
 			<div class="d-flex">
+				<div class="my-auto">{$_SESSION['loginUtilisateur']}</div>
 				<a href="index.php?infoConnexion=deconnexion" class="my-auto btn btn-link mx-2 text-decoration-none text-reset">
 					<svg class="icon" width="24" height="24">
 						<use xlink:href="#logout-icon"></use>
@@ -64,7 +65,7 @@ HTML;
 		$action = $_GET['action'] ?? '';
 
 		if ($module == 'sae' && $action != 'home') {
-			$saeID = $_GET['id'];
+			$saeID = $_GET['id'] ?? "";
 			$this->affichage .= <<<HTML
 			<ul>
 				<li><a href="index.php?module=home">Accueil</a></li>

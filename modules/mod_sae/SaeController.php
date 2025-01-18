@@ -93,6 +93,9 @@ class SaeController
             case "ajout_champ":
                 $this->ajout();
                 break;
+            case "ressources":
+                $this->initRessource();
+                break;
         }
     }
 
@@ -389,5 +392,14 @@ class SaeController
 
         $this->model->suprimmerDepotGroupeSupport($idDepot, $idGroupe);
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
+    }
+
+
+    private function initRessource()
+    {
+
+        $ressource = $this->model->getRessource();
+        $mySAE = $this->model->getMySAE();
+        $this->view->initRessources($ressource, $mySAE);
     }
 }

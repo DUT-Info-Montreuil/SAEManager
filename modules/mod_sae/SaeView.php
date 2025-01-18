@@ -1085,4 +1085,54 @@ HTML;
         </div>
 HTML;
     }
+
+
+
+    // Ressources
+
+
+    function initRessources($ressources, $mySAES)
+    {
+        echo <<<HTML
+    <div class="container mt-5">
+        <h1 class="fw-bold">LISTE DES RESSOURCES</h1>
+        <div class="card shadow bg-white rounded min-h75 p-3">
+            <div class="d-flex align-items-center p-4 mx-5">
+                <div class="me-3">
+                    <svg width="35" height="35">
+                        <use xlink:href="#arrow-icon"></use>
+                    </svg>
+                </div>
+                <h3 class="fw-bold">Liste des ressources de toutes les SAés :</h3>
+            </div>
+            <div class="d-flex mb-4">
+                <input type="text" id="search-bar" class="form-control w-50" placeholder="Rechercher une ressource">
+                <button id="sort-button" class="btn btn-primary ms-3">Trier A-Z</button>
+                <button id="filter-sae-button" class="btn btn-secondary ms-3">Afficher mes SAE</button>
+            </div>
+            <div id="ressources-list" class="ressources-list">
+HTML;
+
+        // Génération des ressources
+        foreach ($ressources as $ressource) {
+            $nomRessource = htmlspecialchars($ressource['nom']);
+            $idSAE = htmlspecialchars($ressource['idRessource']); // ID de la SAE pour filtrer
+            $contenue = htmlspecialchars($ressource['contenu']);
+            echo <<<HTML
+        <div class="resource-item d-flex align-items-center p-2 border-bottom" data-name="$nomRessource" data-sae="$idSAE">
+            <div>
+                <h5 class="mb-0 fw-bold resource-name">$nomRessource</h5>
+                <p class="mb-0 text-muted">Contenu: $contenue</p>
+            </div>
+        </div>
+HTML;
+        }
+
+        echo <<<HTML
+            </div>
+        </div>
+    </div>
+    <script src="js/ressource.js"></script>
+HTML;
+    }
 }
