@@ -93,6 +93,9 @@ class SaeController
             case "ajout_champ":
                 $this->ajout();
                 break;
+            case "creation_groupe":
+                $this->creerGroupe();
+                break;
         }
     }
 
@@ -139,8 +142,10 @@ class SaeController
                 }
             }
             $profs = $this->model->getProfsBySAE($_GET['id']);
+            $etudiants = $this->model->getEtudiantsBySAE($_GET['id']);
+            $inscritSAE = $this->model->isInscritBySAE($_GET['id']);
 
-            $this->view->initSaeDetails($profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
+            $this->view->initSaeDetails($inscritSAE, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
         } else {
             header('Location: index.php');
         }
@@ -388,6 +393,14 @@ class SaeController
         $idDepot = isset($_POST['idDepotSupressionSupport']) ? $_POST['idDepotSupressionSupport'] : exit("idSupport not set");
 
         $this->model->suprimmerDepotGroupeSupport($idDepot, $idGroupe);
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+    }
+
+    private function creerGroupe() {
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        if (count($_POST['etudiants']) == count(array_unique($_POST['etudiants']))) {
+            $this->model->propositionGroupe($_POST['etudiants'], $idSae);
+        }
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 }

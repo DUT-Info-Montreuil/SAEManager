@@ -581,4 +581,75 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->execute();
     }
+
+    public function getEtudiantsBySAE($idSAE) {
+        $req = "SELECT idEleve, prenom, nom
+                FROM EleveInscritSae
+                INNER JOIN Personne ON idPersonne = idEleve
+                WHERE idSAE = :idSAE
+                AND idEleve != :idEleve
+                AND idEleve not in (SELECT idEleve
+                                    FROM PropositionsEleve
+                                    INNER JOIN PropositionsGroupe using(idProposition)
+                                    WHERE idSAE = :idSAE)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idEleve", $_SESSION['idUtilisateur']);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function isInscritBySAE($idSAE) {
+        $req = "SELECT count(*)
+                FROM Groupe
+                INNER JOIN EtudiantGroupe ON Groupe.idgroupe = EtudiantGroupe.idgroupe
+                WHERE idSAE = :idSAE
+                AND idEtudiant = :idEleve";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idEleve", $_SESSION['idUtilisateur']);
+        $pdo_req->execute();
+        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0];
+    }
+
+    private function isInscrivablesBySAE($id_etudiants, $idSAE) {
+        foreach($id_etudiants as $id) {
+            $req = "SELECT count(*)
+                FROM PropositionsGroupe
+                INNER JOIN PropositionsEleve using(idProposition)
+                WHERE idSAE = :idSAE
+                AND idEleve = :idEleve";
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSAE", $idSAE);
+            $pdo_req->bindValue(":idEleve", $id);
+            $pdo_req->execute();
+            if (array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0] !== 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function propositionGroupe($id_etudiants, $idSAE) {
+        array_push($id_etudiants, $_SESSION['idUtilisateur']);
+        if ($this->isInscrivablesBySAE($id_etudiants, $idSAE)) {
+            $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE) VALUES (DEFAULT, :idSAE)";
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSAE", $idSAE);
+            $pdo_req->execute();
+
+            $req = "SELECT max(idProposition)
+                    FROM PropositionsGroupe;";
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->execute();
+            $idProposition = $pdo_req->fetchAll(PDO::FETCH_ASSOC)[0];
+            foreach($id_etudiants as $id) {
+                $req = "INSERT INTO PropositionsEleve (idProposition, idEleve) VALUES (:idProposition, :idEleve)";
+                $pdo_req = self::$bdd->prepare($req);
+                $pdo_req->bindValue(":idProposition", $idProposition['max(idProposition)']);
+                $pdo_req->bindValue(":idEleve", $id);
+                $pdo_req->execute();
+            }
+        }
+    }
 }

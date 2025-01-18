@@ -58,9 +58,8 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
+    function initSaeDetails($inscritSAE, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
     {
-
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
         $sujet = htmlspecialchars($sae[0]['sujet']);
@@ -111,6 +110,10 @@ HTML;
         if ($_SESSION['estProfUtilisateur']) {
             echo $this->initAjoutProf($profs, $idSAE);
         }
+        elseif ($inscritSAE) {
+            echo $this->initCreerGroupe($etudiants, $idSAE);
+        }
+
         // Champs
         echo <<<HTML
         <!-- Champ(s) -->
@@ -1084,5 +1087,32 @@ HTML;
             </div>
         </div>
 HTML;
+    }
+
+    function initCreerGroupe($etudiants, $idSae) {
+        $options = '';
+        foreach ($etudiants as $etudiant) {
+            $options .= '<option value="' . htmlspecialchars($etudiant['idEleve']) . '">' . htmlspecialchars($etudiant['prenom']) . htmlspecialchars($etudiant['nom']) . '</option>';
+        }
+
+        return <<<HTML
+            <h1 class="my-4">Sélectionnez les élèves</h1>
+            <div class="align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                <form action="index.php?module=sae&action=creation_groupe&id=$idSae" method="POST">
+                    <div id="etudiants-container">
+                        <div class="etudiant-container mb-3 w-25">
+                            <select name="etudiants[]" class="form-select" id="addEtudiant">
+                                <option value="">-- Sélectionnez un élève --</option>
+                                $options
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" id="addEtudiantField" class="btn btn-secondary">Ajouter un élève</button>
+                    <div class="d-flex">
+                        <button type="submit" class="btn btn-primary ms-auto">Envoyer</button>
+                    </div>
+                </form>
+            </div>
+        HTML;
     }
 }

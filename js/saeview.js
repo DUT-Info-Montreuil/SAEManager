@@ -303,3 +303,31 @@ if (addRessourceBtn) {
       });
   });
 }
+
+/**
+ * Gestion des créations de groupes
+ */
+
+const addEtudiantButton = document.querySelector("#addEtudiantField");
+const etudiantsContainer = document.querySelector("#etudiants-container");
+
+addEtudiantButton.addEventListener("click", function(){
+  const firstSelect = document.querySelector("#addEtudiant");
+  if (firstSelect) {
+    const optionsHTML = firstSelect.innerHTML;
+    const newField = document.createElement("div");
+    newField.className = "etudiant-container mb-3 d-flex";
+    newField.innerHTML = `
+      <select name="etudiants[]" class="form-select me-2 w-25">
+        ${optionsHTML}
+      </select>
+      <button type="button" onclick="removeField(this)" class="btn btn-danger">Supprimer</button>
+      `;
+    etudiantsContainer.appendChild(newField);
+  }
+});
+
+function removeField(button) {
+  const field = button.parentNode;
+  field.remove();
+}
