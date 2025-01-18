@@ -58,7 +58,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($inscritSAE, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
+    function initSaeDetails($infosEtudiant, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -110,10 +110,16 @@ HTML;
         if ($_SESSION['estProfUtilisateur']) {
             echo $this->initAjoutProf($profs, $idSAE);
         }
-        elseif ($inscritSAE) {
-            echo $this->initCreerGroupe($etudiants, $idSAE);
+        elseif (!$infosEtudiant['inGroupe']) {
+            if ($infosEtudiant['inProposition']){
+                echo '<h1 class="my-4">Vous faites déjà partie d\'une proposition de groupe</h1>';
+            }
+            else {
+                echo $this->initCreerGroupe($etudiants, $idSAE);
+            }
         }
-
+        
+        if ($infosEtudiant['inGroupe']){
         // Champs
         echo <<<HTML
         <!-- Champ(s) -->
@@ -147,7 +153,8 @@ HTML;
             </div>
         </div>
 HTML;
-
+        }
+        if ($infosEtudiant['inGroupe']){
         // Ressources
         echo <<<HTML
             <!-- Ressource(s) -->
@@ -185,9 +192,9 @@ HTML;
                 </div>
             </div>
 HTML;
+        }
 
-
-
+        if ($infosEtudiant['inGroupe']){
         // Rendus
         echo <<<HTML
             <!-- Rendu(s) -->
@@ -230,7 +237,8 @@ HTML;
                 </div>
             </div>
 HTML;
-
+        }
+        if ($infosEtudiant['inGroupe']){
         // Soutenances
         echo <<<HTML
             <!-- Soutenance(s) -->
@@ -271,6 +279,9 @@ HTML;
                 </div>
             </div>
         </div>
+HTML;
+        }
+        echo <<<HTML
         <script src="js/saeview.js"></script>
     </div>
 HTML;

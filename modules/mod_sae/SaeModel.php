@@ -599,7 +599,7 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function isInscritBySAE($idSAE) {
+    public function inGroupeBySAE($idSAE) {
         $req = "SELECT count(*)
                 FROM Groupe
                 INNER JOIN EtudiantGroupe ON Groupe.idgroupe = EtudiantGroupe.idgroupe
@@ -609,21 +609,25 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->bindValue(":idEleve", $_SESSION['idUtilisateur']);
         $pdo_req->execute();
-        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0];
+        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0] !== 0;
     }
 
-    private function isInscrivablesBySAE($id_etudiants, $idSAE) {
-        foreach($id_etudiants as $id) {
-            $req = "SELECT count(*)
+    public function inPropositions($idSAE, $id) {
+        $req = "SELECT count(*)
                 FROM PropositionsGroupe
                 INNER JOIN PropositionsEleve using(idProposition)
                 WHERE idSAE = :idSAE
                 AND idEleve = :idEleve";
-            $pdo_req = self::$bdd->prepare($req);
-            $pdo_req->bindValue(":idSAE", $idSAE);
-            $pdo_req->bindValue(":idEleve", $id);
-            $pdo_req->execute();
-            if (array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0] !== 0) {
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idEleve", $id);
+        $pdo_req->execute();
+        return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0] !== 0;
+    }
+
+    private function isInscrivablesBySAE($id_etudiants, $idSAE) {
+        foreach($id_etudiants as $id) {
+            if ($this->inPropositions($idSAE, $id)) {
                 return false;
             }
         }

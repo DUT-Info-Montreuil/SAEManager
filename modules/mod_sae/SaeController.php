@@ -143,9 +143,14 @@ class SaeController
             }
             $profs = $this->model->getProfsBySAE($_GET['id']);
             $etudiants = $this->model->getEtudiantsBySAE($_GET['id']);
-            $inscritSAE = $this->model->isInscritBySAE($_GET['id']);
+            $inGroupeSAE = $this->model->inGroupeBySAE($_GET['id']);
+            $proposition = $this->model->inPropositions($_GET['id'], $_SESSION['idUtilisateur']);
+            $infosEtudiant = array(
+                'inGroupe' => $inGroupeSAE,
+                'inProposition' => $proposition
+            );
 
-            $this->view->initSaeDetails($inscritSAE, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
+            $this->view->initSaeDetails($infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
         } else {
             header('Location: index.php');
         }
