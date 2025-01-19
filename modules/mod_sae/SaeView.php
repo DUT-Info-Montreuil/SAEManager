@@ -134,10 +134,10 @@ HTML;
     HTML;
             if (!empty($groupes)) {
                 foreach($groupes as $groupe){
-                    echo $this->lineGroupes($groupe, $idSAE);
+                    echo $this->lineGroupes($groupe, "", "");
                 }
             } else {
-                echo $this->lineGroupes("default","");
+                echo $this->lineGroupes("default", $etudiants, $idSAE);
             }
             echo <<<HTML
                     </div>
@@ -145,7 +145,7 @@ HTML;
     HTML;
             }
         
-        if ($infosEtudiant['inGroupe']){
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
         // Champs
         echo <<<HTML
         <!-- Champ(s) -->
@@ -180,7 +180,7 @@ HTML;
         </div>
 HTML;
         }
-        if ($infosEtudiant['inGroupe']){
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
         // Ressources
         echo <<<HTML
             <!-- Ressource(s) -->
@@ -220,7 +220,7 @@ HTML;
 HTML;
         }
 
-        if ($infosEtudiant['inGroupe']){
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
         // Rendus
         echo <<<HTML
             <!-- Rendu(s) -->
@@ -264,7 +264,7 @@ HTML;
             </div>
 HTML;
         }
-        if ($infosEtudiant['inGroupe']){
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
         // Soutenances
         echo <<<HTML
             <!-- Soutenance(s) -->
@@ -424,11 +424,11 @@ HTML;
     HTML;
     }
 
-    function lineGroupes($groupe, $idSAE) {
+    function lineGroupes($groupe, $etudiants, $idSAE) {
         if ($groupe == "default") {
             return <<<HTML
-            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    <span>Aucune proposition de groupe disponible</span>
+            <div class="align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                    {$this->initCreerGroupe($etudiants, $idSAE)}
                 </div>
         HTML;
         }

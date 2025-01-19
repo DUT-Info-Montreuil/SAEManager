@@ -591,6 +591,10 @@ class SaeModel extends Connexion
                 AND idEleve not in (SELECT idEleve
                                     FROM PropositionsEleve
                                     INNER JOIN PropositionsGroupe using(idProposition)
+                                    WHERE idSAE = :idSAE)
+                AND idEleve not in (SELECT idEtudiant
+                                    FROM EtudiantGroupe
+                                    INNER JOIN Groupe on EtudiantGroupe.idGroupe = Groupe.idgroupe
                                     WHERE idSAE = :idSAE)";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
@@ -635,7 +639,6 @@ class SaeModel extends Connexion
     }
 
     public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe) {
-        array_push($id_etudiants, $_SESSION['idUtilisateur']);
         if ($this->isInscrivablesBySAE($id_etudiants, $idSAE)) {
             $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe) VALUES (DEFAULT, :idSAE, :nomGroupe)";
             $pdo_req = self::$bdd->prepare($req);

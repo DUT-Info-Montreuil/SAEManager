@@ -371,7 +371,7 @@ class SaeController
 
             $this->model->ajoutChamp($idChamp, $_SESSION['idUtilisateur'], $reponse);
         }
-        header("Location: index.php?module=sae&action=details&id=" . $_GET['id']);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
     private function depotSupport()
@@ -409,10 +409,13 @@ class SaeController
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $nomGroupe = $_POST['nomGroupe'];
         if (count($_POST['etudiants']) == count(array_unique($_POST['etudiants']))) {
+
             $_POST['etudiants'] = array_filter($_POST['etudiants']);
+            array_push($_POST['etudiants'], $_SESSION['idUtilisateur']);
+
             $this->model->propositionGroupe($_POST['etudiants'], $idSae, $nomGroupe);
         }
-        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
     private function gererGroupe() {
@@ -424,6 +427,6 @@ class SaeController
             $this->model->refuserGroupe($idProposition);
         }
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
-        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }
