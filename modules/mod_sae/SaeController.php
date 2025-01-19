@@ -221,6 +221,7 @@ class SaeController
     {
         $soutenances = $this->model->listeSoutenanceOuEstJuryParSae($_GET['id'], $_SESSION['idUtilisateur']);
         $sae = $this->model->getSaeById($_GET['id']);
+
         if($this->model->estProfSae($_GET['id'], $_SESSION['idUtilisateur']))
             $this->view->initPageListeSoutenance($sae, $soutenances, $_GET['id']);
         else

@@ -422,13 +422,30 @@ class SaeModel extends Connexion
     }
 
     public function estProfSae($idSae, $idPersonne){
-        $profsSae = $this->getProfsBySAE($idSae);
-        foreach($profsSae as $prof){
-            if($prof['idPersonne'] == $idPersonne){
-                return true;
-            }
-        }
-        return false;
+        $req = "SELECT Personne.idPersonne , Personne.prenom, Personne.nom
+                FROM Personne
+                WHERE Personne.estProf = 1
+                AND Personne.idPersonne  = :idPersonne
+                AND Personne.idPersonne in (
+                                        SELECT idResp
+                                        FROM ResponsablesSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idIntervenant
+                                        FROM IntervenantSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idResponsable
+                                        FROM SAE
+                                        WHERE idSAE = :idSAE)";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSae);
+        $pdo_req->bindValue(":idPersonne", $idPersonne);
+        $pdo_req->execute();
+
+        $profsSae = $pdo_req->fetchAll();
+        return $profsSae[0]['idPersonne'] == $idPersonne;
     }
 
     public function ajoutIntervenant($idSAE, $idIntervenant)
