@@ -1051,7 +1051,9 @@ HTML;
     {
         $options = '';
 
-        $idsRessourcesAssociees = array_map(fn($r) => $r['idRessource'], $ressourcesAssociees);
+        $idsRessourcesAssociees = array_map(function ($r) {
+            return $r['idRessource'];
+        }, $ressourcesAssociees);
 
         foreach ($ressources as $ressource) {
             if (!in_array($ressource['idRessource'], $idsRessourcesAssociees)) {

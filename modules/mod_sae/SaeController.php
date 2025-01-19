@@ -134,7 +134,7 @@ class SaeController
             $soutenances = $this->model->getSoutenanceBySae($_GET['id']);
             $champs = $this->model->getChampBySae($_GET['id']);
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
-            $allRessource = $this->model->getRessource();
+
             $rendusDeposer = [];
             foreach ($rendus as $rendu)
                 if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
@@ -162,7 +162,7 @@ class SaeController
             );
             $groupes = $this->model->formationGroupes($_GET['id']);
 
-            $this->view->initSaeDetails($groupes, $infosEtudiant, $etudiants,$profs,$saes ,$champs ,$repId , $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer);
+            $this->view->initSaeDetails($groupes, $infosEtudiant, $etudiants,$profs,$saes ,$champs ,$repId , $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $ressource);
         } else {
             header('Location: index.php');
         }

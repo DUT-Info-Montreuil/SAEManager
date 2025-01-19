@@ -431,7 +431,18 @@ class SaeModel extends Connexion
         return false;
     }
 
-
+    public function ajoutIntervenant($idSAE, $idIntervenant)
+    {
+        $req = "INSERT INTO IntervenantSAE (idSAE, idIntervenant) VALUES (:idSAE, :idIntervenant)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->bindValue(":idIntervenant", $idIntervenant);
+        $pdo_req->execute();
+        if ($pdo_req->rowCount() == 0)
+            return false;
+        else
+            return true;
+    }
 
     // POST
 
@@ -811,10 +822,12 @@ class SaeModel extends Connexion
 
         if($result["dureeMinutes"] == $duration) {
             $req = "DELETE FROM PassageSoutenance
-                    WHERE DATE(PassageSoutenance.date) = :date";
+                    WHERE DATE(PassageSoutenance.date) = :date
+                    AND idSoutenance = :idSoutenance";
 
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":date", $date);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
             $pdo_req->execute();
 
             if($schedules) {
@@ -843,9 +856,10 @@ class SaeModel extends Connexion
             $pdo_req->execute();
 
             $req = "DELETE FROM PassageSoutenance
-                    WHERE 1=1";
+                    WHERE idSoutenande = :idSoutenance";
 
             $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
             $pdo_req->execute();
         }
     }
