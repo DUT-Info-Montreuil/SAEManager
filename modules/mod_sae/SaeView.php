@@ -516,7 +516,7 @@ HTML;
 
     function lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance, $supportsDeposer)
     {
-            
+
         if ($titre == "default") {
             return <<<HTML
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
@@ -1443,7 +1443,7 @@ HTML;
         </div>
     </div>
     <script>
-        const isProf = {$_SESSION['estProfUtilisateur']};
+        isProf = {$_SESSION['estProfUtilisateur']};
     </script>
     <script src="js/ressource.js"></script>
 HTML;

@@ -73,7 +73,7 @@ dropSupportFileCancelButton.addEventListener("click", function () {
 });
 
 listSupportButtons.forEach((element) => {
-  const matches = element.className.match(/supportdrop-(\d+)/);
+  const matches = element.className.match(/rendusoutenance-(\d+)/);
   if (matches) {
     const number = matches[1];
     element.addEventListener("click", function () {
@@ -189,7 +189,6 @@ const modalValiderSupport = document.getElementById("modalValiderDepotSupport");
 const listSupressionSupportButtons = document.querySelectorAll(
   '[class*="supressSupportButton-"]'
 );
-console.log(listSupressionRenduButtons);
 listSupressionSupportButtons.forEach((element) => {
   element.addEventListener("click", function () {
     matches = element.className.match(/supressSupportButton-(\d+)/);
@@ -327,7 +326,6 @@ const listRessourceButtons = document.querySelectorAll(
   '[class*="ressourcedrop-"]'
 );
 
-console.log(listRessourceButtons);
 const idSaeDepotRessource = document.getElementById("idSaeDepotRessource");
 
 listRessourceButtons.forEach((element) => {

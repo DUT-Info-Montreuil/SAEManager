@@ -146,6 +146,7 @@ class SaeController
             $soutenances = $this->model->getSoutenanceBySae($_GET['id']);
             $champs = $this->model->getChampBySae($_GET['id']);
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
+            $allRessource = $this->model->getRessource();
 
             $rendusDeposer = [];
             foreach ($rendus as $rendu)
