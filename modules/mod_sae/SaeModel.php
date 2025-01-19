@@ -403,7 +403,7 @@ class SaeModel extends Connexion
         $req = "SELECT idPersonne, prenom, nom
                 FROM Personne
                 WHERE estProf = 1
-                AND idPersonne in (
+                AND idPersonne not in (
                                         SELECT idResp
                                         FROM ResponsablesSAE
                                         WHERE idSAE = :idSAE
