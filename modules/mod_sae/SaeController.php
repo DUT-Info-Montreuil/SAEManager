@@ -94,7 +94,10 @@ class SaeController
                 $this->ajout();
                 break;
             case "creation_groupe":
-                $this->creerGroupe();
+                $this->creerPropositionGroupe();
+                break;
+            case "gererGroupe":
+                $this->gererGroupe();
                 break;
         }
     }
@@ -149,8 +152,9 @@ class SaeController
                 'inGroupe' => $inGroupeSAE,
                 'inProposition' => $proposition
             );
+            $groupes = $this->model->formationGroupes($_GET['id']);
 
-            $this->view->initSaeDetails($infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
+            $this->view->initSaeDetails($groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
         } else {
             header('Location: index.php');
         }
@@ -401,11 +405,25 @@ class SaeController
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
-    private function creerGroupe() {
+    private function creerPropositionGroupe() {
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $nomGroupe = $_POST['nomGroupe'];
         if (count($_POST['etudiants']) == count(array_unique($_POST['etudiants']))) {
-            $this->model->propositionGroupe($_POST['etudiants'], $idSae);
+            $_POST['etudiants'] = array_filter($_POST['etudiants']);
+            $this->model->propositionGroupe($_POST['etudiants'], $idSae, $nomGroupe);
         }
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+    }
+
+    private function gererGroupe() {
+        $idProposition = $_GET['idproposition'];
+        if (isset($_POST['Accepter'])){
+            $this->model->accepterGroupe($idProposition);
+        }
+        else {
+            $this->model->refuserGroupe($idProposition);
+        }
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 }

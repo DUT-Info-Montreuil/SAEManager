@@ -58,7 +58,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($infosEtudiant, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
+    function initSaeDetails($groupes, $infosEtudiant, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -118,6 +118,32 @@ HTML;
                 echo $this->initCreerGroupe($etudiants, $idSAE);
             }
         }
+
+        if ($_SESSION['estProfUtilisateur']){
+            // Groupes
+            echo <<<HTML
+                <!-- Groupe(s) -->
+                <div class="mb-5">
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Groupe(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+    HTML;
+            if (!empty($groupes)) {
+                foreach($groupes as $groupe){
+                    echo $this->lineGroupes($groupe, $idSAE);
+                }
+            } else {
+                echo $this->lineGroupes("default","");
+            }
+            echo <<<HTML
+                    </div>
+                </div>
+    HTML;
+            }
         
         if ($infosEtudiant['inGroupe']){
         // Champs
@@ -219,8 +245,8 @@ HTML;
                         $aDeposerRendu = true;
                         $dateLimite = $rendusDeposer[$idRendu];
                     }
+                echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
             }
-            echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
         } else {
             echo $this->lineRendus("default", "default", 0, false);
         }
@@ -396,6 +422,36 @@ HTML;
         <a href="#" class="ms-auto text-decoration-none text-primary">Ouvrir la ressource</a> <!-- TO-DO : Ajouter un lien pour voir le contenu -->
     </div>
     HTML;
+    }
+
+    function lineGroupes($groupe, $idSAE) {
+        if ($groupe == "default") {
+            return <<<HTML
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                    <span>Aucune proposition de groupe disponible</span>
+                </div>
+        HTML;
+        }
+
+        $etudiants = '';
+        $idGroupe = $groupe['idGroupe'];
+
+        foreach($groupe['etudiants'] as $etudiant) {
+            $etudiants .= '<span class="badge bg-primary me-1">' . $etudiant['nom'] . ' ' . $etudiant['prenom'] . '</span>';
+        }
+        
+        return <<<HTML
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                <span>{$groupe['nomGroupe']}</span>
+                <div class="ms-auto d-flex gap-2">
+                    <form method="POST" action="index.php?module=sae&action=gererGroupe&id=$idSAE&idproposition=$idGroupe" style="margin: 0;">
+                        $etudiants
+                        <button type="submit" name="Accepter" class="btn btn-success btn-sm">Accepter</button>
+                        <button type="submit" name="Refuser" class="btn btn-danger btn-sm">Refuser</button>
+                    </form>
+                </div>
+            </div>
+            HTML;
     }
 
     function lineRendus($nom, $dateLimite, $id, $renduDeposer)
@@ -1112,8 +1168,9 @@ HTML;
                 <form action="index.php?module=sae&action=creation_groupe&id=$idSae" method="POST">
                     <div id="etudiants-container">
                         <div class="etudiant-container mb-3 w-25">
-                            <select name="etudiants[]" class="form-select" id="addEtudiant">
-                                <option value="">-- Sélectionnez un élève --</option>
+                            <input type="TEXT" name="nomGroupe" class="form-control mb-3 w-75" placeholder="Entrez le nom du groupe" required>
+                            <select name="etudiants[]" class="form-select" id="addEtudiant" required>
+                                <option value="" disable>-- Sélectionnez un élève --</option>
                                 $options
                             </select>
                         </div>

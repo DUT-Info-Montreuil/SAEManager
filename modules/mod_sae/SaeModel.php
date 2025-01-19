@@ -634,12 +634,13 @@ class SaeModel extends Connexion
         return true;
     }
 
-    public function propositionGroupe($id_etudiants, $idSAE) {
+    public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe) {
         array_push($id_etudiants, $_SESSION['idUtilisateur']);
         if ($this->isInscrivablesBySAE($id_etudiants, $idSAE)) {
-            $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE) VALUES (DEFAULT, :idSAE)";
+            $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe) VALUES (DEFAULT, :idSAE, :nomGroupe)";
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idSAE", $idSAE);
+            $pdo_req->bindValue(":nomGroupe", $nomGroupe);
             $pdo_req->execute();
 
             $req = "SELECT max(idProposition)
@@ -655,5 +656,92 @@ class SaeModel extends Connexion
                 $pdo_req->execute();
             }
         }
+    }
+
+    public function propositionsGroupe($idSAE) {
+        $req = "SELECT nomGroupe, nom, prenom, idEleve, idProposition
+                FROM PropositionsGroupe
+                INNER JOIN PropositionsEleve using(idProposition)
+                INNER JOIN Personne on idEleve = idPersonne
+                WHERE idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function formationGroupes($idSAE) {
+        $eleves = $this->propositionsGroupe($idSAE);
+        $groupes = [];
+        foreach ($eleves as $eleve) {
+            $nomGroupe = $eleve['nomGroupe'];
+            $idGroupe = $eleve['idProposition'];
+            if (!isset($groupes[$nomGroupe])) {
+                $groupes[$nomGroupe] = [
+                    'nomGroupe' => $nomGroupe,
+                    'idGroupe' => $idGroupe,
+                    'etudiants' => []
+                ];
+            }
+
+            $groupes[$nomGroupe]['etudiants'][] = [
+                'nom' => $eleve['nom'],
+                'prenom' => $eleve['prenom'],
+                'idEleve' => $eleve['idEleve'],
+            ];
+        }
+        return $groupes;
+    }
+
+    public function accepterGroupe($idProposition) {
+        
+        $req = "INSERT INTO Groupe (idgroupe, nom, imageTitre, idSAE) VALUES (DEFAULT, 
+                                        (SELECT nomGroupe FROM PropositionsGroupe WHERE idProposition = :idProposition), DEFAULT, 
+                                        (SELECT idSAE FROM PropositionsGroupe WHERE idProposition = :idProposition))";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idProposition", $idProposition);
+        $pdo_req->execute();
+
+        $req = "SELECT max(idgroupe)
+                FROM Groupe;";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->execute();
+        $idGroupe = $pdo_req->fetchAll(PDO::FETCH_ASSOC)[0]['max(idgroupe)'];
+
+        $req = "SELECT idEleve
+                FROM PropositionsEleve
+                WHERE idProposition = :idProposition;";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idProposition", $idProposition);
+        $pdo_req->execute();
+        $id_etudiants = $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach($id_etudiants as $id) {
+            $req = "INSERT INTO EtudiantGroupe (idGroupe, idEtudiant) VALUES (:idGroupe, :idEtudiant);";
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idGroupe", $idGroupe);
+            $pdo_req->bindValue(":idEtudiant", $id['idEleve']);
+            $pdo_req->execute();
+        }
+        $this->eraseProposition($idProposition);
+    }
+
+    public function refuserGroupe($idProposition) {
+        $this->eraseProposition($idProposition);
+    }
+
+    private function eraseProposition($idProposition) {
+
+        $req = "DELETE FROM PropositionsEleve
+                WHERE idProposition = :idProposition";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idProposition", $idProposition);
+        $pdo_req->execute();
+
+        $req = "DELETE FROM PropositionsGroupe
+                WHERE idProposition = :idProposition";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idProposition", $idProposition);
+        $pdo_req->execute();
     }
 }
