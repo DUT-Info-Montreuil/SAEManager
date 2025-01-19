@@ -32,8 +32,11 @@ class ConnexionController
                 $this->view->deconnexionPage('<p>Vous n\'êtes pas connecté ! Pour se connecter : <a href="index.php"> Se connecter</a></p>');
                 break;
             case "essaieConnexion" :
-                if($this->model->essaieConnexion()){ //connexion réussite
-                    header('Location: index.php?module=home');
+                if($this->model->essaieConnexion()){
+                    if($_SESSION['estProfUtilisateur'] != 1)//connexion réussite
+                        header('Location: index.php?module=dashboard');
+                    else
+                        header('Location: index.php?module=home');
                 }
                 else{
                     $this->msg_erreur = "identifiant ou mot de passe incorrect !";
