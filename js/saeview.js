@@ -288,6 +288,8 @@ if (createRessourceBtn) {
   });
 }
 
+// Ressource
+
 const addRessourceBtn = document.querySelector("#btn-add-ressource");
 
 if (addRessourceBtn) {
@@ -304,6 +306,41 @@ if (addRessourceBtn) {
   });
 }
 
+document
+  .getElementById("selectFileButtonRessource")
+  .addEventListener("click", function () {
+    document.getElementById("fileInputRessource").click();
+  });
+
+const modalDepotRessource = document.getElementById("modalCreateRessource");
+const dropRessourceFileCancelButton = document.getElementById(
+  "depotCancelButtonRessource"
+);
+
+if (dropRessourceFileCancelButton) {
+  dropRessourceFileCancelButton.addEventListener("click", function () {
+    modalDepotRessource.classList.remove("d-block");
+  });
+}
+
+const listRessourceButtons = document.querySelectorAll(
+  '[class*="ressourcedrop-"]'
+);
+
+console.log(listRessourceButtons);
+const idSaeDepotRessource = document.getElementById("idSaeDepotRessource");
+
+listRessourceButtons.forEach((element) => {
+  const matches = element.className.match(/ressourcedrop-(\d+)/);
+  if (matches) {
+    const number = matches[1];
+    element.addEventListener("click", function () {
+      idSaeDepotRessource.value = number;
+      modalDepotRessource.classList.add("d-block");
+    });
+  }
+});
+
 /**
  * Gestion des créations de groupes
  */
@@ -311,7 +348,7 @@ if (addRessourceBtn) {
 const addEtudiantButton = document.querySelector("#addEtudiantField");
 const etudiantsContainer = document.querySelector("#etudiants-container");
 
-addEtudiantButton.addEventListener("click", function(){
+addEtudiantButton.addEventListener("click", function () {
   const firstSelect = document.querySelector("#addEtudiant");
   if (firstSelect) {
     const optionsHTML = firstSelect.innerHTML;

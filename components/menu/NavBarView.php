@@ -64,13 +64,13 @@ HTML;
 		$action = $_GET['action'] ?? '';
 
 		if ($module == 'sae' && $action != 'home') {
-			$saeID = $_GET['id'];
+			$saeID = $_GET['id'] ?? "";
 			$this->affichage .= <<<HTML
 			<ul>
 				<li><a href="index.php?module=home">Accueil</a></li>
 				<li>Général</li>
 				<li><a href="index.php?module=home">Sujet</a></li>
-				<li><a href="index.php?module=home">Ressources</a></li>
+				<li><a href="index.php?module=sae&action=ressources">Ressources</a></li>
 				<li><a href="index.php?module=home">Rendus</a></li>
 				<li><a href="index.php?module=sae&action=soutenance&id=$saeID">Soutenance</a></li>
 				<li><a href="index.php?module=sae&action=groupe&id=$saeID">Groupe</a></li>

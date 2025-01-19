@@ -6,6 +6,10 @@
     --create-sae-color: #B2B2FD;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .menu {
     background-color: var(--menu-color);
 }
@@ -44,7 +48,9 @@
 .card-sae-content:hover,
 .card-rendus:hover,
 .card-rendus-content:hover,
-.card-create-sae:hover {
+.card-create-sae:hover,
+.card-ressources:hover
+.card-ressources-content:hover {
     transform: scale(1.05);
 }
 
@@ -112,3 +118,12 @@
     resize: none;
   }
 
+  .resource-item {
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Animation fluide */
+}
+
+.resource-item:hover {
+    background-color: #f8f9fa; /* Couleur légèrement plus claire */
+    transform: scale(1.02); /* Légère mise en avant */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombre pour un effet de survol */
+}
