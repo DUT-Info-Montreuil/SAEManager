@@ -285,6 +285,7 @@ class SaeModel extends Connexion
                 INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
                 INNER JOIN Groupe g ON g.idGroupe = EtudiantGroupe.idGroupe
                 WHERE g.idSAE = :idSAE AND Personne.idPersonne = :idPersonne";
+
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->bindValue(":idPersonne", $_SESSION['idUtilisateur']);
@@ -445,6 +446,8 @@ class SaeModel extends Connexion
         $pdo_req->execute();
 
         $profsSae = $pdo_req->fetchAll();
+        if(count($profsSae)==0)
+            return false;
         return $profsSae[0]['idPersonne'] == $idPersonne;
     }
 
@@ -463,7 +466,7 @@ class SaeModel extends Connexion
 
     // POST
 
-    function createRendu($titre, $date, $idSAE, $estNote, $coeff)
+    function createRendu($titre, $date, $idSAE, $estNote, $coeff, $etudiants)
     {
         if ($estNote) {
             $reqEval = "INSERT INTO Evaluation (nom, coeff, responsableEvaluation) VALUES (:nom, :coeff, NULL)";
@@ -489,9 +492,18 @@ class SaeModel extends Connexion
             $pdo_reqRendu->bindValue(":idSAE", $idSAE);
             $pdo_reqRendu->execute();
         }
+
+
+        $nomSae = $this->getSAEById($idSAE)[0]['nomSae'];
+        $message = "Un nouveau rendu à été crée dans la sae $nomSae!";
+        $redirect = "index.php?module=sae&action=details&id=$idSAE";
+
+        foreach ($etudiants as $etudiant) {
+            $this->creeNotification($etudiant['idPersonne'], $message, $idSAE, $redirect);
+        }
     }
 
-    function createSoutenance($titre, $date, $salle, $duree, $idSAE)
+    function createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants)
     {
         $reqEval = "INSERT INTO Evaluation (nom, coeff, responsableEvaluation) VALUES (:nom, :coeff, NULL)";
         $pdo_req_eval = self::$bdd->prepare($reqEval);
@@ -511,6 +523,14 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->bindValue(":idEvaluation", $idEvaluation);
         $pdo_req->execute();
+
+        $nomSae = $this->getSAEById($idSAE)[0]['nomSae'];
+        $message = "Une nouvelle soutenance à été ajoutée à la sae $nomSae!";
+        $redirect = "index.php?module=sae&action=details&id=$idSAE";
+
+        foreach ($etudiants as $etudiant) {
+            $this->creeNotification($etudiant['idPersonne'], $message, $idSAE, $redirect);
+        }
     }
 
     function createChamp($idSAE, $nomChamp)
@@ -640,6 +660,20 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function etudiantQuiOnGroupeDansSAE($idSAE){
+        $req = "SELECT *
+                FROM Personne
+                INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
+                INNER JOIN Groupe ON EtudiantGroupe.idGroupe = Groupe.idgroupe
+                INNER JOIN SAE ON Groupe.idSAE = SAE.idSAE
+                WHERE SAE.idSAE = :idSAE";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function inGroupeBySAE($idSAE) {
         $req = "SELECT count(*)
                 FROM Groupe
@@ -733,7 +767,17 @@ class SaeModel extends Connexion
         return $groupes;
     }
 
-    public function accepterGroupe($idProposition) {
+    public function accepterGroupe($idProposition, $sae, $idEtudiants) {
+        $nomSae = $sae['nomSae'];
+        $idSAE = $sae['idSAE'];
+        $message = "Votre proposition de groupe pour la sae $nomSae a été validé !";
+        $redirect = "index.php?module=sae&action=details&id=$idSAE";
+
+        foreach ($idEtudiants as $etudiant) {
+            $this->creeNotification($etudiant, $message, $idSAE, $redirect);
+        }
+
+
 
         $req = "INSERT INTO Groupe (idgroupe, nom, imageTitre, idSAE) VALUES (DEFAULT, 
                                         (SELECT nomGroupe FROM PropositionsGroupe WHERE idProposition = :idProposition), DEFAULT, 
@@ -766,8 +810,17 @@ class SaeModel extends Connexion
         $this->eraseProposition($idProposition);
     }
 
-    public function refuserGroupe($idProposition) {
-        $this->eraseProposition($idProposition);
+    public function refuserGroupe($idProposition, $sae, $idEtudiants) {
+        if($this->eraseProposition($idProposition)){
+            $nomSae = $sae['nomSae'];
+            $idSAE = $sae['idSAE'];
+            $message = "Votre proposition de groupe pour la sae $nomSae a été refusé.";
+            $redirect = "index.php?module=sae&action=details&id=$idSAE";
+
+            foreach ($idEtudiants as $etudiant) {
+                $this->creeNotification($etudiant, $message, $idSAE, $redirect);
+            }
+        }
     }
 
     private function eraseProposition($idProposition) {
@@ -783,6 +836,8 @@ class SaeModel extends Connexion
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idProposition", $idProposition);
         $pdo_req->execute();
+
+        return true;
     }
     public function getGroupeSansPassageDeSoutenance($idSoutenance)
     {
@@ -896,5 +951,18 @@ class SaeModel extends Connexion
         $pdo_req->execute();
 
         return $pdo_req->fetchAll();
+    }
+
+    private function creeNotification($idUtilisateur, $message, $idSAE, $redirect)
+    {
+        $req = "INSERT INTO Notifications VALUES (DEFAULT, :idPersonne, :message, :idSaeProvenance, :lienForm, :date)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idPersonne", $idUtilisateur);
+        $pdo_req->bindValue(":message", $message);
+        $pdo_req->bindValue(":idSaeProvenance", $idSAE);
+        $pdo_req->bindValue(":lienForm", $redirect);
+        $pdo_req->bindValue(":date", date("Y-m-d H:i:s"));
+        $pdo_req->execute();
+        return true;
     }
 }

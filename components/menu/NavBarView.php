@@ -25,13 +25,26 @@ HTML;
 			</div>
 HTML;
 		if (isset($_SESSION['loginUtilisateur'])) {
-			$this->affichage .= <<<HTML
+            $this->affichage .= <<<HTML
 			<div class="flex-1 d-flex">
 				
 				<div class="my-auto mx-4">
 					<a href="index.php?module=home" class="text-decoration-none text-reset">
 						<svg class="icon" width="24" height="24"><use xlink:href="#icon-profile"></use></svg> 
 						Accueil
+					</a>
+				</div>
+			</div>
+HTML;
+        }
+        if (isset($_SESSION['loginUtilisateur'])) {
+            $this->affichage .= <<<HTML
+            <div class="flex-1 d-flex">
+				
+			    <div class="my-auto mx-4">
+					<a href="index.php?module=dashboard" class="text-decoration-none text-reset">
+						<svg class="icon" width="24" height="24"><use xlink:href="#icon-profile"></use></svg> 
+						Dashboard
 					</a>
 				</div>
 			</div>

@@ -14,7 +14,8 @@ class Site
 		
 		if(!isset($_SESSION['loginUtilisateur'])){
 			$this->moduleName = "connexion";
-		}else if(isset($_SESSION['loginUtilisateur']) && $this->moduleName =="connexion"){
+		}
+        else if(isset($_SESSION['loginUtilisateur']) && $this->moduleName == "connexion"){
 			$this->moduleName = "home";
 		}
 
@@ -54,7 +55,11 @@ class Site
 						require_once 'modules/mod_creerSae/CreerSaeModule.php';
 					}
 					break;
-
+                case "dashboard":
+                    if(isset($_SESSION['loginUtilisateur'])){
+                        require_once 'modules/mod_dashboard/DashboardModule.php';
+                    }
+                    break;
 				default:
 					if(isset($_SESSION['loginUtilisateur'])){
 						die("Module inexistant");
@@ -69,7 +74,7 @@ class Site
 		if(!isset($_SESSION['loginUtilisateur'])){
 			$this->moduleName = "connexion";
 		}else if(isset($_SESSION['loginUtilisateur']) && $this->moduleName =="connexion"){
-			$this->moduleName = "home";
+			$this->moduleName = "dashboard";
 		}
 
 		$moduleClass = $this->moduleName . "Module";

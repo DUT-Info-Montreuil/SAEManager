@@ -35,15 +35,6 @@ HTML;
             $idSAE = $rendu['idSAE'];
             echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
         }
-        <<<HTML
-        </div>
-            </div>
-                
-            </div>
-
-        </div>
-
-        HTML;
     }
 
     function lineRendus($renduNom, $saeNom, $dateLimite, $idSAE)

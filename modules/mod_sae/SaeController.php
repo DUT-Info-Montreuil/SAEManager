@@ -1,5 +1,7 @@
 <?php
 
+use function Sodium\add;
+
 require_once 'modules/mod_sae/SaeView.php';
 require_once 'modules/mod_sae/SaeModel.php';
 
@@ -136,22 +138,30 @@ class SaeController
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
 
             $rendusDeposer = [];
-            foreach ($rendus as $rendu)
-                if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
-                    $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
-                    $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
-                }
-                if($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])){
-                    $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
-                    $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
-                }
-            $supportsDeposer = [];
-            foreach($soutenances as $soutenance){
-                if($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))){
-                    $supportGroup = $this->model->getSupportEleve($soutenance['idSoutenance'], $saes[0]['idSAE']);
-                    $supportsDeposer[htmlspecialchars($supportGroup[0]['idSoutenance'])] = $supportGroup[0]['support'];
+            $estProf = $this->model->estProfSae($_GET['id'], $_SESSION['idUtilisateur']);
+            if(!$estProf) {
+                foreach ($rendus as $rendu) {
+                    if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
+                        $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
+                        $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
+                    }
+                    if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
+                        $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
+                        $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
+                    }
                 }
             }
+            $supportsDeposer = [];
+
+            if(!$estProf) {
+                foreach ($soutenances as $soutenance) {
+                    if ($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))) {
+                        $supportGroup = $this->model->getSupportEleve($soutenance['idSoutenance'], $saes[0]['idSAE']);
+                        $supportsDeposer[htmlspecialchars($supportGroup[0]['idSoutenance'])] = $supportGroup[0]['support'];
+                    }
+                }
+            }
+
             $profs = $this->model->getProfsBySAE($_GET['id']);
             $etudiants = $this->model->getEtudiantsBySAE($_GET['id']);
             $inGroupeSAE = $this->model->inGroupeBySAE($_GET['id']);
@@ -274,7 +284,9 @@ class SaeController
         $estNote = isset($_POST['renduNote']) ? true : false;
         $coeff = isset($_POST['coeff']) ? $_POST['coeff'] : null;
 
-        $this->model->createRendu($titre, $dateLimiteComplete, $idSae, $estNote, $coeff);
+        $etudiants = $this->model->etudiantQuiOnGroupeDansSAE($idSae);
+        $this->model->createRendu($titre, $dateLimiteComplete, $idSae, $estNote, $coeff, $etudiants);
+
 
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
@@ -321,7 +333,8 @@ class SaeController
         $duree = $_POST['dureeSoutenance'];
         $salle = $_POST['salleSoutenance'];
 
-        $this->model->createSoutenance($titre, $date, $salle, $duree, $idSAE);
+        $etudiants = $this->model->etudiantQuiOnGroupeDansSAE($idSAE);
+        $this->model->createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants);
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
@@ -465,12 +478,21 @@ class SaeController
 
     private function gererGroupe() {
         $idProposition = $_GET['idproposition'];
+        $sae = $this->model->getSAEById($_GET['id'])[0];
+        $idEtudiants = [];
+        $i = 0;
+
+        while(isset($_POST['etudiant'.$i])) {
+            $idEtudiants[$i] = $_POST['etudiant'.$i];
+            $i++;
+        }
         if (isset($_POST['Accepter'])){
-            $this->model->accepterGroupe($idProposition);
+            $this->model->accepterGroupe($idProposition, $sae, $idEtudiants);
         }
         else {
-            $this->model->refuserGroupe($idProposition);
+            $this->model->refuserGroupe($idProposition, $sae, $idEtudiants);
         }
+
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
