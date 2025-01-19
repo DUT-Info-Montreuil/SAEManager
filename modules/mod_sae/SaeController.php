@@ -44,12 +44,21 @@ class SaeController
                 break;
             case "ajoutDepotSupport":
                 $this->depotSupport();
-                break;
+                break;    
             case "suprimmerDepotGroupeRendu":
                 $this->suprimmerDepotRenduGroupe();
                 break;
             case "suprimmerDepotGroupeSupport":
                 $this->suprimmerDepotSupportGroupe();
+                break;
+            case "soutenance":
+                $this->initSoutenance();
+                break;
+            case "calendrierPassageSoutenance":
+                $this->initPageSoutenanceCalendrier();
+                break;
+            case "placerPassageSoutenance":
+                $this->placerPassageSoutenance();
                 break;
             case "createRendu":
                 $this->createRendu();
@@ -127,19 +136,18 @@ class SaeController
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
             $allRessource = $this->model->getRessource();
             $rendusDeposer = [];
-            foreach ($rendus as $rendu) {
+            foreach ($rendus as $rendu)
                 if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
-                if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
+                if($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])){
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
-            }
             $supportsDeposer = [];
-            foreach ($soutenances as $soutenance) {
-                if ($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))) {
+            foreach($soutenances as $soutenance){
+                if($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))){
                     $supportGroup = $this->model->getSupportEleve($soutenance['idSoutenance'], $saes[0]['idSAE']);
                     $supportsDeposer[htmlspecialchars($supportGroup[0]['idSoutenance'])] = $supportGroup[0]['support'];
                 }
@@ -154,10 +162,37 @@ class SaeController
             );
             $groupes = $this->model->formationGroupes($_GET['id']);
 
-            $this->view->initSaeDetails($groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
+            $this->view->initSaeDetails($groupes, $infosEtudiant, $etudiants,$profs,$saes ,$champs ,$repId , $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer);
         } else {
             header('Location: index.php');
         }
+    }
+
+    private function initPageSoutenanceCalendrier()
+    {
+        $idSoutenance = isset($_POST['idSoutenance']) ? $_POST['idSoutenance'] : exit("idSoutenance not set");
+        $soutenance =  $this->model->getSoutenanceById($idSoutenance)[0];
+        $titre = $soutenance['titre'];
+        $temps = $soutenance['dureeMinutes'];
+        $listeGroupe = $this->model->getGroupeDeLaSae($_GET['id']);
+        $listeGroupeAvecPassage = $this->model->getGroupeAvecPassageSoutenance($idSoutenance);
+
+        $firstcpt = 0;
+        foreach($listeGroupe as $groupe){
+            $find = false;
+            foreach($listeGroupeAvecPassage as $groupeAvecPassage){
+                if($groupe['idgroupe'] == $groupeAvecPassage['idGroupe']){
+                    $listeGroupe[$firstcpt]['passage'] = $groupeAvecPassage['date'];
+                    $find = true;
+                }
+            }
+            if(!$find) {
+                $listeGroupe[$firstcpt]['passage'] = null;
+            }
+            $firstcpt++;
+        }
+
+        $this->view->initPageSoutenance($titre, $idSoutenance, $_GET['id'], $listeGroupe, $temps);
     }
 
     private function initGroup()
@@ -180,6 +215,16 @@ class SaeController
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
+    }
+
+    private function initSoutenance()
+    {
+        $soutenances = $this->model->listeSoutenanceOuEstJuryParSae($_GET['id'], $_SESSION['idUtilisateur']);
+        $sae = $this->model->getSaeById($_GET['id']);
+        if($this->model->estProfSae($_GET['id'], $_SESSION['idUtilisateur']))
+            $this->view->initPageListeSoutenance($sae, $soutenances, $_GET['id']);
+        else
+            header("Location: index.php?module=sae&action=details&id=" . $_GET['id']);
     }
 
     private function uploadFichier()
@@ -355,9 +400,10 @@ class SaeController
     {
         $idProf = $_POST['idPers'];
         $idSAE = $_GET['id'];
-        if ($_POST['poste'] == 'inter') {
+        if ($_POST['poste'] == 'inter'){
             $this->model->ajoutIntervenant($idSAE, $idProf);
-        } else {
+        }
+        else {
             $this->model->ajoutCResponsables($idSAE, $idProf);
         }
         header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -380,29 +426,27 @@ class SaeController
         $idSoutenance = isset($_POST['idSaeDepotSupport']) ? $_POST['idSaeDepotSupport'] : exit("idSupport not set");
         $file = isset($_FILES['fileInputSupport']) ? $_FILES['fileInputSupport'] : exit("file not set");
         $fileName = $_FILES['fileInputSupport']['name'];
-
+        
         $depotreussi = $this->model->uploadFileSupport($file, $idSoutenance, $fileName, $idSae);
-        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+        header("Location: index.php?module=sae&action=details&id=".$idSae);
     }
 
-    private function suprimmerDepotRenduGroupe()
-    {
+    private function suprimmerDepotRenduGroupe(){
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
         $idDepot = isset($_POST['idDepotSupressionRendu']) ? $_POST['idDepotSupressionRendu'] : exit("idDepot not set");
 
         $this->model->suprimmerDepotGroupeRendu($idDepot, $idGroupe);
-        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+        header("Location: index.php?module=sae&action=details&id=".$idSae);
     }
 
-    private function suprimmerDepotSupportGroupe()
-    {
+    private function suprimmerDepotSupportGroupe(){
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
         $idDepot = isset($_POST['idDepotSupressionSupport']) ? $_POST['idDepotSupressionSupport'] : exit("idSupport not set");
 
         $this->model->suprimmerDepotGroupeSupport($idDepot, $idGroupe);
-        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+        header("Location: index.php?module=sae&action=details&id=".$idSae);
     }
 
     private function creerPropositionGroupe() {
@@ -429,4 +473,20 @@ class SaeController
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
+
+    private function placerPassageSoutenance()
+    {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $date = $_POST['date'] ?? exit("date not set");
+            $duration = $_POST['duration'] ?? exit("duration not set");
+            $schedules = $_POST['schedule'] ?? null;
+            $idSoutenance = $_GET['idsoutenance'] ?? exit("idSoutenance not set");
+
+            $this->model->creePassageSoutenance($date, $duration, $schedules, $idSoutenance);
+        }
+
+        header("Location: index.php?module=sae&action=soutenance&id=".$_GET['id']);
+    }
+
+
 }

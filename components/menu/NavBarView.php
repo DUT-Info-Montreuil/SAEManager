@@ -72,7 +72,7 @@ HTML;
 				<li><a href="index.php?module=home">Sujet</a></li>
 				<li><a href="index.php?module=home">Ressources</a></li>
 				<li><a href="index.php?module=home">Rendus</a></li>
-				<li><a href="index.php?module=home">Soutenance</a></li>
+				<li><a href="index.php?module=sae&action=soutenance&id=$saeID">Soutenance</a></li>
 				<li><a href="index.php?module=sae&action=groupe&id=$saeID">Groupe</a></li>
 				<li><a href="index.php?module=home">Cloud</a></li>
 				<li><a href="index.php?module=home">Messages</a></li>
