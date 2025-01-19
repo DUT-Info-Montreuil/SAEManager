@@ -60,10 +60,11 @@ class SaeModel extends Connexion
 
             $currentDateTime = date('Y-m-d H:i:s');
 
+
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idRendu", $idRendu);
             $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
-            $pdo_req->bindValue(":fichier", $newFileName);
+            $pdo_req->bindValue(":fichier", $newFileName['file']);
             $pdo_req->bindValue(":dateDepot", $currentDateTime);
             $pdo_req->execute();
             return true;
@@ -79,9 +80,6 @@ class SaeModel extends Connexion
             $req = "INSERT INTO SupportSoutenance VALUES (:idSoutenance, :idGroupe, :fichier)";
 
             $currentDateTime = date('Y-m-d H:i:s');
-            var_dump($idGroupe);
-            var_dump($idSoutenance);
-            var_dump($fileName);
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idSoutenance", $idSoutenance);
             $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
@@ -92,46 +90,113 @@ class SaeModel extends Connexion
         return false;
     }
 
+    function uploadFileRessource($file, $fileName, $nom)
+    {
+        $newFileName = $this->uploadFichier($fileName, $file, "none");
+
+        if ($newFileName) {
+            $req = "INSERT INTO Ressource (contenu, couleur, nom) VALUES (:contenu, :couleur, :nom)";
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":contenu", $newFileName['file']);
+            $pdo_req->bindValue(":couleur", "none");
+            $pdo_req->bindValue(":nom", $nom);
+            $pdo_req->execute();
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function uploadFichier($fileName, $fileInput, $color)
     {
+        $apiUrl = 'http://saemanager-api.atwebpages.com/api/api.php';
         $dossier = './files/';
 
-        // Vérifiez ou créez le dossier
         if (!file_exists($dossier)) {
-            if (!mkdir($dossier, 0777, false)) {
+            if (!mkdir($dossier, 0777, true)) {
                 echo "Impossible de créer le dossier : $dossier";
                 return false;
             }
         }
 
-        if (file_exists($dossier . $fileName))
+        if (file_exists($dossier . $fileName)) {
             $fileName = "_" . $fileName;
+        }
 
-        // Déplacez le fichier téléchargé
-        if (move_uploaded_file($fileInput['tmp_name'], $dossier . $fileName)) {
-            echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' !<br>";
-            echo "Nom entré par l'utilisateur : '$fileName'<br>";
-            echo "Couleur choisie : '$color'<br>";
-            return $fileName;
+        $localFilePath = $dossier . $fileName;
+        if (move_uploaded_file($fileInput['tmp_name'], $localFilePath)) {
+            echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' temporairement.<br>";
+
+            $curl = curl_init();
+            $file = new CURLFile($localFilePath);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+
+            $postData = [
+                'file' => $file,
+                'color' => $color,
+            ];
+
+            curl_setopt_array($curl, [
+                CURLOPT_URL => $apiUrl,
+                CURLOPT_POST => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POSTFIELDS => $postData,
+            ]);
+
+            $response = curl_exec($curl);
+
+
+            if (curl_errno($curl)) {
+                echo "Erreur cURL : " . curl_error($curl);
+                curl_close($curl);
+                return false;
+            }
+
+            curl_close($curl);
+
+            echo "Réponse de l'API : $response<br>";
+            return json_decode($response, true);
         } else {
-            echo "Erreur lors du déplacement du fichier.";
+            echo "Erreur lors du déplacement du fichier local.";
             return false;
         }
     }
 
+
     public function deleteFichier($fileName)
     {
-        $dossier = './files/';
+        $apiUrl = 'http://saemanager-api.atwebpages.com/api/api.php';
 
-        if (!file_exists($dossier))
-            if (!mkdir($dossier, 0777, false)) {
-                echo "Impossible de créer le dossier : $dossier";
-                return false;
-            }
-        if (file_exists($dossier . $fileName))
-            return unlink($dossier . $fileName);
-        return false;
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $apiUrl . '?file=' . urlencode($fileName));
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+
+        $response = curl_exec($curl);
+
+        if (curl_errno($curl)) {
+            echo "Erreur cURL : " . curl_error($curl);
+            curl_close($curl);
+            return false;
+        }
+
+        curl_close($curl);
+
+        $responseData = json_decode($response, true);
+        if (isset($responseData['message']) && $responseData['message'] == 'Fichier supprimé avec succès') {
+            echo "Fichier '$fileName' supprimé avec succès via l'API.";
+            return true;
+        } else {
+            echo "Erreur lors de la suppression du fichier via l'API : " . (isset($responseData['error']) ? $responseData['error'] : 'Erreur inconnue');
+            return false;
+        }
     }
+
 
     public function suprimmerDepotGroupeRendu($idDepot, $idGroupe)
     {
@@ -286,6 +351,15 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
+    function getRendu($idRendu)
+    {
+        $req = "SELECT * FROM RenduGroupe WHERE idRendu = :idRendu";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idRendu", $idRendu, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
     function getMyGroupId($idSAE)
     {
         $req = "SELECT g.idGroupe
@@ -302,22 +376,26 @@ class SaeModel extends Connexion
 
     function getMyGroup($idSAE, $GroupeID)
     {
-        foreach ($GroupeID as $id) {
-            $idGroupe = $id['idGroupe'];
+
+        if ($GroupeID) {
+            foreach ($GroupeID as $id) {
+                $idGroupe = $id['idGroupe'];
+            }
+
+
+            $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE
+                    FROM Personne p
+                    INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = p.idPersonne
+                    INNER JOIN Groupe g ON EtudiantGroupe.idGroupe = g.idGroupe
+                    WHERE g.idSAE = :idSAE AND g.idGroupe = :idGroupe";
+
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSAE", $idSAE);
+            $pdo_req->bindValue(":idGroupe", $idGroupe);
+            $pdo_req->execute();
+            return $pdo_req->fetchAll();
         }
-
-        $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE
-                FROM Personne p
-                INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = p.idPersonne
-                INNER JOIN Groupe g ON EtudiantGroupe.idGroupe = g.idGroupe
-                WHERE g.idSAE = :idSAE AND g.idGroupe = :idGroupe";
-
-
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":idGroupe", $idGroupe);
-        $pdo_req->execute();
-        return $pdo_req->fetchAll();
     }
 
     function getSAEResponsable($idSAE)
@@ -432,8 +510,41 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    // POST
+    public function getRessourceInscrit()
+    {
 
+        if ($_SESSION['estProfUtilisateur']) {
+            $req_prof = "
+                SELECT DISTINCT SAE.idSAE, SAE.nomSae, Ressource.contenu, Ressource.nom, RessourcesSAE.idRessource
+                FROM SAE
+                INNER JOIN RessourcesSAE ON SAE.idSAE = RessourcesSAE.idSAE
+                INNER JOIN Ressource ON Ressource.idRessource = RessourcesSAE.idRessource
+                WHERE SAE.idResponsable = :idResponsable
+            ";
+
+            $pdo_req_prof = self::$bdd->prepare($req_prof);
+            $pdo_req_prof->bindValue(":idResponsable", $_SESSION['idUtilisateur'], PDO::PARAM_INT);
+            $pdo_req_prof->execute();
+
+            $ressources_prof = $pdo_req_prof->fetchAll();
+            return $ressources_prof;
+        }
+
+        $req_eleve = "
+            SELECT *
+            FROM EleveInscritSae
+            INNER JOIN RessourcesSAE ON EleveInscritSae.idSAE = RessourcesSAE.idSAE
+            WHERE idEleve = :idEleve
+        ";
+
+        $pdo_req_eleve = self::$bdd->prepare($req_eleve);
+        $pdo_req_eleve->bindValue(":idEleve", $_SESSION['idUtilisateur'], PDO::PARAM_INT);
+        $pdo_req_eleve->execute();
+
+        $ressources_eleve = $pdo_req_eleve->fetchAll();
+
+        return $ressources_eleve;
+    }
 
 
     // POST
@@ -592,5 +703,18 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":sujet", $sujet);
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->execute();
+    }
+
+    function delRessource($idRessource)
+    {
+        $reqSAE = "DELETE FROM RessourcesSAE WHERE idRessource = :id";
+        $pdo_reqSAE = self::$bdd->prepare($reqSAE);
+        $pdo_reqSAE->bindValue(":id", $idRessource);
+        $pdo_reqSAE->execute();
+
+        $reqRessource = "DELETE FROM Ressource WHERE idRessource = :id";
+        $pdo_reqRessource = self::$bdd->prepare($reqRessource);
+        $pdo_reqRessource->bindValue(":id", $idRessource);
+        $pdo_reqRessource->execute();
     }
 }

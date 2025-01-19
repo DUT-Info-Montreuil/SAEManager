@@ -305,3 +305,37 @@ if (addRessourceBtn) {
 }
 
 // Ressource
+
+// Sélectionner le bouton "Sélectionner fichier" pour les ressources
+document
+  .getElementById("selectFileButtonRessource")
+  .addEventListener("click", function () {
+    document.getElementById("fileInputRessource").click();
+  });
+
+// Gestion du bouton d'annulation pour fermer le modal des ressources
+const modalDepotRessource = document.getElementById("modalCreateRessource");
+const dropRessourceFileCancelButton = document.getElementById(
+  "depotCancelButtonRessource"
+);
+
+dropRessourceFileCancelButton.addEventListener("click", function () {
+  modalDepotRessource.classList.remove("d-block");
+});
+
+// Gestion des boutons pour ouvrir le modal de dépôt de ressources
+const listRessourceButtons = document.querySelectorAll(
+  '[class*="ressourcedrop-"]'
+);
+const idSaeDepotRessource = document.getElementById("idSaeDepotRessource");
+
+listRessourceButtons.forEach((element) => {
+  const matches = element.className.match(/ressourcedrop-(\d+)/);
+  if (matches) {
+    const number = matches[1];
+    element.addEventListener("click", function () {
+      idSaeDepotRessource.value = number;
+      modalDepotRessource.classList.add("d-block");
+    });
+  }
+});

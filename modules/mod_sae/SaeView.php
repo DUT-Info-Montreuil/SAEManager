@@ -362,6 +362,8 @@ HTML;
         HTML;
         }
 
+        $fichier = urlencode($contenue);
+
         if ($_SESSION['estProfUtilisateur']) {
             return <<<HTML
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
@@ -370,7 +372,7 @@ HTML;
                     <form method="POST" action="index.php?module=sae&action=supprimerRessource&id=$idSAE&idRessource=$idRessource" class="m-0">
                         <button type="submit" class="btn btn-secondary btn-sm">Supprimer</button>
                     </form>
-                    <a href="#" class="text-decoration-none text-primary align-self-center">Ouvrir la ressource</a>  <!-- TO-DO : Ajouter un lien pour voir le contenu -->
+                    <a href="http://saemanager-api.atwebpages.com/api/api.php?file=$fichier" class="text-decoration-none text-primary align-self-center">Télécharger</a>
                 </div>
             </div>
             HTML;
@@ -379,7 +381,7 @@ HTML;
         return <<<HTML
     <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
         <span>$nomRessource</span> 
-        <a href="#" class="ms-auto text-decoration-none text-primary">Ouvrir la ressource</a> <!-- TO-DO : Ajouter un lien pour voir le contenu -->
+        <a href="http://saemanager-api.atwebpages.com/api/api.php?file=$fichier" class="ms-auto text-decoration-none text-primary">Télécharger</a>
     </div>
     HTML;
     }
@@ -412,12 +414,24 @@ HTML;
         if ($renduDeposer) {
             $color = "success";
             $phrase = "Déposer le : ";
-            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressRenduButton-' . $id . '">Suprimmer le rendu déposer</a>';
+            $depotousupression = '<span class="text-primary text-danger text-decoration-none cursor-pointer supressRenduButton-' . $id . '">Supprimer le rendu déposer</span>';
+            $voirRendu = <<<HTML
+                <form method="POST" action="index.php?module=sae&action=deposerFichierRendu&id=$id" style="display: inline;">
+                    <input type="hidden" name="file" value="678b0db555e6f-cours_ppom (7).pdf">
+                    <button type="submit" class="btn btn-link text-primary text-success text-decoration-none p-0 m-0" style="border: none; background: none;">
+                        Voir le rendu
+                    </button>
+                </form>
+HTML;
         } else {
 
             $color = "danger";
             $phrase = "A déposer avant le : ";
-            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendudrop-' . $id . '">Déposer le rendu</a>';
+            $depotousupression = '<div class="text-primary text-decoration-none cursor-pointer fw-bold rendudrop-' . $id . '">Déposer le rendu</div>';
+        }
+
+        if (!isset($voirRendu)) {
+            $voirRendu = "";
         }
 
         return <<<HTML
@@ -429,6 +443,7 @@ HTML;
                 <p class="text-$color mb-0">$phrase $dateLimite</p>
                     <div class="d-flex flex-column">
                         $depotousupression
+                        $voirRendu
                     </div>
                 </div>
             </div>
@@ -491,6 +506,7 @@ HTML;
         foreach ($sae as $s) {
             $nomSAE = htmlspecialchars($s['nomSae']);
         }
+
 
         echo <<<HTML
     <div class="container mt-5">
@@ -802,32 +818,46 @@ HTML;
     function popUpCreateRessource($idSae)
     {
         return <<<HTML
-        <div class="modal" tabindex="-1" id="modalCreateRessource">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bolder text-center w-100">Créer une ressource</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="index.php?module=sae&action=createRessource&id=$idSae" method="POST">
-                        <div class="modal-body d-flex flex-column text-center">
-                            <div class="form-group mb-3">
-                                <input type="text" class="form-control" name="nomRessource" id="nomRessource" placeholder="Nom de la ressource" required>
-                            </div>
-                            <div class="form-group mb-3">
-                                <textarea class="form-control" name="contenuRessource" id="contenuRessource" placeholder="Contenu de la ressource" required></textarea>
-                            </div>
-                            <div>
-                                <button type="submit" class="btn btn-success m-3">Valider</button>
-                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-ressource-cancel">Annuler</button>
+    <div class="modal" tabindex="-1" id="modalCreateRessource">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bolder text-center w-100">Déposer une ressource</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="index.php?module=sae&action=depotRessource&id=$idSae" method="POST" id="ressourceUploadForm" enctype="multipart/form-data">
+                    <div class="modal-body d-flex flex-column text-center">
+                        <!-- Champ pour le nom de la ressource -->
+                        <div class="form-group mb-3">
+                            <input type="text" class="form-control" name="nomRessource" id="nomRessource" placeholder="Nom de la ressource" required>
+                        </div>
+
+                        <!-- Section pour télécharger un fichier -->
+                        <div class="card border rounded-3 mb-3">
+                            <div class="card-body d-flex flex-column align-items-center">
+                                <svg class="icon" width="100" height="100" style="fill: #0AF;">
+                                    <use xlink:href="#upload-icon"></use>
+                                </svg>
+                                <p>Déposer ou glisser un fichier ici</p>
+                                <p class="fs-10 fw-light">Taille max : 20 Mo</p>
+                                <input type="file" class="form-control-file" id="fileInputRessource" name="fileInputRessource" required style="display: none;">
+                                <button type="button" class="btn btn-light w-50" id="selectFileButtonRessource">Sélectionner fichier</button>
                             </div>
                         </div>
-                    </form>
-                </div>
+
+                        <!-- Boutons d'action -->
+                        <div>
+                            <button type="submit" class="btn btn-success m-3">Valider</button>
+                            <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-ressource-cancel">Annuler</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-    HTML;
+    </div>
+HTML;
     }
+
 
     function popUpAjouterRessource($idSae, $ressources, $ressourcesAssociees)
     {
@@ -1091,8 +1121,11 @@ HTML;
     // Ressources
 
 
-    function initRessources($ressources, $mySAES)
+    function initRessources($ressources, $myRessources)
     {
+        $myRessourcesIds = array_column($myRessources, 'idRessource');
+        $isProf = isset($_SESSION['estProfUtilisateur']) && $_SESSION['estProfUtilisateur'];
+
         echo <<<HTML
     <div class="container mt-5">
         <h1 class="fw-bold">LISTE DES RESSOURCES</h1>
@@ -1103,28 +1136,60 @@ HTML;
                         <use xlink:href="#arrow-icon"></use>
                     </svg>
                 </div>
-                <h3 class="fw-bold">Liste des ressources de toutes les SAés :</h3>
+                <h3 class="fw-bold">Liste des ressources</h3>
             </div>
             <div class="d-flex mb-4">
                 <input type="text" id="search-bar" class="form-control w-50" placeholder="Rechercher une ressource">
-                <button id="sort-button" class="btn btn-primary ms-3">Trier A-Z</button>
+HTML;
+
+        // Le bouton "Afficher mes SAE" n'est affiché que pour les professeurs
+        if ($isProf) {
+            echo <<<HTML
                 <button id="filter-sae-button" class="btn btn-secondary ms-3">Afficher mes SAE</button>
+HTML;
+        }
+
+        echo <<<HTML
+                <button id="sort-button" class="btn btn-primary ms-3">Trier A-Z</button>
             </div>
             <div id="ressources-list" class="ressources-list">
 HTML;
 
-        // Génération des ressources
         foreach ($ressources as $ressource) {
             $nomRessource = htmlspecialchars($ressource['nom']);
-            $idSAE = htmlspecialchars($ressource['idRessource']); // ID de la SAE pour filtrer
+            $idSAE = htmlspecialchars($ressource['idRessource']);
             $contenue = htmlspecialchars($ressource['contenu']);
+            $idRessource = htmlspecialchars($ressource['idRessource']);
+
+            $isMySae = in_array($idRessource, $myRessourcesIds) ? "true" : "false";
+
+            $hiddenClass = (!$isProf && $isMySae === "false") ? "d-none" : "";
+
             echo <<<HTML
-        <div class="resource-item d-flex align-items-center p-2 border-bottom" data-name="$nomRessource" data-sae="$idSAE">
-            <div>
+        <a href="http://saemanager-api.atwebpages.com/api/api.php?file=$contenue" 
+           class="resource-item d-flex align-items-center p-2 border-bottom cursor-pointer text-decoration-none text-dark $hiddenClass" 
+           data-name="$nomRessource" 
+           data-sae="$idSAE" 
+           data-my-sae="$isMySae">
+            <div class="flex-grow-1">
                 <h5 class="mb-0 fw-bold resource-name">$nomRessource</h5>
                 <p class="mb-0 text-muted">Contenu: $contenue</p>
             </div>
-        </div>
+HTML;
+
+            if ($isProf) {
+                echo <<<HTML
+            <div class="ms-auto">
+                <form action="index.php?module=sae&action=delRessource&idRessource=$idRessource" method="POST">
+                    <input type="hidden" name="id" value="$idSAE">
+                    <button type="submit" class="btn btn-danger ms-3">Supprimer</button>
+                </form>
+            </div>
+HTML;
+            }
+
+            echo <<<HTML
+        </a>
 HTML;
         }
 
@@ -1132,6 +1197,9 @@ HTML;
             </div>
         </div>
     </div>
+    <script>
+        const isProf = {$_SESSION['estProfUtilisateur']};
+    </script>
     <script src="js/ressource.js"></script>
 HTML;
     }

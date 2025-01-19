@@ -58,7 +58,7 @@ class SaeController
                 $this->delRendu();
                 break;
             case "supprimerRessource":
-                $this->delRessource();
+                $this->delRessourceSAE();
                 break;
             case "modifierRendu":
                 $this->updateRendu();
@@ -93,8 +93,17 @@ class SaeController
             case "ajout_champ":
                 $this->ajout();
                 break;
+            case "deposerFichierRendu":
+                $this->deposerFichierRendu();
+                break;
             case "ressources":
                 $this->initRessource();
+                break;
+            case "depotRessource":
+                $this->deposerFichierRessource();
+                break;
+            case "delRessource":
+                $this->delRessource();
                 break;
         }
     }
@@ -230,7 +239,7 @@ class SaeController
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    private function delRessource()
+    private function delRessourceSAE()
     {
         $idRessource = $_GET['idRessource'];
         $idSAE = $_GET['id'];
@@ -394,12 +403,43 @@ class SaeController
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
+    private function deposerFichierRendu()
+    {
+        $idRendu = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $rendus = $this->model->getRendu($idRendu);
+        $fichier = $rendus[0]['fichier'];
+
+
+        $apiUrl = "http://saemanager-api.atwebpages.com/api/api.php?file=" . urlencode($fichier);
+        header("Location: $apiUrl");
+    }
+
+    private function deposerFichierRessource()
+    {
+        $idSae = $_GET['id'];
+        $nom = $_POST['nomRessource'];
+        $file = isset($_FILES['fileInputRessource']) ? $_FILES['fileInputRessource'] : exit("file not set");
+        $fileName = $_FILES['fileInputRessource']['name'];
+
+        $depotreussi = $this->model->uploadFileRessource($file, $fileName, $nom);
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
+    }
+
 
     private function initRessource()
     {
 
         $ressource = $this->model->getRessource();
-        $mySAE = $this->model->getMySAE();
-        $this->view->initRessources($ressource, $mySAE);
+        $myRessources = $this->model->getRessourceInscrit();
+        $this->view->initRessources($ressource, $myRessources);
+    }
+
+    private function delRessource()
+    {
+
+        $idRessource = $_GET['idRessource'];
+
+        $this->model->delRessource($idRessource);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }

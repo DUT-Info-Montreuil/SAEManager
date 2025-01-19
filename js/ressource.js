@@ -1,56 +1,84 @@
 // Search bar
 
+const afficherSAE = document.querySelector("#filter-sae-button");
+
 document.getElementById("search-bar").addEventListener("input", function () {
   const filter = this.value.toLowerCase().trim();
   const resources = document.querySelectorAll(".resource-item");
-
   resources.forEach((resource) => {
     const resourceName = resource.getAttribute("data-name").toLowerCase();
-    if (resourceName.includes(filter)) {
-      resource.classList.remove("d-none");
-      console.log(resource.style);
-    } else {
-      resource.classList.add("d-none");
-    }
-  });
+    const isMySae = resource.getAttribute("data-my-sae") === "true";
 
-  // Recherche en direct
-  document.getElementById("search-bar").addEventListener("input", function () {
-    var filter = this.value.toLowerCase();
-    var resources = document.querySelectorAll(".resource-item");
-    resources.forEach(function (resource) {
-      var name = resource
-        .querySelector(".resource-name")
-        .textContent.toLowerCase();
-      resource.style.display = name.includes(filter) ? "" : "none";
-    });
+    if (isProf) {
+      const showOnlyMySae = afficherSAE.classList.contains("active");
+      if (resourceName.includes(filter) && (!showOnlyMySae || isMySae)) {
+        resource.classList.remove("d-none");
+      } else {
+        resource.classList.add("d-none");
+      }
+    } else {
+      if (resourceName.includes(filter) && isMySae) {
+        resource.classList.remove("d-none");
+      } else {
+        resource.classList.add("d-none");
+      }
+    }
   });
 });
 
-// Tri alphabétique avec alternance A-Z / Z-A
-let isAscending = true; // Variable pour suivre l'état du tri (true = A-Z, false = Z-A)
+let isAscending = true;
 
 document.getElementById("sort-button").addEventListener("click", function () {
   var list = document.getElementById("ressources-list");
   var resources = Array.from(list.children);
 
-  // Trier les éléments selon l'ordre actuel (A-Z ou Z-A)
   resources.sort(function (a, b) {
     var nameA = a.getAttribute("data-name").toLowerCase();
     var nameB = b.getAttribute("data-name").toLowerCase();
 
     if (isAscending) {
-      return nameA.localeCompare(nameB); // Tri A-Z
+      return nameA.localeCompare(nameB);
     } else {
-      return nameB.localeCompare(nameA); // Tri Z-A
+      return nameB.localeCompare(nameA);
     }
   });
 
-  // Réorganiser les éléments dans le DOM
   resources.forEach(function (resource) {
     list.appendChild(resource);
   });
 
-  // Inverser l'état du tri (A-Z <-> Z-A)
   isAscending = !isAscending;
 });
+
+const removeRessource = document.querySelectorAll("#delete-resource");
+
+removeRessource.forEach((x) => {
+  x.addEventListener("click", (e) => {
+    e.preventDefault();
+  });
+});
+
+if (isProf) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const filterSaeButton = document.getElementById("filter-sae-button");
+    const resourcesList = document.getElementById("ressources-list");
+
+    filterSaeButton.addEventListener("click", () => {
+      const showMySae = filterSaeButton.classList.toggle("active");
+      const resources = resourcesList.querySelectorAll(".resource-item");
+
+      resources.forEach((resource) => {
+        const isMySae = resource.getAttribute("data-my-sae") === "true";
+        if (showMySae && !isMySae) {
+          resource.classList.add("d-none");
+        } else {
+          resource.classList.remove("d-none");
+        }
+      });
+
+      filterSaeButton.textContent = showMySae
+        ? "Afficher toutes les SAEs"
+        : "Afficher mes SAE";
+    });
+  });
+}
