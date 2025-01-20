@@ -47,6 +47,7 @@ class RendusModel extends Connexion{
             r.nom AS Rendu_nom,
             r.dateLimite AS Rendu_dateLimite,
             s.nomSae AS SAE_nom,
+            s.idSAE AS idSAE,
             e.idEval,
             e.nom AS Eval_nom,
             e.coef AS Eval_coef,
@@ -76,6 +77,73 @@ class RendusModel extends Connexion{
         $pdo_req->execute();
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
+    
+    function getNotesParGroupeDuneEval($idEval){
+        $req = "SELECT DISTINCT 
+                    e.idEval,
+                    e.nom AS Eval_nom,
+                    e.coef AS Eval_coef,
+                    n.note AS Note_valeur,
+                    n.idEleve,
+                    p.nom AS Eleve_nom,
+                    p.prenom AS Eleve_prenom
+                FROM Evaluation e
+                JOIN Notes n ON e.idEval = n.idEval
+                JOIN Personne p ON n.idEleve = p.idPersonne
+                WHERE e.idEval = :idEval
+                ORDER BY n.idEleve;";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idEval", $idEval, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function getElevesParGroupe($idSAE) {
+        $req = "
+        SELECT DISTINCT
+            p.idPersonne,
+            p.nom AS Eleve_nom,
+            p.prenom AS Eleve_prenom,
+            g.idGroupe,
+            g.nom AS Groupe_nom
+        FROM Personne p
+        JOIN EtudiantGroupe eg ON p.idPersonne = eg.idEtudiant
+        JOIN Groupe g ON eg.idGroupe = g.idgroupe
+        WHERE g.idSAE = :idSAE
+        ORDER BY g.idGroupe, p.nom, p.prenom;
+        ";
+    
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam(":idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+
+    function getElevesSansGroupe($idSAE) {
+        $req = "
+        SELECT DISTINCT
+            p.idPersonne,
+            p.nom AS Eleve_nom,
+            p.prenom AS Eleve_prenom
+        FROM Personne p
+        LEFT JOIN EtudiantGroupe eg ON p.idPersonne = eg.idEtudiant
+        WHERE eg.idGroupe IS NULL
+        AND EXISTS (
+            SELECT 1
+            FROM EleveInscritSae esi
+            WHERE esi.idEleve = p.idPersonne
+            AND esi.idSAE = :idSAE
+        )
+        ORDER BY p.nom, p.prenom;
+        ";
+    
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam(":idSAE", $idSAE, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     
     
     

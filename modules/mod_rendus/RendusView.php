@@ -156,8 +156,7 @@ HTML;
         </div>
     HTML;
     }
-
-    public function initEvaluerPage($infoTitre){
+    public function initEvaluerPage($rendus, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe) {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
             <div class="container mt-5">
@@ -172,58 +171,101 @@ HTML;
                         <h3 class="fw-bold">SAE : {$infoTitre['SAE_nom']} <br> Rendu : {$infoTitre['Rendu_nom']} <br> Évaluation : {$infoTitre['Eval_nom']}</h3>
                     </div>
                     <div class="rendu-list">
-HTML;
-            //A MODIFIE
-            // foreach ($rendus as $rendu) {
-            //     $renduNom = $rendu['Rendu_nom'];
-            //     $saeNom = $rendu['SAE_nom'];
-            //     $dateLimite = $rendu['dateLimite'];
-            //     $idSAE = $rendu['idSAE'];
-                
-            //     // Filtrer les notes liées au rendu actuel
-            //     $notesForRendu = array_filter($notes, function ($note) use ($rendu) {
-            //         return $note['idRendu'] === $rendu['idRendu'];
-            //     });
-            //     // var_dump($notes);
-            //     echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu);
-            // }
-
-            echo <<<HTML
+                        <form>
+        HTML;
+        
+                // Organisation des données
+                $groupedNotes = [];
+                foreach ($notesDesElvesParGroupe as $note) {
+                    $groupedNotes[$note['idEleve']] = $note;
+                }
+                // Afficher les groupes et leurs élèves
+                foreach ($tousLesGroupes as $groupeId => $eleves) {
+                    $groupeNom = htmlspecialchars($eleves['nom'], ENT_QUOTES, 'UTF-8');
+                    echo <<<HTML
+                    <div class="group-section mt-4">
+                        <h4 class="fw-bold text-primary">$groupeNom</h4>
+                        <table class="table table-bordered mt-3 ">
+                            <thead class="table-primary">
+                                <tr class="table-primary">
+                                    <h4 class="fw-bold text-primary">$groupeNom</h4>
+                                </tr>
+                            </thead>
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        HTML;
+        
+                    foreach ($eleves['etudiants'] as $eleve) {
+                        // var_dump($groupedNotes);
+                        $idEleve = $eleve['idPersonne'];
+                        $eleveNom = htmlspecialchars($eleve['Eleve_nom'], ENT_QUOTES, 'UTF-8');
+                        $elevePrenom = htmlspecialchars($eleve['Eleve_prenom'], ENT_QUOTES, 'UTF-8');
+                        $noteValeur = isset($groupedNotes[$idEleve]['Note_valeur']) && $groupedNotes[$idEleve]['Note_valeur'] !== null 
+                        ? htmlspecialchars($groupedNotes[$idEleve]['Note_valeur'], ENT_QUOTES, 'UTF-8') 
+                        : '';                    echo <<<HTML
+                                <tr>
+                                    <td>$eleveNom</td>
+                                    <td>$elevePrenom</td>
+                                    <td><input type="number" name="note_$idEleve" class="form-control" value="$noteValeur" /></td>
+                                </tr>
+        HTML;
+                    }
+        
+                    echo <<<HTML
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </div>
-HTML;
-        } else { // Est un étudiant
-            echo <<<HTML
-            <div class="container mt-5">
-                <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
-                <div class="card shadow bg-white rounded min-h75">
-                    <div class="d-flex align-items-center p-5 mx-5">
-                        <div class="me-3">
-                            <svg width="35" height="35">
-                                <use xlink:href="#arrow-icon"></use>
-                            </svg>
-                        </div>
-                        <h3 class="fw-bold">Liste des différents rendus des SAÉs auxquels vous êtes inscrit(e) :</h3>
-                    </div>
-                    <div class="rendu-list">
-HTML;
+        HTML;
+                }
 
-            foreach ($rendus as $rendu) {
-                $renduNom = $rendu['Rendu_nom'];
-                $saeNom = $rendu['SAE_nom'];
-                $dateLimite = $rendu['dateLimite'];
-                $idSAE = $rendu['idSAE'];
-                echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
+                if($tousLesElevesSansGroupe){ //ELEves sans groupes
+
+                    echo '<h3 class="fw-bold mt-5">Élèves sans groupe</h3>';
+                    echo <<<HTML
+                    <table class="table table-bordered mt-3">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            HTML;
+            
+                    foreach ($tousLesElevesSansGroupe as $eleve) {
+                        $idEleve = $eleve['idPersonne'];
+                        $eleveNom = htmlspecialchars($eleve['nom'], ENT_QUOTES, 'UTF-8');
+                        $elevePrenom = htmlspecialchars($eleve['prenom'], ENT_QUOTES, 'UTF-8');
+                        $noteValeur = isset($groupedNotes[$idEleve]) ? htmlspecialchars($groupedNotes[$idEleve]['Note_valeur'], ENT_QUOTES, 'UTF-8') : '';
+                        echo <<<HTML
+                            <tr>
+                                <td>$eleveNom</td>
+                                <td>$elevePrenom</td>
+                                <td><input type="float" name="note_$idEleve" class="form-control" value="$noteValeur" /></td>
+                            </tr>
+            HTML;
+                    }
             }
-
-            echo <<<HTML
-                    </div>
+                echo <<<HTML
+                    </tbody>
+                </table>
+                <div class="w_100 d-flex justify-content-center">
+                    <button class="btn btn-primary btn-success m-3">Valider</button>
                 </div>
-            </div>
-HTML;
+            </form>
+        </div>
+        </div>
+    HTML;
         }
     }
+    
 
     
     
