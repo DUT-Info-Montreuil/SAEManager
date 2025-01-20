@@ -10,13 +10,13 @@ class Site
 
 	public function __construct()
 	{
-		$this->moduleName = isset($_GET['module']) ? $_GET['module'] : "home";
+		$this->moduleName = isset($_GET['module']) ? $_GET['module'] : "dashboard";
 		
 		if(!isset($_SESSION['loginUtilisateur'])){
 			$this->moduleName = "connexion";
 		}
         else if(isset($_SESSION['loginUtilisateur']) && $this->moduleName == "connexion"){
-			$this->moduleName = "home";
+			$this->moduleName = "dashboard";
 		}
 
 		$infoConnexion = isset($_GET['infoConnexion']) ? $_GET['infoConnexion'] : null;

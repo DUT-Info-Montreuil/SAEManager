@@ -33,10 +33,7 @@ class ConnexionController
                 break;
             case "essaieConnexion" :
                 if($this->model->essaieConnexion()){
-                    if($_SESSION['estProfUtilisateur'] != 1)//connexion réussite
-                        header('Location: index.php?module=dashboard');
-                    else
-                        header('Location: index.php?module=home');
+                    header('Location: index.php?module=dashboard');
                 }
                 else{
                     $this->msg_erreur = "identifiant ou mot de passe incorrect !";

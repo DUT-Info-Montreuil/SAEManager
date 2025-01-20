@@ -11,6 +11,8 @@ class DashboardView extends GenericView
 
     public function initDashboardPage($listeRendu, $listeSoutenance, $notifications, $nomUtilisateur)
     {
+        $texteRendu = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes associés à ces évaluations de rendu" : "Vos rendus non déposé";
+        $texteSoutenance = $_SESSION['estProfUtilisateur'] == 1 ?"Vous êtes associés à ces évaluations de soutenance" : "Vos prochaines soutenances";
         echo <<<HTML
                 <div class="container mt-5">
                     <h1 class="fw-bold">DASHBOARD</h1>
@@ -26,11 +28,12 @@ class DashboardView extends GenericView
                                 <div class="row g-4 m-4">
                                     <!-- Colonne 1 -->
                                     <div class="col-md-6">
-                                        <h2 class="h5 mb-3">Vos rendus non déposé</h2>
+                                        <h2 class="h5 mb-3">$texteRendu</h2>
 HTML;
                                         if(count($listeRendu)==0){
+                                            $messageSoutenance = $_SESSION['estProfUtilisateur'] == 1 ? "Vous n'avez aucuns rendus à évaluer" : "Vous n'avez aucuns rendus à rendre."; 
             echo <<<HTML
-                                                <p class="mb-0">Vous n'avez aucuns rendus à rendre.</p>
+                                                            <p class="mb-0">$messageSoutenance</p>
 HTML;
                                         }
                                         else{
@@ -47,8 +50,9 @@ HTML;
             echo <<<HTML
                                     </div>
                                     <!-- Colonne 2 -->
+                                    
                                     <div class="col-md-6">
-                                        <h2 class="h5 mb-3">Vos prochaines soutenances</h2>
+                                        <h2 class="h5 mb-3">$texteSoutenance</h2>
 HTML;
                                         if(count($listeSoutenance)==0){
                                             echo <<<HTML
