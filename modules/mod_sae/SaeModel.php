@@ -325,22 +325,28 @@ class SaeModel extends Connexion
 
     public function getRenduEleve($idRendu, $idSae)
     {
-        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
-        $req = "
-                SELECT RenduGroupe.idRendu, RenduGroupe.dateDepot, RenduGroupe.fichier
-                FROM RenduGroupe
-                WHERE idRendu = :idRendu AND idGroupe = :idGroupe
-        ";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idRendu", $idRendu);
-        $pdo_req->bindValue(":idGroupe", $idGroupe);
-        $pdo_req->execute();
-        return $pdo_req->fetchAll();
+        $idGroupe = $this->getMyGroupId($idSae);
+        if($idGroupe){
+            $idGroupe = $idGroupe[0]["idGroupe"];
+            $req = "
+                    SELECT RenduGroupe.idRendu, RenduGroupe.dateDepot, RenduGroupe.fichier
+                    FROM RenduGroupe
+                    WHERE idRendu = :idRendu AND idGroupe = :idGroupe
+            ";
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idRendu", $idRendu);
+            $pdo_req->bindValue(":idGroupe", $idGroupe);
+            $pdo_req->execute();
+            return $pdo_req->fetchAll();
+        }
     }
 
     public function didGroupDropRendu($idRendu, $idSae)
     {
-        return count($this->getRenduEleve($idRendu, $idSae)) != 0;
+        $count = $this->getRenduEleve($idRendu, $idSae);
+        if($count)
+            return count(count) != 0;
+        return false;
     }
 
     function getSoutenanceBySAE($idSAE)
@@ -381,23 +387,25 @@ class SaeModel extends Connexion
     function getMyGroup($idSAE, $GroupeID)
     {
 
-        if ($GroupeID)
+        if ($GroupeID){
             foreach ($GroupeID as $id) {
                 $idGroupe = $id['idGroupe'];
             }
 
-        $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE
-                FROM Personne p
-                INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = p.idPersonne
-                INNER JOIN Groupe g ON EtudiantGroupe.idGroupe = g.idGroupe
-                WHERE g.idSAE = :idSAE AND g.idGroupe = :idGroupe";
+            $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE
+                    FROM Personne p
+                    INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = p.idPersonne
+                    INNER JOIN Groupe g ON EtudiantGroupe.idGroupe = g.idGroupe
+                    WHERE g.idSAE = :idSAE AND g.idGroupe = :idGroupe";
 
 
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":idGroupe", $idGroupe);
-        $pdo_req->execute();
-        return $pdo_req->fetchAll();
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSAE", $idSAE);
+            $pdo_req->bindValue(":idGroupe", $idGroupe);
+            $pdo_req->execute();
+            return $pdo_req->fetchAll();
+        }
+        return null;
     }
 
     function getSAEResponsable($idSAE)
@@ -1053,7 +1061,7 @@ class SaeModel extends Connexion
             $pdo_req->execute();
 
             $req = "DELETE FROM PassageSoutenance
-                    WHERE idSoutenande = :idSoutenance";
+                    WHERE idSoutenance = :idSoutenance";
 
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idSoutenance", $idSoutenance);

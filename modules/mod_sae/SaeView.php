@@ -435,12 +435,20 @@ HTML;
             $etudiants .= '<span class="badge bg-primary me-1">' . $etudiant['nom'] . ' ' . $etudiant['prenom'] . '</span>';
         }
 
-        return <<<HTML
+        echo <<<HTML
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
                 <span>{$groupe['nomGroupe']}</span>
                 <div class="ms-auto d-flex gap-2">
                     <form method="POST" action="index.php?module=sae&action=gererGroupe&id=$idSAE&idproposition=$idGroupe" style="margin: 0;">
                         $etudiants
+HTML;
+                        for($i = 0 ; $i < count($groupe['etudiants']) ; $i++) {
+                            $idEtudiant = $groupe['etudiants'][$i]['idEleve'];
+                            echo <<<HTML
+                                <input type="hidden" id="etudiant$i" name="etudiant$i" value="$idEtudiant">
+HTML;
+                        }
+        echo <<<HTML
                         <button type="submit" name="Accepter" class="btn btn-success btn-sm">Accepter</button>
                         <button type="submit" name="Refuser" class="btn btn-danger btn-sm">Refuser</button>
                     </form>
