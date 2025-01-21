@@ -82,6 +82,7 @@ class SaeModel extends Connexion
 
     function uploadFileSupport($file, $idSoutenance, $fileName, $idSae){
         $newFileName = $this->uploadFichier($fileName, $file, "none");
+
         if($newFileName){
             $idGroupe = $this->getMyGroupId($idSae);
             $req = "INSERT INTO SupportSoutenance VALUES (:idSoutenance, :idGroupe, :fichier)";
@@ -89,7 +90,7 @@ class SaeModel extends Connexion
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idSoutenance", $idSoutenance);
             $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
-            $pdo_req->bindValue(":fichier", $fileName);
+            $pdo_req->bindValue(":fichier", $newFileName['file']);
             $pdo_req->execute();
             return true;
         }
@@ -345,7 +346,7 @@ class SaeModel extends Connexion
     {
         $count = $this->getRenduEleve($idRendu, $idSae);
         if($count)
-            return count(count) != 0;
+            return count($count) != 0;
         return false;
     }
 
@@ -366,6 +367,15 @@ class SaeModel extends Connexion
         $req = "SELECT * FROM RenduGroupe WHERE idRendu = :idRendu";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idRendu", $idRendu, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    function getSupport($idSoutenance)
+    {
+        $req = "SELECT * FROM SupportSoutenance WHERE idSoutenance = :idSoutenance";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idSoutenance", $idSoutenance, PDO::PARAM_INT);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }

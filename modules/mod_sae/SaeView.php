@@ -488,7 +488,7 @@ HTML;
             $depotousupression = '<span class="text-primary text-danger text-decoration-none cursor-pointer supressRenduButton-' . $id . '">Supprimer le rendu déposer</span>';
             $voirRendu = <<<HTML
                 <form method="POST" action="index.php?module=sae&action=deposerFichierRendu&id=$id" style="display: inline;">
-                    <input type="hidden" name="file" value="678b0db555e6f-cours_ppom (7).pdf">
+                    <input type="hidden" name="file">
                     <button type="submit" class="btn btn-link text-primary text-success text-decoration-none p-0 m-0" style="border: none; background: none;">
                         Voir le rendu
                     </button>
@@ -533,10 +533,18 @@ HTML;
         HTML;
         }
 
-        if ($supportsDeposer)
-            $depotousupression = '<a href="#" class="text-primary text-danger text-decoration-none supressSupportButton-' . $idSoutenance . '">Suprimmer le support déposé</a>';
-        else
-            $depotousupression = '<a href="#" class="text-primary text-decoration-none fw-bold rendusoutenance-' . $idSoutenance . '">Déposer un support</a>';
+        if ($supportsDeposer) {
+            $depotousupression = '<span class="text-primary text-danger text-decoration-none cursor-pointer supressSupportButton-' . $idSoutenance . '">Supprimer le support déposé</span>';
+            $voirSupport = <<<HTML
+                <form method="POST" action="index.php?module=sae&action=deposerFichierSupport&id=$idSoutenance" style="display: inline;">
+                    <input type="hidden" name="file">
+                    <button type="submit" class="btn btn-link text-primary text-success text-decoration-none p-0 m-0" style="border: none; background: none;">
+                        Voir le support
+                    </button>
+                </form>
+HTML;
+}        else
+            $depotousupression = '<span class="text-primary text-decoration-none cursor-pointer fw-bold rendusoutenance-' . $idSoutenance . '">Déposer un support</span>';
 
 
         if ($_SESSION['estProfUtilisateur']) {
@@ -555,18 +563,27 @@ HTML;
 
 
         return <<<HTML
-    <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded-3 shadow-sm mb-2">
-        <div class="d-flex align-items-center">
-            <p class="mb-0">$titre</p>
-        </div>
-        <div class="text-end">
-            <p class="text-muted mb-0">Votre date de passage : $dateSoutenance</p>
-            <p class="text-muted mb-1">Salle : $salle</p>
-            $depotousupression
-        </div>
-    </div>
-    HTML;
+            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+                <div class="d-flex align-items-center">
+                    <p class="mb-0">$titre</p>
+                </div>
+                <div class="text-end">
+                <p class="text-muted mb-0">Votre date de passage : $dateSoutenance</p>
+                <p class="text-muted mb-1">Salle : $salle</p>
+                    <div class="d-flex flex-column">
+                    $depotousupression
+HTML .
+(  !empty($voirSupport) ? $voirSupport : '') . 
+            <<<HTML
+                        
+                    </div>
+                </div>
+            </div>
+
+        HTML;
     }
+
+    
 
 
     /* Groupes */

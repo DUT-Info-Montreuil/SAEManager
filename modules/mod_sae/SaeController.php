@@ -111,6 +111,9 @@ class SaeController
             case "deposerFichierRendu":
                 $this->deposerFichierRendu();
                 break;
+            case "deposerFichierSupport":
+                $this->deposerFichierSupport();
+                break;
             case "ressources":
                 $this->initRessource();
                 break;
@@ -522,6 +525,17 @@ class SaeController
         $rendus = $this->model->getRendu($idRendu);
         $fichier = $rendus[0]['fichier'];
 
+        
+
+        $apiUrl = "http://saemanager-api.atwebpages.com/api/api.php?file=" . urlencode($fichier);
+        header("Location: $apiUrl");
+    }
+
+    private function deposerFichierSupport()
+    {
+        $idSupport = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $supports = $this->model->getSupport($idSupport);
+        $fichier = $supports[0]['support'];
 
         $apiUrl = "http://saemanager-api.atwebpages.com/api/api.php?file=" . urlencode($fichier);
         header("Location: $apiUrl");
