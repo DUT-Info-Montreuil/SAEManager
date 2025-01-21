@@ -21,8 +21,14 @@ class RendusController
             case "home":
                 $this->initRendus();
                 break;
+            case "AjouterUneNote":
+                $this->initAjouterUneNote();
+                break;
             case "evaluer":
                 $this->initEvaluerUneEval();
+                break;
+            case "maj":
+                $this->initMettreAJourLesNotes();
                 break;
             default :
                 $this->initRendus();
@@ -40,9 +46,19 @@ class RendusController
         }
         $this->view->initRendusPage($rendus,$notes);
     }
+    private function initAjouterUneNote(){
+        if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
+            
+
+
+
+        }else{
+            $this->initRendus();
+        }
+    }
 
     private function initEvaluerUneEval() {
-        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             $rendus = $this->model->getRendusProfByPersonne($_SESSION['idUtilisateur']);
             $notes = $this->model->getNotesdesRendusProfByPersonne($_SESSION['idUtilisateur']);
             $flag = 0;
@@ -96,6 +112,14 @@ class RendusController
             $this->initRendus();
         }
     }
-    
+
+    private function initMettreAJourLesNotes(){
+        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+            $idEval = $_GET['eval'];
+            //$_POST['']
+        }else { // Est un étudiant
+            $this->initRendus();
+        }
+    }
     
 }

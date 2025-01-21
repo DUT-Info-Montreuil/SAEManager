@@ -333,7 +333,9 @@ class SaeModel extends Connexion
 
     function getNote($idSAE,  $groupeID)
     {
-
+        if($groupeID == null){
+            return null;
+        }
         foreach ($groupeID as $id) {
             $idGroupe = $id['idGroupe'];
         }
@@ -353,7 +355,9 @@ class SaeModel extends Connexion
 
     function getNoteSoutenance($idSAE, $groupeID)
     {
-
+        if($groupeID == null){
+            return null;
+        }
         foreach ($groupeID as $id) {
             $idGroupe = $id['idGroupe'];
         }

@@ -20,12 +20,18 @@ class RendusView extends GenericView
                                 <use xlink:href="#arrow-icon"></use>
                             </svg>
                         </div>
-                        <h3 class="fw-bold">Tous les rendus auxquels vous êtes responsable/co-responsable/intervenant</h3>
+                        <h3 class="fw-bold">Tous les rendus auxquels vous êtes responsable, co-responsable ou intervenant</h3>
                     </div>
                     <div class="rendu-list">
 HTML;
+            if(empty($rendus)){
+                echo <<<HTML
+                    <h5 class="p-5">Vous êtes associés à aucun rendus.</h5>
 
+            HTML;
+                }
             foreach ($rendus as $rendu) {
+
                 $renduNom = $rendu['Rendu_nom'];
                 $saeNom = $rendu['SAE_nom'];
                 $dateLimite = $rendu['dateLimite'];
@@ -61,6 +67,7 @@ HTML;
 HTML;
 
             foreach ($rendus as $rendu) {
+
                 $renduNom = $rendu['Rendu_nom'];
                 $saeNom = $rendu['SAE_nom'];
                 $dateLimite = $rendu['dateLimite'];
@@ -96,7 +103,7 @@ HTML;
 
     function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes) {
         $notesTable = '';
-        
+        var_dump($notes);
         // Utilisation d'un tableau associatif pour éviter les doublons
         $uniqueNotes = [];
         foreach ($notes as $note) {
@@ -141,18 +148,21 @@ HTML;
         
         return <<<HTML
         <div class="px-5 mx-5 my-4">
-            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100">
-                <div class="align-items-center">
-                    <span class="fw-bold mx-1 d-flex">$renduNom</span>
-                    <span class="fst-italic mx-1 d-flex">$saeNom</span>
+            <form method="POST" action="index.php?module=rendus&action=AjouterUneNote">
+                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100">
+                    <div class="align-items-center">
+                        <span class="fw-bold mx-1 d-flex">$renduNom</span>
+                        <span class="fst-italic mx-1 d-flex">$saeNom</span>
+                    </div>
+                    <div class="text-end">
+                        <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
+                        <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
+                    </div>
                 </div>
-                <div class="text-end">
-                    <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
-                    <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
-                </div>
-            </div>
-            $notesSection
-            <button class="btn btn-primary btn-sm">Ajouter une note</button>
+                $notesSection
+                <input type="hidden" name="idRendu" value="$idSAE">
+                <button class="btn btn-primary btn-sm">Ajouter une note</button>
+            </form>
         </div>
     HTML;
     }
@@ -171,7 +181,7 @@ HTML;
                         <h3 class="fw-bold">SAE : {$infoTitre['SAE_nom']} <br> Rendu : {$infoTitre['Rendu_nom']} <br> Évaluation : {$infoTitre['Eval_nom']}</h3>
                     </div>
                     <div class="rendu-list">
-                        <form>
+                        <form method="POST" action="index.php?module=rendus&action=maj&eval=2">
         HTML;
         
                 // Organisation des données
@@ -257,7 +267,7 @@ HTML;
                     </tbody>
                 </table>
                 <div class="w_100 d-flex justify-content-center">
-                    <button class="btn btn-primary btn-success m-3">Valider</button>
+                    <button type="submit" class="btn btn-primary btn-success m-3">Valider</button>
                 </div>
             </form>
         </div>

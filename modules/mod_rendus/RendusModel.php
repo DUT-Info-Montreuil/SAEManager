@@ -5,20 +5,20 @@ class RendusModel extends Connexion{
     // GET
 
     function getRendusByPersonne($idPersonne){
-        // $req = "SELECT Rendu.nom AS Rendu_nom, SAE.nomSae AS SAE_nom, Rendu.dateLimite, SAE.idSAE
-        //         FROM Personne
-        //         INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
-        //         INNER JOIN RenduGroupe ON RenduGroupe.idGroupe = EtudiantGroupe.idGroupe
-        //         INNER JOIN Rendu ON Rendu.idRendu = RenduGroupe.idRendu
-        //         INNER JOIN SAE ON SAE.idSAE = Rendu.idSAE
-        //         WHERE Personne.idPersonne = :idPersonne";
+        $req = "SELECT Rendu.nom AS Rendu_nom, SAE.nomSae AS SAE_nom, Rendu.dateLimite, SAE.idSAE
+                FROM Personne
+                INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
+                INNER JOIN RenduGroupe ON RenduGroupe.idGroupe = EtudiantGroupe.idGroupe
+                INNER JOIN Rendu ON Rendu.idRendu = RenduGroupe.idRendu
+                INNER JOIN SAE ON SAE.idSAE = Rendu.idSAE
+                WHERE Personne.idPersonne = :idPersonne";
 
-        $req = "SELECT Rendu.nom AS Rendu_nom,SAE.nomSae AS SAE_nom,Rendu.dateLimite,Rendu.idSAE,IF(DepotDesRendus.idEleve IS NOT NULL, 1, 0) AS aRendu
-                FROM EleveInscritSae
-                JOIN Rendu ON EleveInscritSae.idSAE = Rendu.idSAE
-                LEFT JOIN DepotDesRendus ON Rendu.idRendu = DepotDesRendus.idRendu AND EleveInscritSae.idEleve = DepotDesRendus.idEleve
-                JOIN SAE ON Rendu.idSAE = SAE.idSAE
-                WHERE EleveInscritSae.idEleve = :idEleve;";
+        // $req = "SELECT Rendu.nom AS Rendu_nom,SAE.nomSae AS SAE_nom,Rendu.dateLimite,Rendu.idSAE,IF(DepotDesRendus.idEleve IS NOT NULL, 1, 0) AS aRendu
+        //         FROM EleveInscritSae
+        //         JOIN Rendu ON EleveInscritSae.idSAE = Rendu.idSAE
+        //         LEFT JOIN DepotDesRendus ON Rendu.idRendu = DepotDesRendus.idRendu AND EleveInscritSae.idEleve = DepotDesRendus.idEleve
+        //         JOIN SAE ON Rendu.idSAE = SAE.idSAE
+        //         WHERE EleveInscritSae.idEleve = :idEleve;";
 
 
         $pdo_req = self::$bdd->prepare($req);

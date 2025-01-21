@@ -641,7 +641,7 @@ HTML;
         $totalNotes = $totalRendus + $totalSoutenance;
         $totalCoeff = $totalCoeffRendus + $totalCoeffSoutenance;
 
-        $moyenne = ($totalCoeff > 0) ? (round($totalNotes / $totalCoeff, 1)) : 0;
+        $moyenne = ($totalCoeff > 0) ? (round($totalNotes / $totalCoeff, 1)) : "~";
 
         echo $this->lineMoyenne($moyenne);
 
