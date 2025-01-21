@@ -369,7 +369,7 @@ HTML;
             $area = '<textarea name="reponse' . $idChamps . '" class="form-control mb-3 w-75" placeholder="Écrire ici..." rows="4"></textarea>';
             $input = '<button type="submit" class="btn btn-primary ms-auto">Envoyer</button>';
         } else {
-            $area = '<label class="text-warning">Ce champ a déjà été rendu</label>';
+            $area = '<label class="text-succes">Ce champ a déjà été rendu</label>';
             $input = '';
         }
 

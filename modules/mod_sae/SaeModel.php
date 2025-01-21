@@ -51,12 +51,14 @@ class SaeModel extends Connexion
     }
 
     function uploadFileRendu($file, $idSae, $fileName, $idRendu){
-        $newFileName = $this->uploadFichier($fileName, $file, "none");
+        $newFileName = $this->uploadFichier($file, "none");
         if($newFileName){
             $idGroupe = $this->getMyGroupId($idSae);
             $req = "INSERT INTO RenduGroupe VALUES (:idRendu, :idGroupe, :fichier, :dateDepot)";
 
             $currentDateTime = date('Y-m-d H:i:s');
+
+            var_dump($newFileName);
 
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idRendu", $idRendu);
@@ -81,8 +83,7 @@ class SaeModel extends Connexion
     }
 
     function uploadFileSupport($file, $idSoutenance, $fileName, $idSae){
-        $newFileName = $this->uploadFichier($fileName, $file, "none");
-
+        $newFileName = $this->uploadFichier($file, "none");
         if($newFileName){
             $idGroupe = $this->getMyGroupId($idSae);
             $req = "INSERT INTO SupportSoutenance VALUES (:idSoutenance, :idGroupe, :fichier)";
@@ -99,7 +100,7 @@ class SaeModel extends Connexion
 
     function uploadFileRessource($file, $fileName, $nom)
     {
-        $newFileName = $this->uploadFichier($fileName, $file, "none");
+        $newFileName = $this->uploadFichier($file, "none");
 
         if ($newFileName) {
             $req = "INSERT INTO Ressource (contenu, couleur, nom) VALUES (:contenu, :couleur, :nom)";
@@ -116,62 +117,48 @@ class SaeModel extends Connexion
         return false;
     }
 
-    public function uploadFichier($fileName, $fileInput, $color)
-    {
-        $apiUrl = 'http://saemanager-api.atwebpages.com/api/api.php';
-        $dossier = './files/';
+    public function uploadFichier($fileInput, $color)
+{
+    $apiUrl = 'http://saemanager-api.atwebpages.com/api/api.php';
 
-        // Vérifiez ou créez le dossier
-        if (!file_exists($dossier)) {
-            if (!mkdir($dossier, 0777, true)) {
-                echo "Impossible de créer le dossier : $dossier";
-                return false;
-            }
-        }
-
-        if (file_exists($dossier . $fileName)) {
-            $fileName = "_" . $fileName;
-        }
-
-        $localFilePath = $dossier . $fileName;
-        if (move_uploaded_file($fileInput['tmp_name'], $localFilePath)) {
-            echo "Fichier '$fileName' téléchargé avec succès dans le dossier '$dossier' temporairement.<br>";
-
-            $curl = curl_init();
-            $file = new CURLFile($localFilePath);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-
-            $postData = [
-                'file' => $file,
-                'color' => $color,
-            ];
-
-            curl_setopt_array($curl, [
-                CURLOPT_URL => $apiUrl,
-                CURLOPT_POST => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POSTFIELDS => $postData,
-            ]);
-
-            $response = curl_exec($curl);
-
-
-            if (curl_errno($curl)) {
-                echo "Erreur cURL : " . curl_error($curl);
-                curl_close($curl);
-                return false;
-            }
-
-            curl_close($curl);
-
-            echo "Réponse de l'API : $response<br>";
-            return json_decode($response, true);
-        } else {
-            echo "Erreur lors du déplacement du fichier local.";
-            return false;
-        }
+    // Vérifiez si un fichier a été envoyé
+    if (!isset($fileInput['tmp_name']) || !is_uploaded_file($fileInput['tmp_name'])) {
+        echo "Aucun fichier valide n'a été téléchargé.";
+        return false;
     }
+
+    // Configurez cURL pour envoyer le fichier directement
+    $curl = curl_init();
+
+    $file = new CURLFile($fileInput['tmp_name'], $fileInput['type'], $fileInput['name']);
+    $postData = [
+        'file' => $file,
+        'color' => $color,
+    ];
+
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $apiUrl,
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS => $postData,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+    ]);
+
+    $response = curl_exec($curl);
+
+    if (curl_errno($curl)) {
+        echo "Erreur cURL : " . curl_error($curl);
+        curl_close($curl);
+        return false;
+    }
+
+    curl_close($curl);
+
+    echo "Réponse de l'API : $response<br>";
+    return json_decode($response, true);
+}
+
 
 
     public function deleteFichier($fileName)
@@ -379,6 +366,8 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
+
+
 
     function getMyGroupId($idSAE)
     {
