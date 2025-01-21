@@ -23,19 +23,27 @@ class RendusView extends GenericView
                         <use xlink:href="#arrow-icon"></use>
                         </svg>
                     </div>
-                    <div class="d-flex flex-column">
-                        <h3 class="fw-bold">Liste des différents rendus des SAÉs auxquelles vous êtes inscrit(e) :</h3>
+                    <h3 class="fw-bold">Liste des différents rendus des SAÉs auxquelles vous êtes inscrit(e) :</h3>
                 </div>
                 <div class="rendu-list">
 HTML;
 
         foreach ($rendus as $rendu) {
-            $renduNom = $rendu['Rendu_nom'];
-            $saeNom = $rendu['SAE_nom'];
-            $dateLimite = $rendu['dateLimite'];
-            $idSAE = $rendu['idSAE'];
+            $renduNom = htmlspecialchars($rendu['Rendu_nom']);
+            $saeNom = htmlspecialchars($rendu['SAE_nom']);
+            $dateLimite = htmlspecialchars($rendu['dateLimite']);
+            $idSAE = htmlspecialchars($rendu['idSAE']);
             echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
         }
+        <<<HTML
+        </div>
+            </div>
+                
+            </div>
+
+        </div>
+
+        HTML;
     }
 
     function lineRendus($renduNom, $saeNom, $dateLimite, $idSAE)

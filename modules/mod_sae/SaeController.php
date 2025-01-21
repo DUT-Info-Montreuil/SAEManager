@@ -44,7 +44,7 @@ class SaeController
                 break;
             case "ajoutDepotSupport":
                 $this->depotSupport();
-                break;    
+                break;
             case "suprimmerDepotGroupeRendu":
                 $this->suprimmerDepotRenduGroupe();
                 break;
@@ -153,19 +153,19 @@ class SaeController
 
             $rendusDeposer = [];
 
-            foreach ($rendus as $rendu){
+            foreach ($rendus as $rendu) {
                 if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
-                if($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])){
+                if ($this->model->didGroupDropRendu(htmlspecialchars($rendu['idRendu']), $saes[0]['idSAE'])) {
                     $renduGroupe = $this->model->getRenduEleve($rendu['idRendu'], $saes[0]['idSAE']);
                     $rendusDeposer[htmlspecialchars($rendu['idRendu'])] = $renduGroupe[0]['dateDepot'];
                 }
             }
             $supportsDeposer = [];
-            foreach($soutenances as $soutenance){
-                if($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))){
+            foreach ($soutenances as $soutenance) {
+                if ($this->model->didGroupeDropSupport(htmlspecialchars($soutenance['idSoutenance']), htmlspecialchars($saes[0]['idSAE']))) {
                     $supportGroup = $this->model->getSupportEleve($soutenance['idSoutenance'], $saes[0]['idSAE']);
                     $supportsDeposer[htmlspecialchars($supportGroup[0]['idSoutenance'])] = $supportGroup[0]['support'];
                 }
@@ -196,15 +196,15 @@ class SaeController
         $listeGroupeAvecPassage = $this->model->getGroupeAvecPassageSoutenance($idSoutenance);
 
         $firstcpt = 0;
-        foreach($listeGroupe as $groupe){
+        foreach ($listeGroupe as $groupe) {
             $find = false;
-            foreach($listeGroupeAvecPassage as $groupeAvecPassage){
-                if($groupe['idgroupe'] == $groupeAvecPassage['idGroupe']){
+            foreach ($listeGroupeAvecPassage as $groupeAvecPassage) {
+                if ($groupe['idgroupe'] == $groupeAvecPassage['idGroupe']) {
                     $listeGroupe[$firstcpt]['passage'] = $groupeAvecPassage['date'];
                     $find = true;
                 }
             }
-            if(!$find) {
+            if (!$find) {
                 $listeGroupe[$firstcpt]['passage'] = null;
             }
             $firstcpt++;
@@ -240,7 +240,7 @@ class SaeController
         $soutenances = $this->model->listeSoutenanceOuEstJuryParSae($_GET['id'], $_SESSION['idUtilisateur']);
         $sae = $this->model->getSaeById($_GET['id']);
 
-        if($this->model->estProfSae($_GET['id'], $_SESSION['idUtilisateur']))
+        if ($this->model->estProfSae($_GET['id'], $_SESSION['idUtilisateur']))
             $this->view->initPageListeSoutenance($sae, $soutenances, $_GET['id']);
         else
             header("Location: index.php?module=sae&action=details&id=" . $_GET['id']);
@@ -422,10 +422,9 @@ class SaeController
     {
         $idProf = $_POST['idPers'];
         $idSAE = $_GET['id'];
-        if ($_POST['poste'] == 'inter'){
+        if ($_POST['poste'] == 'inter') {
             $this->model->ajoutIntervenant($idSAE, $idProf);
-        }
-        else {
+        } else {
             $this->model->ajoutCResponsables($idSAE, $idProf);
         }
         header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -448,36 +447,39 @@ class SaeController
         $idSoutenance = isset($_POST['idSaeDepotSupport']) ? $_POST['idSaeDepotSupport'] : exit("idSupport not set");
         $file = isset($_FILES['fileInputSupport']) ? $_FILES['fileInputSupport'] : exit("file not set");
         $fileName = $_FILES['fileInputSupport']['name'];
-        
+
         $depotreussi = $this->model->uploadFileSupport($file, $idSoutenance, $fileName, $idSae);
-        header("Location: index.php?module=sae&action=details&id=".$idSae);
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
-    private function suprimmerDepotRenduGroupe(){
+    private function suprimmerDepotRenduGroupe()
+    {
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
         $idDepot = isset($_POST['idDepotSupressionRendu']) ? $_POST['idDepotSupressionRendu'] : exit("idDepot not set");
 
-        $this->model->suprimmerDepotGroupeRendu($idDepot, $idGroupe);
-        header("Location: index.php?module=sae&action=details&id=".$idSae);
+        $this->model->suprimmerDepotGroupeRendu($idDepot, $idGroupe, $idSae);
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
-    private function suprimmerDepotSupportGroupe(){
+    private function suprimmerDepotSupportGroupe()
+    {
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
         $idDepot = isset($_POST['idDepotSupressionSupport']) ? $_POST['idDepotSupressionSupport'] : exit("idSupport not set");
 
         $this->model->suprimmerDepotGroupeSupport($idDepot, $idGroupe);
-        header("Location: index.php?module=sae&action=details&id=".$idSae);
+        header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
-    private function creerPropositionGroupe() {
+    private function creerPropositionGroupe()
+    {
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $nomGroupe = $_POST['nomGroupe'];
         if (count($_POST['etudiants']) == count(array_unique($_POST['etudiants']))) {
 
             $_POST['etudiants'] = array_filter($_POST['etudiants']);
-            if($_SESSION['estProfUtilisateur'] != 1)
+            if ($_SESSION['estProfUtilisateur'] != 1)
                 array_push($_POST['etudiants'], $_SESSION['idUtilisateur']);
 
             $this->model->propositionGroupe($_POST['etudiants'], $idSae, $nomGroupe);
@@ -485,21 +487,21 @@ class SaeController
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    private function gererGroupe() {
+    private function gererGroupe()
+    {
         $idProposition = $_GET['idproposition'];
         $sae = $this->model->getSAEById($_GET['id'])[0];
         $idEtudiants = [];
         $i = 0;
 
-        while(isset($_POST['etudiant'.$i])) {
+        while (isset($_POST['etudiant' . $i])) {
             echo "here";
-            $idEtudiants[$i] = $_POST['etudiant'.$i];
+            $idEtudiants[$i] = $_POST['etudiant' . $i];
             $i++;
         }
-        if (isset($_POST['Accepter'])){
+        if (isset($_POST['Accepter'])) {
             $this->model->accepterGroupe($idProposition, $sae, $idEtudiants);
-        }
-        else {
+        } else {
             $this->model->refuserGroupe($idProposition, $sae, $idEtudiants);
         }
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
@@ -517,7 +519,7 @@ class SaeController
             $this->model->creePassageSoutenance($date, $duration, $schedules, $idSoutenance);
         }
 
-        header("Location: index.php?module=sae&action=soutenance&id=".$_GET['id']);
+        header("Location: index.php?module=sae&action=soutenance&id=" . $_GET['id']);
     }
 
     private function deposerFichierRendu()
@@ -526,7 +528,7 @@ class SaeController
         $rendus = $this->model->getRendu($idRendu);
         $fichier = $rendus[0]['fichier'];
 
-        
+
 
         $apiUrl = "http://saemanager-api.atwebpages.com/api/api.php?file=" . urlencode($fichier);
         header("Location: $apiUrl");
