@@ -9,96 +9,153 @@ class ConnexionView extends GenericView
         parent::__construct();
     }
 
-    function deconnexionPage($msg){
+    function deconnexionPage($msg)
+    {
         echo <<<HTML
         <div class="container mt-5">
             <h1 class="fw-bold">DÉCONNEXION</h1>
             <div class="card shadow bg-white rounded w-100 h-75">
                 <div class="d-flex w-100 h-75 justify-content-center m-auto">
-                $msg
+                    $msg
                 </div>
-                
             </div>
-
         </div>
-
 HTML;
     }
 
-    function connexionPage($msg_erreur){
-        echo <<<HTML
-<div class="container mt-5">
-    <h1 class="fw-bold text-center text-md-start">CONNEXION</h1>
-    <div class="card shadow bg-white rounded w-100 d-flex flex-column flex-md-row" 
-         style="height: auto; max-height: 75%;">
-        <!-- Partie gauche : images -->
-        <div class="images-container d-flex position-relative mx-auto mx-md-0" 
-             style="flex: 1; overflow: hidden; max-width: 100%; height: auto;">
-            <div style="
-                        width: 199px;
-                        height: 365px;
-                        left: 83px;
-                        top: 12px;
-                        position: absolute;
-                        background: linear-gradient(180deg, #E54C91 0%, #F48B7B 50%, #F7AD50 100%);
-                        box-shadow: 0px 9.923077583312988px 39.69231033325195px 9.923077583312988px rgba(0, 0, 0, 0.25);
-                        border-radius: 49.62px;
-                        ">
+    function connexionPage($msg_erreur)
+    {
+        $toast = '';
+
+        if (isset($_SESSION['deconnexion']) && $_SESSION['deconnexion']) {
+            $toast = <<<HTML
+        <div class="toast align-items-center text-bg-warning border-0 position-fixed top-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Déconnexion réussie !
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <img src="assets/img/Vector1.png" style="width: 142px;height: 283px;left: 125px;top: 74px;position: absolute;" />
-            <img src="assets/img/Saly-13.png" style="width: 320px;height: 311px;left: 49px;top: 41px;position: absolute;" />
         </div>
+HTML;
 
-        <!-- Partie droite : formulaire -->
-        <div class="form-container d-flex flex-column justify-content-center align-items-center px-3" 
-             style="flex: 1; padding: 20px; max-width: 100%; height: auto;">
-            <form action="index.php?module=connexion&infoConnexion=essaieConnexion" id="formConnexion" method="POST" style="width: 100%;">
-                <div class="mb-3 text-center">
-                    <span>Bienvenue sur </span>
-                    <span style="background: linear-gradient(90deg, #E54C91 0%, #F48B7B 50%, #F7AD50 100%);
-                                 -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                        SAÉ MANAGER
-                    </span>
-                    <span>, l’outil qui va te changer la vie !</span>
+            unset($_SESSION['deconnexion']);
+        }
+
+        echo <<<HTML
+    <div class="container mt-5">
+        <h1 class="fw-bold text-center">Connexion</h1>
+        <div class="card shadow bg-white rounded mx-auto p-4 d-flex flex-column flex-md-row" style="max-width: 900px; height: 600px;">
+            <div class="illustration-container d-flex justify-content-center align-items-center flex-column" style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); flex: 1; height: 100%;">
+                <img src="assets/img/Saly-13.png" alt="Illustration" class="img-fluid" style="max-width: 80%; height: auto;">
+            </div>
+
+            <div class="form-container d-flex flex-column justify-content-center align-items-center p-4" style="flex: 1; height: 100%;">
+                <div class="text-center mb-4">
+                    <p>Bienvenue sur <span style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SAÉ MANAGER</span>, l’outil qui va te changer la vie !</p>
                 </div>
 
-                <p class="text-danger text-center">
-                    $msg_erreur
-                </p>
+                <p class="text-danger text-center mb-3">$msg_erreur</p>
 
-                <div class="mb-3">
-                    <label for="login" class="form-label">Identifiant :</label>
-                    <input type="text" name="login" class="form-control" id="login" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Mot de passe :</label>
-                    <input type="password" name="password" class="form-control" id="password" required>
-                </div>
+                <form action="index.php?module=connexion&infoConnexion=essaieConnexion" method="POST" class="w-100">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="login" class="form-control" placeholder="Nom d'utilisateur" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
+                        </div>
+                    </div>
 
-                <!-- Protection CSRF -->
 HTML .
-                protectionCSRF::genererTokenInput() .
-                <<<HTML
+            protectionCSRF::genererTokenInput() .
+            <<<HTML
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                    </div>
+                </form>
 
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Se connecter</button>
+                <!-- Lien vers l'inscription -->
+                <div class="text-center mt-3">
+                    <p>Vous n'avez pas de compte ? <a href="index.php?module=connexion&infoConnexion=register" class="btn btn-link">Inscrivez-vous</a></p>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
-<style>
-    .card {
-        height: auto;  /* Par défaut, auto */
-    }
+    $toast
 
-    @media (min-width: 768px) { /* Pour les écrans plus grands */
-        .card {
-            height: 75%!important; /* Hauteur fixée à 75% */
-        }
-    }
-</style>
+    <script src="js/toast.js"></script>
 HTML;
+    }
 
+    function inscriptionPage($msg_erreur)
+    {
+        echo <<<HTML
+    <div class="container mt-5">
+        <h1 class="fw-bold text-center">Inscription</h1>
+        <div class="card shadow bg-white rounded mx-auto p-4 d-flex flex-column flex-md-row" style="max-width: 900px; height: 600px;">
+            <div class="illustration-container d-flex justify-content-center align-items-center flex-column" style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); flex: 1; height: 100%;">
+                <img src="assets/img/Saly-13.png" alt="Illustration" class="img-fluid" style="max-width: 80%; height: auto;">
+            </div>
+
+            <div class="form-container d-flex flex-column justify-content-center align-items-center p-4" style="flex: 1; height: 100%;">
+                <div class="text-center mb-4">
+                    <p>Bienvenue sur <span style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SAÉ MANAGER</span>, l’outil qui va te changer la vie !</p>
+                </div>
+
+                <p class="text-danger text-center mb-3">$msg_erreur</p>
+
+                <form action="index.php?module=connexion&infoConnexion=essaieInscription" method="POST" class="w-100">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="nom" class="form-control" placeholder="Nom" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="prenom" class="form-control" placeholder="Prénom" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="text" name="email" class="form-control" placeholder="Email universitaire" required id="email-part1">
+                            <span class="input-group-text" id="email-part2">@iut.univ-paris8.fr</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
+                        </div>
+                    </div>
+
+HTML .
+
+            protectionCSRF::genererTokenInput() .
+
+            <<<HTML
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+                    </div>
+                </form>
+
+                <!-- Lien vers la connexion -->
+                <div class="text-center mt-3">
+                    <p>Vous avez déjà un compte ? <a href="index.php?module=connexion" class="btn btn-link">Connectez-vous</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/connexion.js"></script>
+HTML;
     }
 }

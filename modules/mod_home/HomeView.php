@@ -12,6 +12,20 @@ class HomeView extends GenericView
     function initHomePage()
     {
 
+        $toast = "";
+        if (isset($_SESSION['connexion_reussie']) && $_SESSION['connexion_reussie'] === true) {
+            $toast = <<<HTML
+    <div class="toast align-items-center text-bg-success border-0 position-fixed top-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Connexion réussie !
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+HTML;
+            unset($_SESSION['connexion_reussie']);
+        }
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
             echo <<<HTML
             <div class="container mt-5">
@@ -41,6 +55,11 @@ class HomeView extends GenericView
 
         HTML;
         }
+
+        echo <<<HTML
+        $toast
+        <script src="js/toast.js"></script>
+HTML;
     }
 
     function cardSAE()

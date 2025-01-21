@@ -119,11 +119,43 @@
   }
 
   .resource-item {
-    transition: background-color 0.3s ease, transform 0.3s ease; /* Animation fluide */
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .resource-item:hover {
-    background-color: #f8f9fa; /* Couleur légèrement plus claire */
-    transform: scale(1.02); /* Légère mise en avant */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombre pour un effet de survol */
+    background-color: #f8f9fa;
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+/* CONNEXION */
+
+.images-container {
+    height: auto;
+    max-height: 75%;
+}
+
+
+.illustration-container {
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+.form-container {
+    padding: 20px;
+    background-color: white;
+}
+
+.input-group-text {
+    background-color: #f1f1f1;
+    border: none;
+    border-radius: 0;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0;
+}
+
+  
