@@ -385,7 +385,7 @@ HTML;
         }
 
         return <<<HTML
-                <form method="POST" action="index.php?module=sae&action=ajoutEtudiantSAE&id=$idSAE" class="p-3 border rounded shadow-sm bg-light">
+                <form method="POST" action="index.php?module=sae&action=ajoutEtudiantSAE&id=$idSAE" class="p-3 border rounded shadow-sm bg-light" id="studentForm">
                     <label class="form-label fw-bold">Ajouter des étudiants à la SAE :</label>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdownButton">Rechercher des étudiants</button>
@@ -399,6 +399,9 @@ HTML;
                             <!-- Options avec cases à cocher -->
                             $inputs
                         </div>
+                    </div>
+                    <div class="text-danger mt-2" id="errorMessage" style="display: none;">
+                        Vous devez sélectionner au moins un étudiant.
                     </div>
                     <div class="d-flex justify-content-end mt-5">
                         <button type="submit" class="btn btn-primary">Valider</button>
