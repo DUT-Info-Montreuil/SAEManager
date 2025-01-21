@@ -58,7 +58,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($groupes, $infosEtudiant, $etudiants,$profs,$sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
+    function initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants,$profs,$sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -106,7 +106,36 @@ HTML;
             </div>
 HTML;
         if ($_SESSION['estProfUtilisateur']) {
+            echo <<<HTML
+            <div class="d-flex">
+                <div class="mb-5">  
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Professeur(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+    HTML;
             echo $this->initAjoutProf($profs, $idSAE);
+            echo <<<HTML
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Etudiants(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+    HTML;
+            echo $this->initAjoutEtudiant($pasinscrits, $idSAE);
+            echo <<<HTML
+                    </div>
+                </div>
+            </div>
+    HTML;
         } elseif (!$infosEtudiant['inGroupe']) {
             if ($infosEtudiant['inProposition']) {
                 echo '<h1 class="my-4">Vous faites déjà partie d\'une proposition de groupe</h1>';
@@ -341,6 +370,32 @@ HTML;
         return $html;
     }
 
+    function initAjoutEtudiant($etudiants, $idSAE)
+    {
+        $options = '';
+
+        foreach ($etudiants as $etudiant) {
+            $id = htmlspecialchars($etudiant['idPersonne']);
+            $nom = htmlspecialchars($etudiant['nom']);
+            $prenom = htmlspecialchars($etudiant['prenom']);
+            $options .= "<option value=\"$id\">$nom $prenom</option>";
+        }
+
+        return <<<HTML
+            <form method="POST" action="index.php?module=sae&action=ajoutProf&id=$idSAE" class="p-3 border rounded shadow-sm bg-light">
+                <div class="mb-3">
+                    <label for="nom" class="form-label fw-bold">Inscrivez un etudiant à la SAE :</label>
+                    <select name="idPers" class="form-select" required>
+                        <option value="" selected>Choisissez un etudiant</option>
+                        $options
+                    </select>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Valider</button>
+                </div>
+            </form>
+    HTML;
+    }
 
     function lineChamp($nomChamp, $idChamps, $param, $idSAE)
     {

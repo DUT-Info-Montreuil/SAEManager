@@ -176,8 +176,9 @@ class SaeController
                 'inProposition' => $proposition
             );
             $groupes = $this->model->formationGroupes($_GET['id']);
+            $pasinscrits = $this->model->getEtudiantsPasInscrits($_GET['id']);
 
-            $this->view->initSaeDetails($groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
+            $this->view->initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
         } else {
             header('Location: index.php');
         }
