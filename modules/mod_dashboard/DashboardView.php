@@ -10,7 +10,7 @@ class DashboardView extends GenericView
     }
 
     public function initDashboardPage($listeRendu, $listeSoutenance, $notifications, $nomUtilisateur)
-    {
+    {   $estProfUtilisateur = $_SESSION["estProfUtilisateur"] == 1;
         $texteRendu = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes associés à ces évaluations de rendu" : "Vos rendus non déposé";
         $texteSoutenance = $_SESSION['estProfUtilisateur'] == 1 ?"Vous êtes associés à ces évaluations de soutenance" : "Vos prochaines soutenances";
         echo <<<HTML
@@ -31,7 +31,7 @@ class DashboardView extends GenericView
                                         <h2 class="h5 mb-3">$texteRendu</h2>
 HTML;
                                         if(count($listeRendu)==0){
-                                            $messageSoutenance = $_SESSION['estProfUtilisateur'] == 1 ? "Vous n'avez aucuns rendus à évaluer" : "Vous n'avez aucuns rendus à rendre."; 
+                                            $messageSoutenance = $estProfUtilisateur ? "Vous n'avez aucuns rendus à évaluer" : "Vous n'avez aucuns rendus à rendre.";
             echo <<<HTML
                                                             <p class="mb-0">$messageSoutenance</p>
 HTML;
@@ -65,7 +65,10 @@ HTML;
 HTML;
 
                                             foreach($listeSoutenance as $soutenance){
-                                                $this->initLineSoutenance($soutenance['titre'], $soutenance['idSAE'], $soutenance['nomSae'], $soutenance['date']);
+                                                if($_SESSION['estProfUtilisateur'] != 1)
+                                                    $this->initLineSoutenance($soutenance['titre'], $soutenance['idSAE'], $soutenance['nomSae'], $soutenance['date']);
+                                                else
+                                                    $this->initLineSoutenance($soutenance['titre'], $soutenance['idSAE'], $soutenance['nom'], $soutenance['date']);
                                             }
         echo <<<HTML
                                         </div>
@@ -120,47 +123,44 @@ HTML;
                         <div class="d-flex flex-column">
                             <p class="mb-0 fw-bold">$renduNom</p>
 HTML;
-        $dateToCheck = date('Y-m-d H:i:s');
+        $color = $this->colorByDate($dateLimite);
 
-        $dateTime = new DateTime($dateLimite);
-        $dateTimeToCheck = new DateTime($dateToCheck);
-
-        if ($dateTimeToCheck < $dateTime)
-            $color = "success";
-        else if ($dateTimeToCheck > $dateTime && $dateTimeToCheck < (clone $dateTime)->modify('+24 hours'))
-            $color = "warning";
-        else
-            $color =  "danger";
-
-
-        echo <<<HTML
-                            <p class="mb-0 text-$color">à déposer avant le : $dateLimite</p>
+        $texte = $_SESSION['estProfUtilisateur'] == 1 ? "Les élèves peuvent déposer leur rendu jusqu'au :<br>": "à déposer avant le : ";
+            echo <<<HTML
+                            $texte<p class="mb-0 text-$color">$dateLimite</p>
                         </div>
                         <form method="POST" action="index.php?module=sae&action=details&id=$idSAE" class="w-25">
                             <button type="submit" class="btn btn-outline-primary btn-sm w-100">$nomSae</button>
                         </form>
-                    </div>      
-            
-        HTML;
+                    </div>
+HTML;
     }
 
-    function initLineSoutenance($soutenanceNom, $idSAE, $nomSae, $date){
-        $nomSae = strlen($nomSae) > 30 ? substr($nomSae, 0, 30) . "..." : $nomSae;
-        echo <<<HTML
+    ///Soutenance.idSoutenance, Soutenance.titre, PassageSoutenance.date, SAE.nomSae, Groupe.nom
+     function initLineSoutenance($soutenanceNom, $idSAE, $nomSae, $date){
+            $color = $this->colorByDate($date);
+            $texte = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes jury du groupe \"$nomSae\"<br>Date de passage" : "Date et heure de passage";
+
+             if($_SESSION['estProfUtilisateur'] != 1)
+                 $nomSae = strlen($nomSae) > 30 ? substr($nomSae, 0, 30) . "..." : $nomSae;
+             else {
+                 $nomSae = "accéder à la SAE de la soutenance";
+             }
+            echo <<<HTML
                     <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded-3 shadow-sm mb-3">
                         <div class="d-flex flex-column">
                             <p class="mb-0 fw-bold">$soutenanceNom</p>
-                            <p class="mb-0">Date de votre passage : $date</p>
+                            <p class="mb-0">$texte : </p><p  class='text-$color'>$date</p>
                         </div>
                         <form method="POST" action="index.php?module=sae&action=details&id=$idSAE" class="w-25">
                             <button type="submit" class="btn btn-outline-primary btn-sm w-100">$nomSae</button>
                         </form> 
-                    </div>            
-            
-        HTML;
+                    </div>   
+            HTML;
+
     }
 
-    private function initLineNotif($idNotification, $message, $lienForm, $date)
+    function initLineNotif($idNotification, $message, $lienForm, $date)
     {
         echo <<<HTML
                     <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded-3 shadow-sm mb-3">
@@ -168,16 +168,33 @@ HTML;
                             <p class="mb-0 fw-bold">$date</p>
                             <p class="mb-0">$message</p>
                         </div>
-                        <form method="POST" action="$lienForm" class="w-25">
-                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">Voir</button>
-                        </form> 
-                        <form method="POST" action="index.php?module=dashboard&action=suprimmernotif">
-                            <button type="submit" class="btn btn-danger btn-sm">X</button>
-                            <input type="hidden" id="idNotification" name="idNotification" value=$idNotification>
-                        </form>
+                        <div class="d-flex flex-row align-items-right">
+                            <form method="POST" action="$lienForm" class="w-10">
+                                <button type="submit" class="btn btn-outline-primary btn-sm w-100">Voir</button>
+                            </form> 
+                            <form method="POST" action="index.php?module=dashboard&action=suprimmernotif">
+                                <button type="submit" class="btn btn-danger btn-sm">X</button>
+                                <input type="hidden" id="idNotification" name="idNotification" value=$idNotification>
+                            </form>
+                        </div>
                     </div>            
             
         HTML;
+    }
+
+    private function colorByDate($dateLimite)
+    {
+        $dateToCheck = date('Y-m-d H:i:s');
+
+        $dateTime = new DateTime($dateLimite);
+        $dateTimeToCheck = new DateTime($dateToCheck);
+
+        if ($dateTimeToCheck < $dateTime)
+            return "success";
+        else if ($dateTimeToCheck > $dateTime && $dateTimeToCheck < (clone $dateTime)->modify('+24 hours'))
+            return "warning";
+        else
+            return "danger";
     }
 
 

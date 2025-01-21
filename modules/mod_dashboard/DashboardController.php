@@ -34,9 +34,7 @@ class DashboardController
         }
         else{
             $listeEvaluationEvaluateur = $this->model->getEvaluationRenduEvaluateur($_SESSION['idUtilisateur']);
-        
-            $listeSoutenance = $this->model->getEvaluationSoutenanceEvaluateur($_SESSION['idUtilisateur']);
-        
+            $listeSoutenance = $this->model->getPassageSoutenanceJury($_SESSION['idUtilisateur']);
             $nomUtilisateur = $this->model->getPersonne($_SESSION['idUtilisateur'])[0]['prenom'];
             $notifications = $this->model->getNotification($_SESSION['idUtilisateur']);
 

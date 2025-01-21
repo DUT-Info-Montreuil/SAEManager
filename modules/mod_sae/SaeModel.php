@@ -289,8 +289,10 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         if ($pdo_req->rowCount() == 0)
             return false;
-        else
+        else{
+            $this->creeNotification($idResp, "Vous avez été assigné coresponsable à une SAE.", $idSAE, "index.php?module=sae&action=details&id=$idSAE");
             return true;
+        }
     }
     public function suprimmerDepotGroupeSupport($idDepot, $idGroupe){
         $idSae = $this->getSAEById($_SESSION['idUtilisateur'])[0]['idSAE'];
@@ -431,7 +433,7 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    function getNote($idSAE,  $groupeID)
+    function getNote($idSAE, $groupeID)
     {
 
         foreach ($groupeID as $id) {
@@ -485,17 +487,20 @@ class SaeModel extends Connexion
     }
     public function getSupportEleve($idSoutenance, $idSae)
     {
-        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
-        $req = "
+        if($_SESSION['estProfUtilisateur'] != 1) {
+            $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
+            $req = "
                 SELECT SupportSoutenance.idSoutenance, SupportSoutenance.idGroupe, SupportSoutenance.support
                 FROM SupportSoutenance
                 WHERE idSoutenance = :idSoutenance AND idGroupe = :idGroupe
         ";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
-        $pdo_req->bindValue(":idGroupe", $idGroupe);
-        $pdo_req->execute();
-        return $pdo_req->fetchAll();
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+            $pdo_req->bindValue(":idGroupe", $idGroupe);
+            $pdo_req->execute();
+            return $pdo_req->fetchAll();
+        }
+        return array();
     }
     public function getProfsBySAE($idSAE){
         $req = "SELECT idPersonne, prenom, nom
@@ -557,8 +562,10 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         if ($pdo_req->rowCount() == 0)
             return false;
-        else
+        else{
+            $this->creeNotification($idIntervenant, "Vous avez été assigné intervenant à une SAE.", $idSAE, "index.php?module=sae&action=details&id=$idSAE");
             return true;
+        }
     }
     public function getRessourceInscrit()
     {
@@ -1099,7 +1106,7 @@ class SaeModel extends Connexion
         $pdo_reqRessource->execute();
     }
 
-    private function creeNotification($idUtilisateur, $message, $idSAE, $redirect)
+    public static function creeNotification($idUtilisateur, $message, $idSAE, $redirect)
     {
         $req = "INSERT INTO Notifications VALUES (DEFAULT, :idPersonne, :message, :idSaeProvenance, :lienForm, :date)";
         $pdo_req = self::$bdd->prepare($req);
