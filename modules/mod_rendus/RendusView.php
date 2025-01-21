@@ -11,6 +11,27 @@ class RendusView extends GenericView
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
+                <script src="js/renduview.js"></script>
+                <style>
+    /* Par défaut, le tableau est visible, si tu veux qu'il soit caché au départ, tu peux ajouter "display: none;" */
+.table-wrapper {
+    display: block; /* Afficher par défaut */
+    transition: max-height 0.3s ease-out;
+}
+
+.table-wrapper.collapsed {
+    display: none;
+}
+
+/* Animation pour une transition plus douce */
+.table-wrapper table {
+    max-height: 1000px;
+    transition: max-height 0.3s ease-out;
+}
+
+</style>
+
+
             <div class="container mt-5">
                 <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
                 <div class="card shadow bg-white rounded min-h75">
@@ -31,18 +52,18 @@ HTML;
             HTML;
                 }
             foreach ($rendus as $rendu) {
-
                 $renduNom = $rendu['Rendu_nom'];
                 $saeNom = $rendu['SAE_nom'];
                 $dateLimite = $rendu['dateLimite'];
                 $idSAE = $rendu['idSAE'];
+                $idRendu = $rendu['idRendu'];
                 
                 // Filtrer les notes liées au rendu actuel
                 $notesForRendu = array_filter($notes, function ($note) use ($rendu) {
                     return $note['idRendu'] === $rendu['idRendu'];
                 });
-                // var_dump($notes);
-                echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu);
+                // var_dump($notes);lineRendusProf
+                echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu,$idRendu);
             }
 
             echo <<<HTML
@@ -101,71 +122,107 @@ HTML;
 HTML;
     }
 
-    function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes) {
+    function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes, $idRendu) {
         $notesTable = '';
-        var_dump($notes);
-        // Utilisation d'un tableau associatif pour éviter les doublons
         $uniqueNotes = [];
+    
+        // Filtrer les notes uniques
         foreach ($notes as $note) {
-            $uniqueKey = $note['idEval'] . '_' . $note['idRendu']; // Identifiant unique pour chaque combinaison
+            $uniqueKey = $note['idEval'] . '_' . $note['idRendu'];
             if (!isset($uniqueNotes[$uniqueKey])) {
                 $uniqueNotes[$uniqueKey] = $note;
             }
         }
     
-        // Générer la table des notes
+        // Générer les lignes du tableau
         foreach ($uniqueNotes as $note) {
             $noteNom = $note['Eval_nom'] ? htmlspecialchars($note['Eval_nom'], ENT_QUOTES, 'UTF-8') : "";
             $noteId = $note['idEval'] ? $note['idEval'] : "";
             $coef = $note['Eval_coef'] ? htmlspecialchars($note['Eval_coef'], ENT_QUOTES, 'UTF-8') : "";
-            $canEvaluate = $note['PeutEvaluer'] ? '<a href="index.php?module=rendus&action=evaluer&eval='.$noteId.'" class="btn btn-primary btn-sm">Évaluer</a>' : '';
-            if(!($noteId == "")){
+            $canEvaluate = $note['PeutEvaluer'] 
+                ? '<a href="index.php?module=rendus&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>' 
+                : 'Pas le droit';
+    
+            if ($noteId !== "") {
                 $notesTable .= <<<HTML
                 <tr>
-                    <td>$noteNom</td>
-                    <td>$canEvaluate</td>
-                    <td class="d-flex"><input type="number" name="coef_$noteId" class="form-control form-control-sm w-auto" value="$coef" placeholder="Coef"><button class="btn btn-primary btn-sm btn-success">Valider</button></td>
+                    <form method="POST" action="index.php?module=rendus&action=homeMaj">
+                        <input type="hidden" name="idEval" value="$noteId">
+                        <td>
+                            <input class="input-group form-control" type="text" name="noteNom" value="$noteNom">
+                        </td>
+                        <td>$canEvaluate</td>
+                        <td class="d-flex">
+                            <input type="number" name="coef" class="form-control form-control-sm w-auto" value="$coef" placeholder="Coef">
+                            <button type="submit" class="btn btn-primary btn-sm btn-success">Valider</button>
+                        </td>
+                    </form>
                 </tr>
                 HTML;
             }
         }
     
-        $notesSection = $notesTable ? <<<HTML
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th>Nom de la note</th>
-                    <th>Action</th>
-                    <th>Coefficient</th>
-                </tr>
-            </thead>
-            <tbody>
+        // Contenu du tableau ou message si aucune note
+        $notesSection = $notesTable 
+            ? <<<HTML
+            <tbody id="table-body-$idRendu">
                 $notesTable
             </tbody>
-        </table>
-    HTML
-        : '<p class="text-muted">Aucune note disponible pour ce rendu.</p>';
-        
+            HTML
+            : '<p class="text-muted mt-3">Aucune note disponible pour ce rendu.</p>';
+    
+        // Vue complète avec la possibilité de plier/déplier
         return <<<HTML
         <div class="px-5 mx-5 my-4">
-            <form method="POST" action="index.php?module=rendus&action=AjouterUneNote">
-                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100">
-                    <div class="align-items-center">
+            <!-- En-tête du rendu avec fonction de pliage et le chevron -->
+            <div 
+                class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100" 
+                onclick="toggleTableBody('$idRendu')" 
+                style="cursor: pointer;"
+            >                
+            
+            <div class="align-items-center d-flex">
+                    <i id="chevron-$idRendu" class="fas fa-chevron-down"></i>
+                    <div class="ms-2">
                         <span class="fw-bold mx-1 d-flex">$renduNom</span>
                         <span class="fst-italic mx-1 d-flex">$saeNom</span>
                     </div>
-                    <div class="text-end">
-                        <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
-                        <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
-                    </div>
                 </div>
-                $notesSection
-                <input type="hidden" name="idRendu" value="$idSAE">
-                <button class="btn btn-primary btn-sm">Ajouter une note</button>
-            </form>
+                <div class="text-end">
+                    <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
+                    <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
+                </div>
+                <!-- Chevron pour indiquer l'état du tableau -->
+            </div>
+    
+            <!-- Tableau complet, y compris l'en-tête et les notes -->
+            <div class="mt-3 table-wrapper" id="table-wrapper-$idRendu">
+                <table class="table table-bordered mt-3">
+                    <!-- En-tête du tableau -->
+                    <thead>
+                        <tr>
+                            <th>Nom de la note</th>
+                            <th>Action</th>
+                            <th>Coefficient</th>
+                        </tr>
+                    </thead>
+                    <!-- Corps du tableau avec les notes -->
+                    $notesSection
+                </table>
+                <!-- Formulaire pour ajouter une note -->
+                <form method="POST" action="index.php?module=rendus&action=AjouterUneNote" class="mt-3">
+                    <input type="hidden" name="idRendu" value="$idRendu">
+                    <button type="submit" class="btn btn-primary btn-sm">Ajouter une note</button>
+                </form>
+            </div>
+    
         </div>
     HTML;
     }
+    
+    
+    
+    
     public function initEvaluerPage($rendus, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe) {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
@@ -194,7 +251,6 @@ HTML;
                     $groupeNom = htmlspecialchars($eleves['nom'], ENT_QUOTES, 'UTF-8');
                     echo <<<HTML
                     <div class="group-section mt-4">
-                        <h4 class="fw-bold text-primary">$groupeNom</h4>
                         <table class="table table-bordered mt-3 ">
                             <thead class="table-primary">
                                 <tr class="table-primary">

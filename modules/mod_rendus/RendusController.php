@@ -21,6 +21,9 @@ class RendusController
             case "home":
                 $this->initRendus();
                 break;
+            case "homeMaj":
+                $this->validerModifHomePage();
+                break;
             case "AjouterUneNote":
                 $this->initAjouterUneNote();
                 break;
@@ -48,10 +51,13 @@ class RendusController
     }
     private function initAjouterUneNote(){
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
-            
+            $idRendu = $_POST['idRendu'];
+            var_dump("test");
+            $test = $this->model->creerNotePourUnRendu($idRendu);
+            var_dump($test);
+            var_dump("test");
 
-
-
+            header('Location: index.php?module=rendus&action=home');
         }else{
             $this->initRendus();
         }
@@ -117,6 +123,20 @@ class RendusController
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
             $idEval = $_GET['eval'];
             //$_POST['']
+        }else { // Est un étudiant
+            $this->initRendus();
+        }
+    }
+
+    private function validerModifHomePage(){
+        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+            $idEval = $_POST['idEval'];
+            $noteNom = $_POST['noteNom'];
+            $coef = $_POST['coef'];
+            $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef);
+            header('Location: index.php?module=rendus&action=home');
+
+            
         }else { // Est un étudiant
             $this->initRendus();
         }

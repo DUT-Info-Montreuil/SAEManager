@@ -144,7 +144,54 @@ class RendusModel extends Connexion{
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    function creerNotePourUnRendu($idRendu) {
+        // Créer une nouvelle évaluation pour le rendu s'il n'en a pas déjà
+        $evalReq = "
+            INSERT INTO Evaluation (nom, coef)
+            VALUES ('nom à définir', 1)
+        ";
+        $evalInsert = self::$bdd->prepare($evalReq);
+        $evalInsert->execute();
+        $idEval = self::$bdd->lastInsertId(); // Récupérer l'idEval généré
     
+        // Associer l'évaluation créée au rendu
+        $updateRenduReq = "
+            UPDATE Rendu 
+            SET idEvaluation = :idEval 
+            WHERE idRendu = :idRendu
+        ";
+        $updateRendu = self::$bdd->prepare($updateRenduReq);
+        $updateRendu->bindParam("idEval", $idEval, PDO::PARAM_INT);
+        $updateRendu->bindParam("idRendu", $idRendu, PDO::PARAM_INT);
+        $updateRendu->execute();
+    
+        // Insérer les notes (avec note NULL) pour les étudiants inscrits au SAE associé au rendu
+        $notesReq = "
+            INSERT INTO Notes (idEval, idEleve, idRendu, note)
+            SELECT 
+                :idEval, 
+                EleveInscritSae.idEleve, 
+                :idRendu, 
+                NULL
+            FROM EleveInscritSae
+            JOIN Rendu ON Rendu.idSAE = EleveInscritSae.idSAE
+            WHERE Rendu.idRendu = :idRendu
+        ";
+        $insertNotes = self::$bdd->prepare($notesReq);
+        $insertNotes->bindParam("idEval", $idEval, PDO::PARAM_INT);
+        $insertNotes->bindParam("idRendu", $idRendu, PDO::PARAM_INT);
+        $insertNotes->execute();
+    }
+    
+    function MettreAJourInfoUneEval($idEval, $noteNom, $coef){
+        $req = "UPDATE Evaluation SET nom = :noteNom, coef = :coef WHERE idEval = :idEval";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idEval", $idEval, PDO::PARAM_INT);
+        $pdo_req->bindParam("noteNom", $noteNom, PDO::PARAM_STR);
+        $pdo_req->bindParam("coef", $coef, PDO::PARAM_INT);
+        $pdo_req->execute();
+    }
+
     
     
     
