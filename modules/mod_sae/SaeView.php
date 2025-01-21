@@ -108,7 +108,7 @@ HTML;
         if ($_SESSION['estProfUtilisateur']) {
             echo <<<HTML
             <div class="d-flex">
-                <div class="mb-5">  
+                <div class="mb-5 w-50 me-3">  
                     <h3 class="fw-bold d-flex align-items-center">
                         <svg class="me-2" width="25" height="25">
                             <use xlink:href="#arrow-icon"></use>
@@ -121,7 +121,7 @@ HTML;
             echo <<<HTML
                     </div>
                 </div>
-                <div class="mb-5">
+                <div class="mb-5 w-50">
                     <h3 class="fw-bold d-flex align-items-center">
                         <svg class="me-2" width="25" height="25">
                             <use xlink:href="#arrow-icon"></use>
@@ -372,28 +372,38 @@ HTML;
 
     function initAjoutEtudiant($etudiants, $idSAE)
     {
-        $options = '';
+        $inputs = '';
 
         foreach ($etudiants as $etudiant) {
             $id = htmlspecialchars($etudiant['idPersonne']);
             $nom = htmlspecialchars($etudiant['nom']);
             $prenom = htmlspecialchars($etudiant['prenom']);
-            $options .= "<option value=\"$id\">$nom $prenom</option>";
+            $inputs .= '<div class="form-check">
+                            <input class="form-check-input" name="student[]" type="checkbox" value="'.$id.'" id="'.$id.'">
+                            <label class="form-check-label" for="'.$id.'">'.$prenom . ' ' . $nom.'</label>
+                        </div>';
         }
 
         return <<<HTML
-            <form method="POST" action="index.php?module=sae&action=ajoutProf&id=$idSAE" class="p-3 border rounded shadow-sm bg-light">
-                <div class="mb-3">
-                    <label for="nom" class="form-label fw-bold">Inscrivez un etudiant à la SAE :</label>
-                    <select name="idPers" class="form-select" required>
-                        <option value="" selected>Choisissez un etudiant</option>
-                        $options
-                    </select>
-                </div>
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Valider</button>
-                </div>
-            </form>
+                <form method="POST" action="index.php?module=sae&action=ajoutEtudiantSAE&id=$idSAE" class="p-3 border rounded shadow-sm bg-light">
+                    <label class="form-label fw-bold">Ajouter des étudiants à la SAE :</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdownButton">Rechercher des étudiants</button>
+                        <div class="dropdown-menu p-2 w-100" id="dropdownContent" style="display: none;">
+                            <!-- Barre de recherche -->
+                            <input 
+                                type="text" 
+                                class="form-control mb-2" 
+                                id="searchInput" 
+                                placeholder="Rechercher...">
+                            <!-- Options avec cases à cocher -->
+                            $inputs
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-5">
+                        <button type="submit" class="btn btn-primary">Valider</button>
+                    </div>
+                </form>
     HTML;
     }
 

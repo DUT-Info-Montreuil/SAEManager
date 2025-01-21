@@ -1125,4 +1125,19 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         return true;
     }
+
+    public function inscrireEtudiantSAE($idSAE, $idEtudiant) {
+        $req = "INSERT INTO EleveInscritSae (idSAE, idEleve) VALUES (:idSAE, :idEleve)";
+        $stmt = self::$bdd->prepare($req);
+        $stmt->execute([
+            ':idSAE' => $idSAE,
+            ':idEleve' => $idEtudiant
+        ]);
+    }
+
+    public function inscrireEtudiantsSAE($idSAE, $idEtudiants) {
+        foreach($idEtudiants as $id) {
+            $this->inscrireEtudiantSAE($idSAE, $id);
+        }
+    }
 }
