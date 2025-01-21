@@ -477,7 +477,8 @@ class SaeController
         if (count($_POST['etudiants']) == count(array_unique($_POST['etudiants']))) {
 
             $_POST['etudiants'] = array_filter($_POST['etudiants']);
-            array_push($_POST['etudiants'], $_SESSION['idUtilisateur']);
+            if($_SESSION['estProfUtilisateur'] != 1)
+                array_push($_POST['etudiants'], $_SESSION['idUtilisateur']);
 
             $this->model->propositionGroupe($_POST['etudiants'], $idSae, $nomGroupe);
         }

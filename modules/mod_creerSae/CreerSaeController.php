@@ -30,8 +30,7 @@ class CreerSaeController
     }
 
     private function initRendus(){
-        $listePersonne = $this->model->recupListePersonne();
-        //var_dump($listePersonne);
+        $listePersonne = $this->model->recupListePersonneSansMoi();
         $this->view->initCreerSaePage($listePersonne);
     }
 
@@ -49,7 +48,7 @@ class CreerSaeController
         $result = $this->model->createSae($nomSae, $semestre, $sujet, $coResponsables, $intervenants, $eleves);
 
         if ($result) {
-            echo "SAE créée avec succès !";
+        header("Location: index.php?module=sae&action=home");
         } else {
             echo "Erreur lors de la création de la SAE.";
         }

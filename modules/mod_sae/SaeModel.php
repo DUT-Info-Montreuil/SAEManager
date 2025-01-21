@@ -473,11 +473,14 @@ class SaeModel extends Connexion
     public function getReponseIdBySAE($idChamp)
     {
         $req = "SELECT idChamp
-                FROM reponsesChamp";
+                FROM reponsesChamp
+                WHERE idEleve = :idEleve";
         $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idEleve", $_SESSION['idUtilisateur']);
         $pdo_req->execute();
         return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'idChamp');
     }
+
     public function didGroupeDropSupport($idSoutenance, $idSae)
     {
         return count($this->getSupportEleve($idSoutenance, $idSae)) != 0;

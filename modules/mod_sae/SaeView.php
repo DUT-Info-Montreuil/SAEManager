@@ -22,15 +22,28 @@ class SaeView extends GenericView
                         <use xlink:href="#arrow-icon"></use>
                     </svg>
                 </div>
-                <h3 class="fw-bold">Liste des SAÉs auxquelles vous êtes inscrit(e) :</h3>
+                <div class="d-flex flex-column">
+                    <h3 class="fw-bold">Liste des SAÉs auxquelles vous êtes inscrit(e) :</h3>
+    HTML;
+                    if(empty($saes)){
+                    echo <<<HTML
+                        <p class="h5" >Vous êtes inscrit à aucunes Saés.</p>
+    HTML;
+                    }
+        echo <<<HTML
+                </div>
             </div>
+HTML;
+        if(!empty($saes)){
+        echo <<<HTML
             <div class="sae-list">
 HTML;
-        foreach ($saes as $sae) {
-            echo $this->lineSae($sae);
+            foreach ($saes as $sae) {
+                echo $this->lineSae($sae);
+            }
         }
 
-        echo <<<HTML
+            echo <<<HTML
             </div>
         </div>
     </div>

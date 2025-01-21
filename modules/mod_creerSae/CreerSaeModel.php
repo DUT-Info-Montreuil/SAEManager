@@ -57,6 +57,16 @@ class CreerSaeModel extends Connexion
             return false;
         }
     }
+
+    public function recupListePersonneSansMoi(){
+        $req = "SELECT * FROM Personne
+                WHERE idPersonne != :idPersonne";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idPersonne", $_SESSION['idUtilisateur']);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function recupListePersonne(){
         $req = "SELECT * FROM Personne";
         $pdo_req = self::$bdd->prepare($req);

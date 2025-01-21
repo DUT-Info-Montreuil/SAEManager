@@ -41,7 +41,7 @@ class DashboardModel extends Connexion{
          ";
 
         $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(':idPersonne', $idPersonne);
+        $pdo_req->bindValue(':idPersonne', $idEvaluateur);
 
 
         $pdo_req->execute();

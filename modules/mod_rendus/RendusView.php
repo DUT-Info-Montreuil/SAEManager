@@ -23,7 +23,8 @@ class RendusView extends GenericView
                         <use xlink:href="#arrow-icon"></use>
                         </svg>
                     </div>
-                    <h3 class="fw-bold">Liste des différents rendus des SAÉs auxquelles vous êtes inscrit(e) :</h3>
+                    <div class="d-flex flex-column">
+                        <h3 class="fw-bold">Liste des différents rendus des SAÉs auxquelles vous êtes inscrit(e) :</h3>
                 </div>
                 <div class="rendu-list">
 HTML;

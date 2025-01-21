@@ -116,17 +116,17 @@ HTML;
                         <div class="d-flex flex-column">
                             <p class="mb-0 fw-bold">$renduNom</p>
 HTML;
-        $dateToCheck = date('Y-m-d H:i:s');
+                            $dateToCheck = date('Y-m-d H:i:s');
 
-        $dateTime = new DateTime($dateLimite);
-        $dateTimeToCheck = new DateTime($dateToCheck);
+                            $dateTime = new DateTime($dateLimite);
+                            $dateTimeToCheck = new DateTime($dateToCheck);
 
-        if ($dateTimeToCheck < $dateTime)
-            $color = "success";
-        else if ($dateTimeToCheck > $dateTime && $dateTimeToCheck < (clone $dateTime)->modify('+24 hours'))
-            $color = "warning";
-        else
-            $color =  "danger";
+                            if ($dateTimeToCheck > $dateTime)
+                                $color = "danger";
+                            else if ($dateTimeToCheck > (clone $dateTime)->modify('-24 hours'))
+                                $color = "warning";
+                            else
+                                $color =  "success";
 
 
         echo <<<HTML
