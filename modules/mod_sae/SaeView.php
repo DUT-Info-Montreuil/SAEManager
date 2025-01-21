@@ -566,11 +566,10 @@ HTML;
 
     function initGroupPage($sae, $groupe, $responsable)
     {
-
+        // Récupération du nom du SAE
         foreach ($sae as $s) {
             $nomSAE = htmlspecialchars($s['nomSae']);
         }
-
 
         echo <<<HTML
     <div class="container mt-5">
@@ -614,11 +613,12 @@ HTML;
             $prenom = htmlspecialchars($resp['prenom']);
             echo $this->linePersonne($prenom, $nom);
         }
+
         echo <<<HTML
                 </div>
             </div>
 
-            <!-- MESSA E -->
+            <!-- MESSAGERIE -->
             <div class="mb-5">
                 <h3 class="d-flex align-items-center">
                     <svg class="me-2" width="25" height="25">
@@ -626,14 +626,31 @@ HTML;
                     </svg>
                     Message(s) du groupe
                 </h3>
-                <div class="d-flex flex-column">
+                <div id="messageBox" class="d-flex flex-column" style="max-height: 300px; overflow-y: auto; margin-bottom: 10px; padding-right: 10px; border-right: 3px solid #ccc;">
+                    <!-- Les messages seront ici -->
+                </div>
+                <div class="d-flex">
+                    <input type="text" id="messageInput" class="form-control" placeholder="Écrire un message..." style="margin-right: 10px;">
+                    <button id="sendMessage" class="btn btn-primary">Envoyer</button>
                 </div>
             </div>
 
         </div>
     </div>
     HTML;
+
+        $idSAE = $_GET['id'];
+        $idGroupe = $groupe[0]['idGroupe'];
+
+        echo <<<HTML
+                <script>
+            const id = $idSAE;
+            const idGroupe = $idGroupe;
+        </script>
+        <script src="js/chat.js"></script>
+    HTML;
     }
+
 
     function linePersonne($prenom, $nom)
     {
