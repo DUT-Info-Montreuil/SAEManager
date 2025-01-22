@@ -490,21 +490,26 @@ class SaeModel extends Connexion
 
     public function didGroupeDropSupport($idSoutenance, $idSae)
     {
-        return count($this->getSupportEleve($idSoutenance, $idSae)) != 0;
+        return $this->getSupportEleve($idSoutenance, $idSae);
     }
     public function getSupportEleve($idSoutenance, $idSae)
     {
-        $idGroupe = $this->getMyGroupId($idSae)[0]['idGroupe'];
-        $req = "
+        $idGroupe = $this->getMyGroupId($idSae);
+
+        if ($idGroupe) {
+            $id = $idGroupe[0]['idGroupe'];
+            $req = "
                 SELECT SupportSoutenance.idSoutenance, SupportSoutenance.idGroupe, SupportSoutenance.support
                 FROM SupportSoutenance
                 WHERE idSoutenance = :idSoutenance AND idGroupe = :idGroupe
         ";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSoutenance", $idSoutenance);
-        $pdo_req->bindValue(":idGroupe", $idGroupe);
+        $pdo_req->bindValue(":idGroupe", $id);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
+        }
+        
     }
     public function getProfsBySAE($idSAE)
     {
