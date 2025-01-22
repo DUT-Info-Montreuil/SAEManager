@@ -45,7 +45,7 @@ class CreerSaeView extends GenericView
                     <!-- Co-responsables -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Co-responsables</label>
-                        <div class="border p-2" style="max-height: 150px; overflow-y: auto;">
+                        <div class="border p-2 choix-responsable" style="max-height: 150px; overflow-y: auto;">
     HTML;
     
         // Générer les co-responsables

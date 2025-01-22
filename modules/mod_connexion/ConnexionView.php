@@ -60,14 +60,14 @@ HTML;
         echo <<<HTML
     <div class="container mt-5">
         <h1 class="fw-bold text-center">Connexion</h1>
-        <div class="card shadow bg-white rounded mx-auto p-4 d-flex flex-column flex-md-row" style="max-width: 900px; height: 600px;">
-            <div class="illustration-container d-flex justify-content-center align-items-center flex-column" style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); flex: 1; height: 100%;">
-                <img src="assets/img/Saly-13.png" alt="Illustration" class="img-fluid" style="max-width: 80%; height: auto;">
+        <div class="card shadow bg-white rounded mx-auto p-4 d-flex flex-column flex-md-row rounded-2 card-connexion">
+            <div class="illustration-container d-flex justify-content-center align-items-center flex-column rounded-2">
+                <img src="assets/img/Saly-13.png" alt="Illustration" class="img-fluid">
             </div>
 
-            <div class="form-container d-flex flex-column justify-content-center align-items-center p-4" style="flex: 1; height: 100%;">
+            <div class="form-container d-flex flex-column justify-content-center align-items-center p-4">
                 <div class="text-center mb-4">
-                    <p>Bienvenue sur <span style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SAÉ MANAGER</span>, l’outil qui va te changer la vie !</p>
+                    <p>Bienvenue sur <span class="sae-manager-text">SAÉ MANAGER</span>, l’outil qui va te changer la vie !</p>
                 </div>
 
                 <p class="text-danger text-center mb-3">$msg_erreur</p>
@@ -113,14 +113,14 @@ HTML;
         echo <<<HTML
     <div class="container mt-5">
         <h1 class="fw-bold text-center">Inscription</h1>
-        <div class="card shadow bg-white rounded mx-auto p-4 d-flex flex-column flex-md-row" style="max-width: 900px; height: 600px;">
-            <div class="illustration-container d-flex justify-content-center align-items-center flex-column" style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); flex: 1; height: 100%;">
-                <img src="assets/img/Saly-13.png" alt="Illustration" class="img-fluid" style="max-width: 80%; height: auto;">
+        <div class="card shadow bg-white rounded mx-auto p-4 d-flex flex-column flex-md-row card-connexion">
+            <div class="illustration-container d-flex justify-content-center align-items-center flex-column rounded-2">
+                <img src="assets/img/Saly-13.png" alt="Illustration" class="img-fluid">
             </div>
 
-            <div class="form-container d-flex flex-column justify-content-center align-items-center p-4" style="flex: 1; height: 100%;">
+            <div class="form-container d-flex flex-column justify-content-center align-items-center p-4">
                 <div class="text-center mb-4">
-                    <p>Bienvenue sur <span style="background: linear-gradient(90deg, #E54C91, #F48B7B, #F7AD50); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SAÉ MANAGER</span>, l’outil qui va te changer la vie !</p>
+                    <p>Bienvenue sur <span class="sae-manager-text">SAÉ MANAGER</span>, l’outil qui va te changer la vie !</p>
                 </div>
 
                 <p class="text-danger text-center mb-3">$msg_erreur</p>
