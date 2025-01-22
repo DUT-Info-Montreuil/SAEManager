@@ -31,30 +31,37 @@ HTML;
             echo <<<HTML
             <div class="container mt-5">
                 <h1 class="fw-bold">ACCUEIL</h1>
-                <div class="card shadow bg-white rounded w-100 h-75">
-                    <div class="d-flex w-100 h-75 justify-content-center m-auto">
-                        {$this->cardSAE()}
-                        {$this->cardRendus()}
-                        {$this->cardCreerSAE()}
+                <div class="card-general shadow bg-white rounded w-100 m-auto">
+                    <div class="d-flex flex-column w-100">
+                        <div class="d-flex w-100 m-auto mt-5">
+                            {$this->cardSAE()}
+                            {$this->cardRendus()}
+                            {$this->cardCreerSAE()}
+                        </div>
+                        <div class="d-flex w-100 m-auto mt-5 mb-5">   
+                            {$this->cardRessource()}
+                        </div>
                     </div>
                 </div>
             </div>
-        HTML;
+HTML;
         } else { //Est un élève
             echo <<<HTML
             <div class="container mt-5">
                 <h1 class="fw-bold">ACCUEIL</h1>
-                <div class="card shadow bg-white rounded w-100 h-75">
-                    <div class="d-flex w-100 h-75 justify-content-center m-auto">
-                        {$this->cardSAE()}
-                        {$this->cardRendus()}
+                <div class="card-general shadow bg-white rounded w-100 m-auto min-h75">
+                    <div class="d-flex flex-column w-100">
+                        <div class="d-flex w-100 m-auto mt-5">
+                            {$this->cardSAE()}
+                            {$this->cardRendus()}
+                            {$this->cardRessource()}
+                        </div>
+                        <div class="d-flex w-100 m-auto mt-5 mb-5">   
+                        </div>
                     </div>
-                    
                 </div>
-
             </div>
-
-        HTML;
+HTML;
         }
 
         echo <<<HTML
@@ -67,46 +74,66 @@ HTML;
     {
 
         return <<<HTML
-        <div class="card shadow px-3 mx-5  rounded w-25 h-75 card-sae-content">
+        <div class="card shadow px-3 mx-5 rounded w-25 card-sae-content">
             <a href="index.php?module=sae&action=home" class="text-decoration-none text-reset">
-                <div class="card card-sae shadow w-100 h-100"></div>
+                <div class="card card-sae shadow w-100" style="min-height: 150px;">
+                </div>
                 <div class="m-4">
                     <h4>SAÉs</h4>
                     <p>Retrouvez ici la liste de toutes les SAÉs auquel vous avez été associé.</p>
                 </div>
             </a>
         </div>
-        HTML;
+HTML;
     }
 
     function cardRendus()
     {
         return <<<HTML
-        <div class="card shadow px-3 mx-5 rounded-bottom w-25 h-75 card-rendus-content">
+        <div class="card shadow px-3 mx-5 rounded-bottom w-25 card-rendus-content">
             <a href="index.php?module=rendus&action=home" class="text-decoration-none text-reset">
-                <div class="card card-rendus shadow w-100 h-100"></div>
+                <div class="card card-rendus shadow w-100" style="min-height: 150px;">
+                </div>
                 <div class="m-4">
                     <h4>Rendus</h4>
                     <p>Retrouvez ici la liste de tous les rendus (ceux à rendre et ceux déjà rendus)</p>
                 </div>
             </a>
         </div>
-        HTML;
+HTML;
     }
 
     function cardCreerSAE()
     {
 
         return <<<HTML
-        <div class="card shadow px-3 mx-5 rounded-bottom w-25 h-75 card-rendus-content">
+        <div class="card shadow px-3 mx-5 rounded-bottom w-25 card-rendus-content">
             <a href="index.php?module=creerSae&action=home" class="text-decoration-none text-reset">
-                <div style="min-height: 50px;" class="card card-create-sae shadow w-100 h-100"></div>
+                <div class="card card-create-sae shadow w-100" style="min-height: 150px;">
+                </div>
                 <div class="m-4">
                     <h4>Créer une SAÉ</h4>
                     <p>Créer un nouveau sujet de SAE.</p>
                 </div>
             </a>
         </div>
-        HTML;
+HTML;
+    }
+
+    function cardRessource()
+    {
+
+        return <<<HTML
+        <div class="card shadow px-3 mx-5 rounded-bottom w-25 card-rendus-content">
+            <a href="index.php?module=ressources&action=home" class="text-decoration-none text-reset">
+                <div class="card card-ressource shadow w-100" style="min-height: 150px;">
+                </div>
+                <div class="m-4">
+                    <h4>Ressources</h4>
+                    <p>Accéder à vos Ressources</p>
+                </div>
+            </a>
+        </div>
+HTML;
     }
 }

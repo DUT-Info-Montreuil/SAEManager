@@ -24,7 +24,7 @@ class SaeModel extends Connexion
             INNER JOIN IntervenantSAE ON SAE.idSAE = IntervenantSAE.idSAE
             INNER JOIN Personne ON Personne.idPersonne = IntervenantSAE.idIntervenant
             WHERE Personne.idPersonne = :idPersonne";
-        }else{
+        } else {
             $req = "SELECT SAE.nomSae, SAE.idSAE
                         FROM Personne
                         INNER JOIN EleveInscritSae ON Personne.idPersonne = EleveInscritSae.idEleve
@@ -32,7 +32,7 @@ class SaeModel extends Connexion
                         WHERE Personne.idPersonne = :idPersonne
                         ";
         }
-        
+
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
         $pdo_req->execute();
@@ -71,7 +71,8 @@ class SaeModel extends Connexion
         return false;
     }
 
-    function getSoutenanceById($idSoutenance){
+    function getSoutenanceById($idSoutenance)
+    {
         $req = "SELECT *
                 FROM Soutenance
                 WHERE Soutenance.idSoutenance = :idSoutenance";
@@ -204,7 +205,7 @@ class SaeModel extends Connexion
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idRendu", $idDepot);
         $pdo_req->bindValue(":idGroupe", $idGroupe);
-        if($pdo_req->execute()){
+        if ($pdo_req->execute()) {
             return $this->deleteFichier($fileName);
         }
         return false;
@@ -278,7 +279,7 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         if ($pdo_req->rowCount() == 0)
             return false;
-        else{
+        else {
             $this->creeNotification($idResp, "Vous avez été assigné coresponsable à une SAE.", $idSAE, "index.php?module=sae&action=details&id=$idSAE");
             return true;
         }
@@ -295,7 +296,7 @@ class SaeModel extends Connexion
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSoutenance", $idDepot);
         $pdo_req->bindValue(":idGroupe", $idGroupe);
-        if($pdo_req->execute()){
+        if ($pdo_req->execute()) {
             return $this->deleteFichier($fileName);
         }
         return false;
@@ -318,7 +319,7 @@ class SaeModel extends Connexion
     public function getRenduEleve($idRendu, $idSae)
     {
         $idGroupe = $this->getMyGroupId($idSae);
-        if($idGroupe){
+        if ($idGroupe) {
             $idGroupe = $idGroupe[0]["idGroupe"];
             $req = "
                     SELECT RenduGroupe.idRendu, RenduGroupe.dateDepot, RenduGroupe.fichier
@@ -336,7 +337,7 @@ class SaeModel extends Connexion
     public function didGroupDropRendu($idRendu, $idSae)
     {
         $count = $this->getRenduEleve($idRendu, $idSae);
-        if($count)
+        if ($count)
             return count($count) != 0;
         return false;
     }
@@ -390,7 +391,7 @@ class SaeModel extends Connexion
     function getMyGroup($idSAE, $GroupeID)
     {
 
-        if ($GroupeID){
+        if ($GroupeID) {
             foreach ($GroupeID as $id) {
                 $idGroupe = $id['idGroupe'];
             }
@@ -482,11 +483,11 @@ class SaeModel extends Connexion
                 INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEval
                 WHERE NotesSoutenance.idEleve = :idEleve AND s.idSAE = :idSAE";
 
-// $req = "SELECT r.nom, Notes.note, Evaluation.coef,Notes.idRendu
-// FROM Notes
-// INNER JOIN Evaluation ON Evaluation.idEval = Notes.idEval
-// INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
-// WHERE Notes.idEleve = :idEleve AND r.idSAE = :idSAE";
+        // $req = "SELECT r.nom, Notes.note, Evaluation.coef,Notes.idRendu
+        // FROM Notes
+        // INNER JOIN Evaluation ON Evaluation.idEval = Notes.idEval
+        // INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
+        // WHERE Notes.idEleve = :idEleve AND r.idSAE = :idSAE";
 
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
@@ -508,6 +509,7 @@ class SaeModel extends Connexion
     {
         return $this->getSupportEleve($idSoutenance, $idSae);
     }
+
     public function getSupportEleve($idSoutenance, $idSae)
     {
         $idGroupe = $this->getMyGroupId($idSae);
@@ -519,15 +521,16 @@ class SaeModel extends Connexion
                 FROM SupportSoutenance
                 WHERE idSoutenance = :idSoutenance AND idGroupe = :idGroupe
         ";
-        $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
-        $pdo_req->bindValue(":idGroupe", $id);
-        $pdo_req->execute();
-        return $pdo_req->fetchAll();
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+            $pdo_req->bindValue(":idGroupe", $id);
+            $pdo_req->execute();
+            return $pdo_req->fetchAll();
         }
         return array();
     }
-    public function getProfsBySAE($idSAE){
+    public function getProfsBySAE($idSAE)
+    {
         $req = "SELECT idPersonne, prenom, nom
                 FROM Personne
                 WHERE estProf = 1
@@ -549,7 +552,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function estProfSae($idSae, $idPersonne){
+    public function estProfSae($idSae, $idPersonne)
+    {
         $req = "SELECT Personne.idPersonne , Personne.prenom, Personne.nom
                 FROM Personne
                 WHERE Personne.estProf = 1
@@ -573,7 +577,7 @@ class SaeModel extends Connexion
         $pdo_req->execute();
 
         $profsSae = $pdo_req->fetchAll();
-        if(count($profsSae)==0)
+        if (count($profsSae) == 0)
             return false;
         return $profsSae[0]['idPersonne'] == $idPersonne;
     }
@@ -587,45 +591,10 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         if ($pdo_req->rowCount() == 0)
             return false;
-        else{
+        else {
             $this->creeNotification($idIntervenant, "Vous avez été assigné intervenant à une SAE.", $idSAE, "index.php?module=sae&action=details&id=$idSAE");
             return true;
         }
-    }
-    public function getRessourceInscrit()
-    {
-
-        if ($_SESSION['estProfUtilisateur']) {
-            $req_prof = "
-                SELECT DISTINCT SAE.idSAE, SAE.nomSae, Ressource.contenu, Ressource.nom, RessourcesSAE.idRessource
-                FROM SAE
-                INNER JOIN RessourcesSAE ON SAE.idSAE = RessourcesSAE.idSAE
-                INNER JOIN Ressource ON Ressource.idRessource = RessourcesSAE.idRessource
-                WHERE SAE.idResponsable = :idResponsable
-            ";
-
-            $pdo_req_prof = self::$bdd->prepare($req_prof);
-            $pdo_req_prof->bindValue(":idResponsable", $_SESSION['idUtilisateur'], PDO::PARAM_INT);
-            $pdo_req_prof->execute();
-
-            $ressources_prof = $pdo_req_prof->fetchAll();
-            return $ressources_prof;
-        }
-
-        $req_eleve = "
-            SELECT *
-            FROM EleveInscritSae
-            INNER JOIN RessourcesSAE ON EleveInscritSae.idSAE = RessourcesSAE.idSAE
-            WHERE idEleve = :idEleve
-        ";
-
-        $pdo_req_eleve = self::$bdd->prepare($req_eleve);
-        $pdo_req_eleve->bindValue(":idEleve", $_SESSION['idUtilisateur'], PDO::PARAM_INT);
-        $pdo_req_eleve->execute();
-
-        $ressources_eleve = $pdo_req_eleve->fetchAll();
-
-        return $ressources_eleve;
     }
 
 
@@ -804,7 +773,8 @@ class SaeModel extends Connexion
         $pdo_req->execute();
     }
 
-    public function getEtudiantsPasInscrits($idSAE) {
+    public function getEtudiantsPasInscrits($idSAE)
+    {
         $req = "SELECT idPersonne, prenom, nom
                 FROM Personne
                 WHERE estProf = 0
@@ -818,7 +788,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getEtudiantsBySAE($idSAE) {
+    public function getEtudiantsBySAE($idSAE)
+    {
         $req = "SELECT idEleve, prenom, nom
                 FROM EleveInscritSae
                 INNER JOIN Personne ON idPersonne = idEleve
@@ -854,7 +825,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function inGroupeBySAE($idSAE) {
+    public function inGroupeBySAE($idSAE)
+    {
         $req = "SELECT count(*)
                 FROM Groupe
                 INNER JOIN EtudiantGroupe ON Groupe.idgroupe = EtudiantGroupe.idgroupe
@@ -867,7 +839,8 @@ class SaeModel extends Connexion
         return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0] !== 0;
     }
 
-    public function inPropositions($idSAE, $id) {
+    public function inPropositions($idSAE, $id)
+    {
         $req = "SELECT count(*)
                 FROM PropositionsGroupe
                 INNER JOIN PropositionsEleve using(idProposition)
@@ -880,8 +853,9 @@ class SaeModel extends Connexion
         return array_column($pdo_req->fetchAll(PDO::FETCH_ASSOC), 'count(*)')[0] !== 0;
     }
 
-    private function isInscrivablesBySAE($id_etudiants, $idSAE) {
-        foreach($id_etudiants as $id) {
+    private function isInscrivablesBySAE($id_etudiants, $idSAE)
+    {
+        foreach ($id_etudiants as $id) {
             if ($this->inPropositions($idSAE, $id)) {
                 return false;
             }
@@ -889,7 +863,8 @@ class SaeModel extends Connexion
         return true;
     }
 
-    public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe) {
+    public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe)
+    {
         if ($this->isInscrivablesBySAE($id_etudiants, $idSAE)) {
             $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe) VALUES (DEFAULT, :idSAE, :nomGroupe)";
             $pdo_req = self::$bdd->prepare($req);
@@ -902,7 +877,7 @@ class SaeModel extends Connexion
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->execute();
             $idProposition = $pdo_req->fetchAll(PDO::FETCH_ASSOC)[0];
-            foreach($id_etudiants as $id) {
+            foreach ($id_etudiants as $id) {
                 $req = "INSERT INTO PropositionsEleve (idProposition, idEleve) VALUES (:idProposition, :idEleve)";
                 $pdo_req = self::$bdd->prepare($req);
                 $pdo_req->bindValue(":idProposition", $idProposition['max(idProposition)']);
@@ -912,7 +887,8 @@ class SaeModel extends Connexion
         }
     }
 
-    public function propositionsGroupe($idSAE) {
+    public function propositionsGroupe($idSAE)
+    {
         $req = "SELECT nomGroupe, nom, prenom, idEleve, idProposition
                 FROM PropositionsGroupe
                 INNER JOIN PropositionsEleve using(idProposition)
@@ -924,7 +900,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function formationGroupes($idSAE) {
+    public function formationGroupes($idSAE)
+    {
         $eleves = $this->propositionsGroupe($idSAE);
         $groupes = [];
         foreach ($eleves as $eleve) {
@@ -947,7 +924,8 @@ class SaeModel extends Connexion
         return $groupes;
     }
 
-    public function accepterGroupe($idProposition, $sae, $idEtudiants) {
+    public function accepterGroupe($idProposition, $sae, $idEtudiants)
+    {
         $nomSae = $sae['nomSae'];
         $idSAE = $sae['idSAE'];
         $message = "Votre proposition de groupe pour la sae $nomSae a été validé !";
@@ -980,7 +958,7 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         $id_etudiants = $pdo_req->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach($id_etudiants as $id) {
+        foreach ($id_etudiants as $id) {
             $req = "INSERT INTO EtudiantGroupe (idGroupe, idEtudiant) VALUES (:idGroupe, :idEtudiant);";
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idGroupe", $idGroupe);
@@ -990,8 +968,9 @@ class SaeModel extends Connexion
         $this->eraseProposition($idProposition);
     }
 
-    public function refuserGroupe($idProposition, $sae, $idEtudiants) {
-        if($this->eraseProposition($idProposition)){
+    public function refuserGroupe($idProposition, $sae, $idEtudiants)
+    {
+        if ($this->eraseProposition($idProposition)) {
             $nomSae = $sae['nomSae'];
             $idSAE = $sae['idSAE'];
             $message = "Votre proposition de groupe pour la sae $nomSae a été refusé.";
@@ -1003,7 +982,8 @@ class SaeModel extends Connexion
         }
     }
 
-    private function eraseProposition($idProposition) {
+    private function eraseProposition($idProposition)
+    {
 
         $req = "DELETE FROM PropositionsEleve
                 WHERE idProposition = :idProposition";
@@ -1050,7 +1030,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function getGroupeDeLaSae($idSae){
+    public function getGroupeDeLaSae($idSae)
+    {
         $req = "SELECT *
         FROM Groupe
         WHERE Groupe.idSAE = :idSAE";
@@ -1072,7 +1053,7 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         $result = $pdo_req->fetch();
 
-        if($result["dureeMinutes"] == $duration) {
+        if ($result["dureeMinutes"] == $duration) {
             $req = "DELETE FROM PassageSoutenance
                     WHERE DATE(PassageSoutenance.date) = :date
                     AND idSoutenance = :idSoutenance";
@@ -1082,7 +1063,7 @@ class SaeModel extends Connexion
             $pdo_req->bindValue(":idSoutenance", $idSoutenance);
             $pdo_req->execute();
 
-            if($schedules) {
+            if ($schedules) {
                 foreach ($schedules as $schedule) {
                     $idGroupe = explode("|", $schedule)[0];
                     $time = trim(explode("-", explode("|", $schedule)[1])[0]); # récupère l'heure de début du passage
@@ -1096,8 +1077,7 @@ class SaeModel extends Connexion
                     $pdo_req->execute();
                 }
             }
-        }
-        else {
+        } else {
             $req = "UPDATE Soutenance
             SET Soutenance.dureeMinutes = :duration
             WHERE Soutenance.idSoutenance = :idSoutenance";
@@ -1159,7 +1139,8 @@ class SaeModel extends Connexion
         return true;
     }
 
-    public function inscrireEtudiantSAE($idSAE, $idEtudiant) {
+    public function inscrireEtudiantSAE($idSAE, $idEtudiant)
+    {
         $req = "INSERT INTO EleveInscritSae (idSAE, idEleve) VALUES (:idSAE, :idEleve)";
         $stmt = self::$bdd->prepare($req);
         $stmt->execute([
@@ -1168,8 +1149,9 @@ class SaeModel extends Connexion
         ]);
     }
 
-    public function inscrireEtudiantsSAE($idSAE, $idEtudiants) {
-        foreach($idEtudiants as $id) {
+    public function inscrireEtudiantsSAE($idSAE, $idEtudiants)
+    {
+        foreach ($idEtudiants as $id) {
             $this->inscrireEtudiantSAE($idSAE, $id);
         }
     }
