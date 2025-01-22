@@ -12,16 +12,8 @@ class RendusModel extends Connexion
                 INNER JOIN Rendu ON Rendu.idSAE = SAE.idSAE
                 WHERE Personne.idPersonne = :idPersonne";
 
-        // $req = "SELECT Rendu.nom AS Rendu_nom,SAE.nomSae AS SAE_nom,Rendu.dateLimite,Rendu.idSAE,IF(DepotDesRendus.idEleve IS NOT NULL, 1, 0) AS aRendu
-        //         FROM EleveInscritSae
-        //         JOIN Rendu ON EleveInscritSae.idSAE = Rendu.idSAE
-        //         LEFT JOIN DepotDesRendus ON Rendu.idRendu = DepotDesRendus.idRendu AND EleveInscritSae.idEleve = DepotDesRendus.idEleve
-        //         JOIN SAE ON Rendu.idSAE = SAE.idSAE
-        //         WHERE EleveInscritSae.idEleve = :idEleve;";
-
-
         $pdo_req = self::$bdd->prepare($req);
-        $pdo_req->bindParam("idEleve", $idPersonne, PDO::PARAM_INT);
+        $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
         $pdo_req->execute();
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }

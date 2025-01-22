@@ -437,47 +437,63 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    function getNote($idSAE,  $groupeID)
+    function getNoteRenduBySae($idSAE)
     {
-        if($groupeID == null){
-            return null;
-        }
-        foreach ($groupeID as $id) {
-            $idGroupe = $id['idGroupe'];
-        }
-        $req = "SELECT r.nom, note, coef
-                FROM Note
-                INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
-                INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
+        $idEleve = $_SESSION['idUtilisateur'];
+        // $req = "SELECT r.nom, note, coef
+        //         FROM Note
+        //         INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
+        //         INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
+        //         INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
+        //         WHERE EtudiantGroupe.idGroupe = :groupeID AND r.idSAE = :idSAE";
+
+        $req = "SELECT r.nom, Notes.note, Evaluation.coef,Notes.idRendu
+                FROM Notes
+                INNER JOIN Evaluation ON Evaluation.idEval = Notes.idEval
                 INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
-                WHERE EtudiantGroupe.idGroupe = :groupeID AND r.idSAE = :idSAE";
+                WHERE Notes.idEleve = :idEleve AND r.idSAE = :idSAE";
+
+        // $req = "SELECT n.idRendu, r.nom, note, Evaluation.coef, AVG(note) as moyenne
+        //         FROM Notes n
+        //         INNER JOIN Evaluation ON Evaluation.idEval = n.idEval
+        //         INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
+        //         WHERE n.ideleve = :idEleve AND r.idSAE = :idSAE
+        //         GROUP BY n.idRendu, r.nom
+        //         ";
 
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":groupeID", $idGroupe);
+        $pdo_req->bindValue(":idEleve", $idEleve);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
 
-    function getNoteSoutenance($idSAE, $groupeID)
+    function getNoteSoutenance($idSAE)
     {
-        if($groupeID == null){
-            return null;
-        }
-        foreach ($groupeID as $id) {
-            $idGroupe = $id['idGroupe'];
-        }
+        $idEleve = $_SESSION['idUtilisateur'];
 
-        $req = "SELECT s.titre, note, coef
-                FROM Note
-                INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
-                INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
+        // $req = "SELECT s.titre, note, coef
+        //         FROM Note
+        //         INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
+        //         INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
+        //         INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEval
+        //         WHERE EtudiantGroupe.idGroupe = :groupeID AND s.idSAE = :idSAE";
+
+        $req = "SELECT s.titre, NotesSoutenance.note, Evaluation.coef, NotesSoutenance.idSoutenance
+                FROM NotesSoutenance
+                INNER JOIN Evaluation ON Evaluation.idEval = NotesSoutenance.idEval
                 INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEval
-                WHERE EtudiantGroupe.idGroupe = :groupeID AND s.idSAE = :idSAE";
+                WHERE NotesSoutenance.idEleve = :idEleve AND s.idSAE = :idSAE";
+
+// $req = "SELECT r.nom, Notes.note, Evaluation.coef,Notes.idRendu
+// FROM Notes
+// INNER JOIN Evaluation ON Evaluation.idEval = Notes.idEval
+// INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
+// WHERE Notes.idEleve = :idEleve AND r.idSAE = :idSAE";
 
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
-        $pdo_req->bindValue(":groupeID", $idGroupe);
+        $pdo_req->bindValue(":idEleve", $idEleve);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }

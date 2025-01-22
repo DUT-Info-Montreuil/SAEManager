@@ -232,7 +232,7 @@ class SaeController
 
         $groupeID = $this->model->getMyGroupId($_GET['id']);
 
-        $notes = $this->model->getNote($_GET['id'], $groupeID);
+        $notes = $this->model->getNoteRenduBySae($_GET['id']);
         $sae = $this->model->getSaeById($_GET['id']);
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 

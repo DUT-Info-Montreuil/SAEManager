@@ -780,12 +780,15 @@ HTML;
 
         if (!empty($notes)) {
             foreach ($notes as $note) {
-                $nom = htmlspecialchars($note['nom']);
-                $noteValue = htmlspecialchars($note['note']);
-                $coeff = htmlspecialchars($note['coeff']);
+                $nom = htmlspecialchars($note['nom']) ?? "";
+                $noteAttribuee = isset($note['note']);
+                $noteValue = $noteAttribuee ? htmlspecialchars($note['note']) : "~";
+                $coeff = htmlspecialchars($note['coef']) ?? "";
 
-                $totalRendus += $noteValue * $coeff;
-                $totalCoeffRendus += $coeff;
+                if($noteAttribuee){
+                    $totalRendus += $noteValue * $coeff;
+                    $totalCoeffRendus += $coeff;
+                }
 
                 echo $this->lineNoteRendus($nom, $noteValue, $coeff);
             }
@@ -812,12 +815,16 @@ HTML;
 
         if (!empty($noteSoutenance)) {
             foreach ($noteSoutenance as $note) {
+                $noteAttribuee = isset($note['note']);
+
                 $nom = htmlspecialchars($note['titre']);
-                $noteValue = htmlspecialchars($note['note']);
+                $noteValue = $noteAttribuee ? htmlspecialchars($note['note']) : "~";
                 $coeff = htmlspecialchars($note['coeff']);
 
-                $totalSoutenance += $noteValue * $coeff;
-                $totalCoeffSoutenance += $coeff;
+                if($noteAttribuee){
+                    $totalSoutenance += $noteValue * $coeff;
+                    $totalCoeffSoutenance += $coeff;
+                }
 
                 echo $this->lineNoteRendus($nom, $noteValue, $coeff);
             }
