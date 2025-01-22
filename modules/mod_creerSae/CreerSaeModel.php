@@ -1,5 +1,6 @@
 <?php
 
+require_once 'modules/mod_sae/SaeModel.php';
 class CreerSaeModel extends Connexion
 {
     public function createSae($nomSae, $semestre, $sujet, $coResponsables, $intervenants, $eleves){
@@ -50,12 +51,20 @@ class CreerSaeModel extends Connexion
             }
 
             self::$bdd->commit();
+            foreach($coResponsables as $coResponsable)
+                SaeModel::creeNotification($coResponsable, "Vous avez été assigné coresponsable à une SAE qui vient d'être créée.", null, "index.php?module=sae&action=home");
+            foreach($intervenants as $intervenant)
+                SaeModel::creeNotification($intervenant, "Vous avez été assigné intervenant à une SAE qui vient d'être créée.", null, "index.php?module=sae&action=home");
+
             return true;
         } catch (Exception $e) {
             self::$bdd->rollBack();
             echo("Erreur lors de la création de la SAE : " . $e->getMessage());
             return false;
         }
+
+
+
     }
 
     public function recupListePersonneSansMoi(){
