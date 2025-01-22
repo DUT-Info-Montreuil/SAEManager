@@ -145,17 +145,6 @@ class RendusModel extends Connexion
         $evalInsert->execute();
         $idEval = self::$bdd->lastInsertId(); // Récupérer l'idEval généré
     
-        // Associer l'évaluation créée au rendu
-        $updateRenduReq = "
-            UPDATE Rendu 
-            SET idEvaluation = :idEval 
-            WHERE idRendu = :idRendu
-        ";
-        $updateRendu = self::$bdd->prepare($updateRenduReq);
-        $updateRendu->bindParam("idEval", $idEval, PDO::PARAM_INT);
-        $updateRendu->bindParam("idRendu", $idRendu, PDO::PARAM_INT);
-        $updateRendu->execute();
-    
         // Insérer les notes (avec note NULL) pour les étudiants inscrits au SAE associé au rendu
         $notesReq = "
             INSERT INTO Notes (idEval, idEleve, idRendu, note)

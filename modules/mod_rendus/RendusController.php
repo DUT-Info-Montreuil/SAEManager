@@ -52,11 +52,7 @@ class RendusController
     private function initAjouterUneNote(){
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
             $idRendu = $_POST['idRendu'];
-            var_dump("test");
             $test = $this->model->creerNotePourUnRendu($idRendu);
-            var_dump($test);
-            var_dump("test");
-
             header('Location: index.php?module=rendus&action=home');
         }else{
             $this->initRendus();

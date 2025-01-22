@@ -8,7 +8,7 @@ class SoutenanceView extends GenericView
         parent::__construct();
     }
 
-    public function initRendusPage($rendus, $notes)
+    public function initSoutenancePage($soutenances, $notes)
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
@@ -25,25 +25,24 @@ class SoutenanceView extends GenericView
                     </div>
                     <div class="rendu-list">
 HTML;
-            if(empty($rendus)){
+            if(empty($soutenances)){
                 echo <<<HTML
                     <h5 class="p-5">Vous êtes associés à aucune soutenance.</h5>
 
             HTML;
                 }
-            foreach ($rendus as $rendu) {
-                $renduNom = $rendu['Rendu_nom'];
-                $saeNom = $rendu['SAE_nom'];
-                $dateLimite = $rendu['dateLimite'];
-                $idSAE = $rendu['idSAE'];
-                $idRendu = $rendu['idRendu'];
+            foreach ($soutenances as $soutenance) {
+                $soutenanceNom = $soutenance['Soutenance_nom'];
+                $saeNom = $soutenance['SAE_nom'];
+                $date = $soutenance['date'];
+                $idSAE = $soutenance['idSAE'];
+                $idSoutenance = $soutenance['idSoutenance'];
                 
-                // Filtrer les notes liées au rendu actuel
-                $notesForRendu = array_filter($notes, function ($note) use ($rendu) {
-                    return $note['idRendu'] === $rendu['idRendu'];
+                // Filtrer les notes liées à la soutenance actuel
+                $notesForSoutenance = array_filter($notes, function ($note) use ($soutenance) {
+                    return $note['idSoutenance'] === $soutenance['idSoutenance'];
                 });
-                // var_dump($notes);lineRendusProf
-                echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu,$idRendu);
+                echo $this->lineSoutenanceProf($soutenanceNom, $saeNom, $date, $idSAE, $notesForSoutenance,$idSoutenance);
             }
 
             echo <<<HTML
@@ -54,59 +53,28 @@ HTML;
         } else { // Est un étudiant
             echo <<<HTML
             <div class="container mt-5">
-                <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
+                <h1 class="fw-bold">Oups...</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
                         <div class="me-3">
-                            <svg width="35" height="35">
-                                <use xlink:href="#arrow-icon"></use>
-                            </svg>
                         </div>
-                        <h3 class="fw-bold">Liste des différents rendus des SAÉs auxquels vous êtes inscrit(e) :</h3>
+                        <h3 class="fw-bold">Vous n'avez pas accès à cette pages...</h3>
                     </div>
                     <div class="rendu-list">
-HTML;
+                    </div>
+                </div>
+            </div>
 
-        foreach ($rendus as $rendu) {
-            $renduNom = htmlspecialchars($rendu['Rendu_nom']);
-            $saeNom = htmlspecialchars($rendu['SAE_nom']);
-            $dateLimite = htmlspecialchars($rendu['dateLimite']);
-            $idSAE = htmlspecialchars($rendu['idSAE']);
-            echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
-        }
-        <<<HTML
-        </div>
-            </div>
-                
-            </div>
 HTML;
         }
     }
-
-    function lineRendus($renduNom, $saeNom, $dateLimite, $idSAE)
-    {
-        return <<<HTML
-        <div class="px-5 mx-5 my-4">
-            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100">
-                <div class="align-items-center">
-                    <span class="fw-bold mx-1 d-flex">$renduNom</span>
-                    <span class="fst-italic mx-1 d-flex">$saeNom</span>
-                </div>
-                <div class="text-end">
-                    <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
-                    <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
-                </div>
-            </div>
-        </div>
-HTML;
-    }
-
-    function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes, $idRendu) {
+                                
+    function lineSoutenanceProf($soutenanceNom, $saeNom, $date, $idSAE, $notes, $idSoutenance) {
         $notesTable = '';
         $uniqueNotes = [];
     
         foreach ($notes as $note) {
-            $uniqueKey = $note['idEval'] . '_' . $note['idRendu'];
+            $uniqueKey = $note['idEval'] . '_' . $note['idSoutenance'];
             if (!isset($uniqueNotes[$uniqueKey])) {
                 $uniqueNotes[$uniqueKey] = $note;
             }
@@ -117,13 +85,13 @@ HTML;
             $noteId = $note['idEval'] ? $note['idEval'] : "";
             $coef = $note['Eval_coef'] ? htmlspecialchars($note['Eval_coef'], ENT_QUOTES, 'UTF-8') : "";
             $canEvaluate = $note['PeutEvaluer'] 
-                ? '<a href="index.php?module=rendus&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>' 
+                ? '<a href="index.php?module=soutenance&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>' 
                 : 'Vous n\'êtes pas évaluateur';
     
             if ($noteId !== "") {
                 $notesTable .= <<<HTML
                 <tr>
-                    <form method="POST" action="index.php?module=rendus&action=homeMaj">
+                    <form method="POST" action="index.php?module=soutenance&action=homeMaj">
                         <input type="hidden" name="idEval" value="$noteId">
                         <td>
                             <input class="input-group form-control" type="text" name="noteNom" value="$noteNom" placeholder="Nom de l'évaluation">
@@ -141,7 +109,7 @@ HTML;
     
         $notesSection = $notesTable 
             ? <<<HTML
-            <tbody id="table-body-$idRendu">
+            <tbody id="table-body-$idSoutenance">
                 <thead>
                     <tr>
                         <th>Nom de la note</th>
@@ -152,11 +120,11 @@ HTML;
                 $notesTable
             </tbody>
             HTML
-            : '<p class="text-muted mt-3">Aucune note disponible pour ce rendu.</p>';
+            : '<p class="text-muted mt-3">Aucune note disponible pour ce rendu de soutenance.</p>';
 
             $dateToCheck = date('Y-m-d H:i:s');
 
-            $dateTime = new DateTime($dateLimite);
+            $dateTime = new DateTime($date);
             $dateTimeToCheck = new DateTime($dateToCheck);
 
             if ($dateTimeToCheck > $dateTime)
@@ -170,30 +138,30 @@ HTML;
         <div class="px-5 mx-5 my-4">
             <div 
                 class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100 table-header" 
-                onclick="toggleTableBody('$idRendu')" 
+                onclick="toggleTableBody('$idSoutenance')" 
                 style="cursor: pointer;"
             >                
             
                 <div class="align-items-center d-flex">
-                    <i id="chevron-$idRendu" class="fas fa-chevron-down"></i>
+                    <i id="chevron-$idSoutenance" class="fas fa-chevron-down"></i>
                     <div class="ms-2">
-                        <span class="fw-bold mx-1 d-flex">$renduNom</span>
+                        <span class="fw-bold mx-1 d-flex">$soutenanceNom</span>
                         <span class="fst-italic mx-1 d-flex">$saeNom</span>
                     </div>
                 </div>
                 <div class="text-end">
-                    <p class="text-$color mb-0">Le dépot se finit dans : $dateLimite</p>
-                    <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
+                    <p class="text-$color mb-0">La soutenance est le : $date</p>
+                    <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE de la soutenance</a>
                 </div>
             </div>
     
-            <div class="mt-3 table-wrapper" id="table-wrapper-$idRendu">
+            <div class="mt-3 table-wrapper" id="table-wrapper-$idSoutenance">
                 <table class="table table-bordered mt-3">
                     
                     $notesSection
                 </table>
-                <form method="POST" action="index.php?module=rendus&action=AjouterUneNote" class="mt-3">
-                    <input type="hidden" name="idRendu" value="$idRendu">
+                <form method="POST" action="index.php?module=soutenance&action=AjouterUneNote" class="mt-3">
+                    <input type="hidden" name="idSoutenance" value="$idSoutenance">
                     <button type="submit" class="btn btn-primary btn-sm">Ajouter une note</button>
                 </form>
             </div>
@@ -205,7 +173,7 @@ HTML;
     
     
     
-    public function initEvaluerPage($rendus, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe) {
+    public function initEvaluerPage($soutenance, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe) {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
             <div class="container mt-5">
@@ -217,10 +185,10 @@ HTML;
                                 <use xlink:href="#arrow-icon"></use>
                             </svg>
                         </div>
-                        <h3 class="fw-bold">SAE : {$infoTitre['SAE_nom']} <br> Rendu : {$infoTitre['Rendu_nom']} <br> Évaluation : {$infoTitre['Eval_nom']}</h3>
+                        <h3 class="fw-bold">SAE : {$infoTitre['SAE_nom']} <br> Soutenance : {$infoTitre['Soutenance_nom']} <br> Évaluation : {$infoTitre['Eval_nom']}</h3>
                     </div>
                     <div class="rendu-list">
-                        <form method="POST" action="index.php?module=rendus&action=maj&eval=2">
+                        <form method="POST" action="index.php?module=soutenance&action=maj&eval=2">
             HTML;
             
             $groupedNotes = [];
