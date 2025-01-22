@@ -1,4 +1,3 @@
-// Fonction pour afficher/masquer le tableau complet (en-tête + corps) et changer le chevron
 function toggleTableBody(id) {
     var tableWrapper = document.getElementById("table-wrapper-" + id);
     var chevron = document.getElementById("chevron-" + id);
@@ -23,6 +22,8 @@ function toggleTableBody(id) {
     }
 }
 
+
+
 // Fonction pour afficher/masquer les élèves d'un groupe et changer le chevron
 function toggleGroup(groupeId) {
     var groupTable = document.getElementById("table-wrapper-" + groupeId);
@@ -44,5 +45,20 @@ function toggleGroup(groupeId) {
         chevron.classList.remove('fa-chevron-up');
         chevron.classList.add('fa-chevron-down');
     }
+}
+
+// Fonction pour mettre à jour la note de tous les élèves du groupe
+function updateGroupNotes(groupeId) {
+    var globalNote = document.getElementById("global-note-" + groupeId).value;
+    var elevesNotes = document.querySelectorAll("#table-wrapper-" + groupeId + " input[name^='note_']");
+    
+    elevesNotes.forEach(function(input) {
+        input.value = globalNote;
+    });
+}
+
+// Fonction pour empêcher le repliage du tableau quand on clique sur l'input
+function preventGroupToggle(event, groupeId) {
+    event.stopPropagation(); // Empêche la propagation de l'événement "click" vers l'élément parent
 }
 

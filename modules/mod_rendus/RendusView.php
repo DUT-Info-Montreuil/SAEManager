@@ -4,6 +4,7 @@ class RendusView extends GenericView
 {
     public function __construct()
     {
+        echo '<script src="js/renduview.js"></script>';
         parent::__construct();
     }
 
@@ -11,27 +12,6 @@ class RendusView extends GenericView
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
-                
-                <style>
-    /* Par défaut, le tableau est visible, si tu veux qu'il soit caché au départ, tu peux ajouter "display: none;" */
-.table-wrapper {
-    display: block; /* Afficher par défaut */
-    transition: max-height 0.3s ease-out;
-}
-
-.table-wrapper.collapsed {
-    display: none;
-}
-
-/* Animation pour une transition plus douce */
-.table-wrapper table {
-    max-height: 1000px;
-    transition: max-height 0.3s ease-out;
-}
-
-</style>
-
-
             <div class="container mt-5">
                 <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
                 <div class="card shadow bg-white rounded min-h75">
@@ -126,7 +106,6 @@ HTML;
         $notesTable = '';
         $uniqueNotes = [];
     
-        // Filtrer les notes uniques
         foreach ($notes as $note) {
             $uniqueKey = $note['idEval'] . '_' . $note['idRendu'];
             if (!isset($uniqueNotes[$uniqueKey])) {
@@ -134,14 +113,13 @@ HTML;
             }
         }
     
-        // Générer les lignes du tableau
         foreach ($uniqueNotes as $note) {
             $noteNom = $note['Eval_nom'] ? htmlspecialchars($note['Eval_nom'], ENT_QUOTES, 'UTF-8') : "";
             $noteId = $note['idEval'] ? $note['idEval'] : "";
             $coef = $note['Eval_coef'] ? htmlspecialchars($note['Eval_coef'], ENT_QUOTES, 'UTF-8') : "";
             $canEvaluate = $note['PeutEvaluer'] 
                 ? '<a href="index.php?module=rendus&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>' 
-                : 'Pas le droit';
+                : 'Vous n\'êtes pas évaluateur';
     
             if ($noteId !== "") {
                 $notesTable .= <<<HTML
@@ -149,7 +127,7 @@ HTML;
                     <form method="POST" action="index.php?module=rendus&action=homeMaj">
                         <input type="hidden" name="idEval" value="$noteId">
                         <td>
-                            <input class="input-group form-control" type="text" name="noteNom" value="$noteNom">
+                            <input class="input-group form-control" type="text" name="noteNom" value="$noteNom" placeholder="Nom de l'évaluation">
                         </td>
                         <td>$canEvaluate</td>
                         <td class="d-flex">
@@ -162,26 +140,42 @@ HTML;
             }
         }
     
-        // Contenu du tableau ou message si aucune note
         $notesSection = $notesTable 
             ? <<<HTML
             <tbody id="table-body-$idRendu">
+                <thead>
+                    <tr>
+                        <th>Nom de la note</th>
+                        <th>Action</th>
+                        <th>Coefficient</th>
+                    </tr>
+                </thead>
                 $notesTable
             </tbody>
             HTML
             : '<p class="text-muted mt-3">Aucune note disponible pour ce rendu.</p>';
-    
-        // Vue complète avec la possibilité de plier/déplier
+
+            $dateToCheck = date('Y-m-d H:i:s');
+
+            $dateTime = new DateTime($dateLimite);
+            $dateTimeToCheck = new DateTime($dateToCheck);
+
+            if ($dateTimeToCheck > $dateTime)
+                $color = "danger";
+            else if ($dateTimeToCheck > (clone $dateTime)->modify('-24 hours'))
+                $color = "warning";
+            else
+                $color = "success";
+
         return <<<HTML
         <div class="px-5 mx-5 my-4">
-            <!-- En-tête du rendu avec fonction de pliage et le chevron -->
             <div 
-                class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100" 
+                class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100 table-header" 
                 onclick="toggleTableBody('$idRendu')" 
                 style="cursor: pointer;"
             >                
             
-            <div class="align-items-center d-flex">
+                <div class="align-items-center d-flex">
                     <i id="chevron-$idRendu" class="fas fa-chevron-down"></i>
                     <div class="ms-2">
                         <span class="fw-bold mx-1 d-flex">$renduNom</span>
@@ -189,27 +183,16 @@ HTML;
                     </div>
                 </div>
                 <div class="text-end">
-                    <p class="text-danger mb-0">A déposer avant le : $dateLimite</p>
+                    <p class="text-$color mb-0">Le dépot se finit dans : $dateLimite</p>
                     <a href="index.php?module=sae&action=details&id=$idSAE" class="text-primary text-decoration-none">Accéder à la SAE du rendu</a>
                 </div>
-                <!-- Chevron pour indiquer l'état du tableau -->
             </div>
     
-            <!-- Tableau complet, y compris l'en-tête et les notes -->
             <div class="mt-3 table-wrapper" id="table-wrapper-$idRendu">
                 <table class="table table-bordered mt-3">
-                    <!-- En-tête du tableau -->
-                    <thead>
-                        <tr>
-                            <th>Nom de la note</th>
-                            <th>Action</th>
-                            <th>Coefficient</th>
-                        </tr>
-                    </thead>
-                    <!-- Corps du tableau avec les notes -->
+                    
                     $notesSection
                 </table>
-                <!-- Formulaire pour ajouter une note -->
                 <form method="POST" action="index.php?module=rendus&action=AjouterUneNote" class="mt-3">
                     <input type="hidden" name="idRendu" value="$idRendu">
                     <button type="submit" class="btn btn-primary btn-sm">Ajouter une note</button>
@@ -241,13 +224,11 @@ HTML;
                         <form method="POST" action="index.php?module=rendus&action=maj&eval=2">
             HTML;
             
-            // Organisation des données
             $groupedNotes = [];
             foreach ($notesDesElvesParGroupe as $note) {
                 $groupedNotes[$note['idEleve']] = $note;
             }
             
-            // Afficher les groupes et leurs élèves
             foreach ($tousLesGroupes as $groupeId => $eleves) {
                 $groupeNom = htmlspecialchars($eleves['nom'], ENT_QUOTES, 'UTF-8');
                 $groupeId = htmlspecialchars($groupeId, ENT_QUOTES, 'UTF-8');
@@ -255,9 +236,8 @@ HTML;
                 echo <<<HTML
                 <div class="group-section mt-4">
                     <div class="d-flex align-items-center table-header" onclick="toggleGroup('$groupeId')">
-                        <!-- Chevron avant le nom du groupe -->
-                        <i id="chevron-$groupeId" class="fas fa-chevron-down me-2"></i>
-                        <h4 class="fw-bold text-primary mb-0">$groupeNom</h4>
+                         <i id="chevron-$groupeId" class="fas fa-chevron-down me-2"></i> <!--chevron déroulant -->
+                        <h4 class="fw-bold text mb-0">$groupeNom</h4>
                         <div class="ml-auto">
                             <label for="note">Ajouter une note globale au groupe :</label>
                             <input type="number" class="form-control" id="global-note-$groupeId" value="" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
@@ -343,95 +323,6 @@ HTML;
             </form>
             </div>
         </div>
-        <style>
-            .table-header {
-                cursor: pointer;
-                padding: 10px;
-                background-color: #f8f9fa;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                display: flex;
-                align-items: center;
-                width: 100%;
-            }
-    
-            .table-header:hover {
-                background-color: #e9ecef;
-            }
-    
-            .table-header h4 {
-                margin: 0;
-                font-size: 1.2rem;
-            }
-    
-            .ml-auto {
-                margin-left: auto;
-            }
-    
-            .group-table {
-                display: none;
-                margin-top: 15px;
-            }
-    
-            .group-table.collapsed {
-                display: block;
-            }
-    
-            .table-secondary th {
-                background-color: #e9ecef;
-                font-weight: bold;
-            }
-    
-            .fas {
-                font-size: 18px;
-                color: #007bff;
-                transition: transform 0.3s ease;
-            }
-    
-            .fas.fa-chevron-up {
-                transform: rotate(180deg);
-            }
-    
-        </style>
-        <script>
-            // Fonction pour afficher/masquer les élèves d'un groupe et changer le chevron
-            function toggleGroup(groupeId) {
-                var groupTable = document.getElementById("table-wrapper-" + groupeId);
-                var chevron = document.getElementById("chevron-" + groupeId);
-                
-                // Vérifie si le tableau est déjà replié
-                if (groupTable.classList.contains('collapsed')) {
-                    // Déplier le tableau
-                    groupTable.classList.remove('collapsed');
-                    
-                    // Changer l'icône du chevron en haut
-                    chevron.classList.remove('fa-chevron-down');
-                    chevron.classList.add('fa-chevron-up');
-                } else {
-                    // Replier le tableau
-                    groupTable.classList.add('collapsed');
-                    
-                    // Changer l'icône du chevron en bas
-                    chevron.classList.remove('fa-chevron-up');
-                    chevron.classList.add('fa-chevron-down');
-                }
-            }
-    
-            // Fonction pour mettre à jour la note de tous les élèves du groupe
-            function updateGroupNotes(groupeId) {
-                var globalNote = document.getElementById("global-note-" + groupeId).value;
-                var elevesNotes = document.querySelectorAll("#table-wrapper-" + groupeId + " input[name^='note_']");
-                
-                elevesNotes.forEach(function(input) {
-                    input.value = globalNote;
-                });
-            }
-    
-            // Fonction pour empêcher le repliage du tableau quand on clique sur l'input
-            function preventGroupToggle(event, groupeId) {
-                event.stopPropagation(); // Empêche la propagation de l'événement "click" vers l'élément parent
-            }
-        </script>
         HTML;
         }
     }

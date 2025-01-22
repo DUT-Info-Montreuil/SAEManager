@@ -460,7 +460,7 @@ class SaeModel extends Connexion
 
     function createSoutenance($titre, $date, $salle, $duree, $idSAE)
     {
-        $reqEval = "INSERT INTO Evaluation (nom, coeff, responsableEvaluation) VALUES (:nom, :coeff, NULL)";
+        $reqEval = "INSERT INTO Evaluation (nom, coef, IntervenantEvaluateur) VALUES (:nom, :coeff, NULL)";
         $pdo_req_eval = self::$bdd->prepare($reqEval);
         $pdo_req_eval->bindValue(":nom", $titre);
         $pdo_req_eval->bindValue(":coeff", 1);
