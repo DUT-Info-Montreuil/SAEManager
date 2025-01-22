@@ -25,7 +25,7 @@ HTML;
 			</div>
 HTML;
 		if (isset($_SESSION['loginUtilisateur'])) {
-            $this->affichage .= <<<HTML
+			$this->affichage .= <<<HTML
 			<div class="flex-1 d-flex">
 				
 				<div class="my-auto mx-4">
@@ -36,9 +36,9 @@ HTML;
 				</div>
 			</div>
 HTML;
-        }
-        if (isset($_SESSION['loginUtilisateur'])) {
-            $this->affichage .= <<<HTML
+		}
+		if (isset($_SESSION['loginUtilisateur'])) {
+			$this->affichage .= <<<HTML
             <div class="flex-1 d-flex">
 				
 			    <div class="my-auto mx-4">

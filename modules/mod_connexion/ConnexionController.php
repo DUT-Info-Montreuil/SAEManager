@@ -33,7 +33,6 @@ class ConnexionController
 
             case "essaieConnexion":
                 if ($this->model->essaieConnexion()) {
-                    // Connexion réussie
                     $_SESSION['connexion_reussie'] = true;
                     if ($_SESSION['estProfUtilisateur'] != 1) {
                         header('Location: index.php?module=dashboard');
@@ -41,13 +40,39 @@ class ConnexionController
                         header('Location: index.php?module=home');
                     }
                 } else {
-                    // Échec de la connexion
                     $this->msg_erreur = "identifiant ou mot de passe incorrect !";
                     $this->view->connexionPage($this->msg_erreur);
                 }
                 break;
             case "register":
                 $this->view->inscriptionPage($this->msg_erreur);
+                break;
+            case "essaieInscription":
+                $this->essaieInscription();
+                if ($_SESSION) {
+                    header('Location: index.php?module=dashboard');
+                }
+                break;
+        }
+    }
+
+    private function essaieInscription()
+    {
+        $nom = $_POST['nom'];
+        $prenom = $_POST['prenom'];
+        $emailPart1 = $_POST['email'];
+        $password = $_POST['password'];
+
+        if (strpos($emailPart1, '@') === false) {
+            $email = $emailPart1 . '@iut.univ-paris8.fr';
+        }
+
+        $inscription = $this->model->inscription($nom, $prenom, $email, $password);
+
+        if ($inscription) {
+            $_SESSION['inscription_reussie'] = true;
+            $_SESSION['identifiant_inscription'] = strtolower($prenom) . '.' . strtolower($nom);
+            header('Location: index.php?module=connexion');
         }
     }
 }

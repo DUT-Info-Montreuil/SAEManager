@@ -12,6 +12,7 @@ class HomeView extends GenericView
     function initHomePage()
     {
 
+
         $toast = "";
         if (isset($_SESSION['connexion_reussie']) && $_SESSION['connexion_reussie'] === true) {
             $toast = <<<HTML

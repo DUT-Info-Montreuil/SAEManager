@@ -38,8 +38,23 @@ HTML;
             </div>
         </div>
 HTML;
-
             unset($_SESSION['deconnexion']);
+        }
+
+        if (isset($_SESSION['inscription_reussie']) && $_SESSION['inscription_reussie']) {
+            $identifiant = $_SESSION['identifiant_inscription'];
+            $toast .= <<<HTML
+        <div class="toast align-items-center text-bg-success border-0 position-fixed top-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Inscription réussie ! Veuillez vous connecter avec vos identifiants : $identifiant
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+HTML;
+            unset($_SESSION['inscription_reussie']);
+            unset($_SESSION['identifiant_inscription']);
         }
 
         echo <<<HTML
@@ -92,6 +107,7 @@ HTML .
 HTML;
     }
 
+
     function inscriptionPage($msg_erreur)
     {
         echo <<<HTML
@@ -125,8 +141,16 @@ HTML;
                     <div class="mb-3">
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="text" name="email" class="form-control" placeholder="Email universitaire" required id="email-part1">
-                            <span class="input-group-text" id="email-part2">@iut.univ-paris8.fr</span>
+                            <input 
+                                type="text" 
+                                name="email" 
+                                class="form-control" 
+                                placeholder="Email universitaire" 
+                                required 
+                                id="email-part1" 
+                                pattern="^[^@]+$" 
+                                oninput="removeAtSymbol(this)">
+                            <span class="input-group-text" id="email-domain">@iut.univ-paris8.fr</span>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -137,11 +161,8 @@ HTML;
                     </div>
 
 HTML .
-
             protectionCSRF::genererTokenInput() .
-
             <<<HTML
-
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
                     </div>
@@ -150,6 +171,11 @@ HTML .
                 <!-- Lien vers la connexion -->
                 <div class="text-center mt-3">
                     <p>Vous avez déjà un compte ? <a href="index.php?module=connexion" class="btn btn-link">Connectez-vous</a></p>
+                </div>
+
+                <!-- Informations supplémentaires -->
+                <div class="text-center mt-4">
+                    <p>Vous êtes enseignant ? <span class="text-muted">Contactez le support pour être inscrit en tant qu'enseignant.</span></p>
                 </div>
             </div>
         </div>

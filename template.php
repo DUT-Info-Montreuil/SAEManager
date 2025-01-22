@@ -13,6 +13,14 @@
 
 <body>
 
+    <!-- Page de chargement -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <p class="loading-text">Chargement...</p>
+        </div>
+    </div>
+
     <header><?php echo $menu->getAffichage(); ?></header>
 
     <main><?= $module ?></main>
