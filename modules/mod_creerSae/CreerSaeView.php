@@ -6,14 +6,14 @@ class CreerSaeView extends GenericView
     public function __construct()
     {
         parent::__construct();
-       
     }
 
-    public function initCreerSaePage($listePersonne) {
+    public function initCreerSaePage($listePersonne)
+    {
         echo <<<HTML
         <div class="container mt-5">
             <h1 class="fw-bold text-left">CRÉER UNE SAE</h1>
-            <div class="card shadow bg-white rounded p-4">
+            <div class="card-general shadow bg-white rounded p-4">
                 <div class="d-flex align-items-center mb-4">
                     <div class="me-3">
                         <svg width="35" height="35"><use xlink:href="#arrow-icon"></use></svg>
@@ -47,10 +47,10 @@ class CreerSaeView extends GenericView
                         <label class="form-label fw-bold">Co-responsables</label>
                         <div class="border p-2 choix-responsable" style="max-height: 150px; overflow-y: auto;">
     HTML;
-    
+
         // Générer les co-responsables
         foreach ($listePersonne as $personne) {
-            if($personne['estProf']){
+            if ($personne['estProf']) {
                 $id = htmlspecialchars($personne['idPersonne']);
                 $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
                 echo <<<HTML
@@ -61,7 +61,7 @@ class CreerSaeView extends GenericView
     HTML;
             }
         }
-    
+
         echo <<<HTML
                         </div>
                         <small class="text-muted">Cochez les co-responsables nécessaires. Laissez vide si aucun.</small>
@@ -72,10 +72,10 @@ class CreerSaeView extends GenericView
                         <label class="form-label fw-bold">Intervenants</label>
                         <div class="border p-2" style="max-height: 150px; overflow-y: auto;">
     HTML;
-    
+
         // Générer les intervenants
         foreach ($listePersonne as $personne) {
-            if($personne['estProf']){
+            if ($personne['estProf']) {
 
                 $id = htmlspecialchars($personne['idPersonne']);
                 $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
@@ -87,7 +87,7 @@ class CreerSaeView extends GenericView
     HTML;
             }
         }
-    
+
         echo <<<HTML
                         </div>
                         <small class="text-muted">Cochez les intervenants nécessaires. Laissez vide si aucun.</small>
@@ -98,10 +98,10 @@ class CreerSaeView extends GenericView
                         <label class="form-label fw-bold">Ajouter des élèves</label>
                         <div class="border p-2" style="max-height: 150px; overflow-y: auto;">
     HTML;
-    
+
         // Générer les élèves
         foreach ($listePersonne as $personne) {
-            if(!($personne['estProf'])){
+            if (!($personne['estProf'])) {
 
                 $id = htmlspecialchars($personne['idPersonne']);
                 $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
@@ -113,7 +113,7 @@ class CreerSaeView extends GenericView
     HTML;
             }
         }
-    
+
         echo <<<HTML
                         </div>
                         <small class="text-muted">Cochez les élèves nécessaires. Laissez vide si aucun.</small>
@@ -127,9 +127,4 @@ class CreerSaeView extends GenericView
         </div>
     HTML;
     }
-    
-
-
-    
-
 }

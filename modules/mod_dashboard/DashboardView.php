@@ -30,7 +30,7 @@ HTML;
         echo <<<HTML
                 <div class="container mt-5">
                     <h1 class="fw-bold">DASHBOARD</h1>
-                    <div class="card shadow bg-white rounded">
+                    <div class="card-general shadow bg-white rounded">
                         <div class="d-flex flex-column align-items-center">
                             <!-- Message de bienvenue centré -->
                             <div class="mt-3 mb-4">

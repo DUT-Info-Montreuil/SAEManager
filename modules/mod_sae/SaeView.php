@@ -15,7 +15,7 @@ class SaeView extends GenericView
         echo <<<HTML
     <div class="container mt-5">
         <h1 class="fw-bold">LISTE DES SAÉ(S)</h1>
-        <div class="card shadow bg-white rounded min-h75">
+        <div class="card-general shadow bg-white rounded min-h75">
             <div class="d-flex align-items-center p-5 mx-5">
                 <div class="me-3">
                     <svg width="35" height="35">
@@ -25,17 +25,17 @@ class SaeView extends GenericView
                 <div class="d-flex flex-column">
                     <h3 class="fw-bold">Liste des SAÉs auxquelles vous êtes inscrit(e) :</h3>
     HTML;
-                    if(empty($saes)){
-                    echo <<<HTML
+        if (empty($saes)) {
+            echo <<<HTML
                         <p class="h5" >Vous êtes inscrit à aucunes Saés.</p>
     HTML;
-                    }
+        }
         echo <<<HTML
                 </div>
             </div>
 HTML;
-        if(!empty($saes)){
-        echo <<<HTML
+        if (!empty($saes)) {
+            echo <<<HTML
             <div class="sae-list">
 HTML;
             foreach ($saes as $sae) {
@@ -43,7 +43,7 @@ HTML;
             }
         }
 
-            echo <<<HTML
+        echo <<<HTML
             </div>
         </div>
     </div>
@@ -71,7 +71,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants,$profs,$sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
+    function initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -81,7 +81,7 @@ HTML;
         echo <<<HTML
     <div class="container mt-5">
         <h1 class="fw-bold">$nom</h1>
-        <div class="card shadow bg-white rounded p-4">
+        <div class="card-general shadow bg-white rounded p-4">
             <!-- Sujet -->
             <div class="mb-5">
                 <h3 class="fw-bold d-flex align-items-center">
@@ -104,7 +104,7 @@ HTML;
         echo '<p class="text-muted">Posté le ' . $dateModif . '</p>';
         echo '<p>' . $sujet . '</p>';
         echo $this->popUpDepot("Rendu", $idSAE);
-        echo $this->popUpDepot("Support", $idSAE); 
+        echo $this->popUpDepot("Support", $idSAE);
         echo $this->popUpSupressionDepot("Rendu", $idSAE);
         echo $this->popUpSupressionDepot("Support", $idSAE);
         echo $this->popUpCreateRendu($idSAE);
@@ -157,7 +157,7 @@ HTML;
             }
         }
 
-        if ($_SESSION['estProfUtilisateur']){
+        if ($_SESSION['estProfUtilisateur']) {
             // Groupes
             echo <<<HTML
                 <!-- Groupe(s) -->
@@ -171,7 +171,7 @@ HTML;
                     <div class="d-flex flex-column">
     HTML;
             if (!empty($groupes)) {
-                foreach($groupes as $groupe){
+                foreach ($groupes as $groupe) {
                     echo $this->lineGroupes($groupe, $_SESSION['idUtilisateur'], $idSAE);
                 }
             } else {
@@ -181,11 +181,11 @@ HTML;
                     </div>
                 </div>
     HTML;
-            }
+        }
 
-        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
-        // Champs
-        echo <<<HTML
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']) {
+            // Champs
+            echo <<<HTML
         <!-- Champ(s) -->
         <div class="mb-5">
             <h3 class="fw-bold d-flex align-items-center">
@@ -196,31 +196,31 @@ HTML;
             </h3>
             <div class="d-flex flex-column">
 HTML;
-        if (!empty($champs)) {
-            foreach ($champs as $c) {
-                $nomChamps = htmlspecialchars($c['nomchamp']);
-                echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId), $idSAE);
+            if (!empty($champs)) {
+                foreach ($champs as $c) {
+                    $nomChamps = htmlspecialchars($c['nomchamp']);
+                    echo $this->lineChamp($nomChamps, $c['idChamps'], !in_array($c['idChamps'], $repId), $idSAE);
+                }
+            } else {
+                echo $this->lineChamp("default", "", "", "");
             }
-        } else {
-            echo $this->lineChamp("default","", "", "");
-        }
 
-        if ($_SESSION['estProfUtilisateur']) {
+            if ($_SESSION['estProfUtilisateur']) {
 
-            echo <<<HTML
+                echo <<<HTML
             <div class=" p-3">
                 <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-champ">Ajouter un champ</button>
             </div>
 HTML;
-        }
-        echo <<<HTML
+            }
+            echo <<<HTML
             </div>
         </div>
 HTML;
         }
-        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
-        // Ressources
-        echo <<<HTML
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']) {
+            // Ressources
+            echo <<<HTML
             <!-- Ressource(s) -->
             <div class="mb-5">
                 <h3 class="fw-bold d-flex align-items-center">
@@ -231,36 +231,36 @@ HTML;
                 </h3>
                 <div class="d-flex flex-column">
 HTML;
-        if (!empty($ressource)) {
-            foreach ($ressource as $r) {
-                $nomRessource = htmlspecialchars($r['nom']);
-                $idSAE = htmlspecialchars($sae[0]['idSAE']);
-                $idRessource = htmlspecialchars($r['idRessource']);
-                $contenue = htmlspecialchars($r['contenu']);
-                echo $this->lineRessource($nomRessource, $idSAE, $idRessource, $contenue);
+            if (!empty($ressource)) {
+                foreach ($ressource as $r) {
+                    $nomRessource = htmlspecialchars($r['nom']);
+                    $idSAE = htmlspecialchars($sae[0]['idSAE']);
+                    $idRessource = htmlspecialchars($r['idRessource']);
+                    $contenue = htmlspecialchars($r['contenu']);
+                    echo $this->lineRessource($nomRessource, $idSAE, $idRessource, $contenue);
+                }
+            } else {
+                echo $this->lineRessource("default", $sae[0]['idSAE'], "", "");
             }
-        } else {
-            echo $this->lineRessource("default", $sae[0]['idSAE'], "", "");
-        }
 
-        if ($_SESSION['estProfUtilisateur']) {
+            if ($_SESSION['estProfUtilisateur']) {
 
-            echo <<<HTML
+                echo <<<HTML
             <div class="d-flex gap-3 p-3">
                 <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="btn-add-ressource">Ajouter une ressource</button>
                 <button class="btn btn-secondary rounded-pill shadow-sm px-4" id="create-ressource">Créer une ressource</button>
             </div>
 HTML;
-        }
-        echo <<<HTML
+            }
+            echo <<<HTML
                 </div>
             </div>
 HTML;
         }
 
-        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
-        // Rendus
-        echo <<<HTML
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']) {
+            // Rendus
+            echo <<<HTML
             <!-- Rendu(s) -->
             <div class="mb-5">
                 <h3 class="fw-bold d-flex align-items-center">
@@ -271,41 +271,41 @@ HTML;
                 </h3>
                 <div class="d-flex flex-column">
 HTML;
-        if (!empty($rendus)) {
-            foreach ($rendus as $r) {
-                $nomRendu = htmlspecialchars($r['nom']);
-                $dateLimite = htmlspecialchars($r['dateLimite']);
-                $idRendu = htmlspecialchars($r['idRendu']);
-                $aDeposerRendu = false;
-                $listeRenduDeposer = array_keys($rendusDeposer);
-                foreach ($listeRenduDeposer as $renduDeposer)
-                    if ($renduDeposer == $idRendu) {
-                        $aDeposerRendu = true;
-                        $dateLimite = $rendusDeposer[$idRendu];
-                    }
+            if (!empty($rendus)) {
+                foreach ($rendus as $r) {
+                    $nomRendu = htmlspecialchars($r['nom']);
+                    $dateLimite = htmlspecialchars($r['dateLimite']);
+                    $idRendu = htmlspecialchars($r['idRendu']);
+                    $aDeposerRendu = false;
+                    $listeRenduDeposer = array_keys($rendusDeposer);
+                    foreach ($listeRenduDeposer as $renduDeposer)
+                        if ($renduDeposer == $idRendu) {
+                            $aDeposerRendu = true;
+                            $dateLimite = $rendusDeposer[$idRendu];
+                        }
 
-                echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
+                    echo $this->lineRendus($nomRendu, $dateLimite, $idRendu, $aDeposerRendu);
+                }
+            } else {
+                echo $this->lineRendus("default", "default", 0, false);
             }
-        } else {
-            echo $this->lineRendus("default", "default", 0, false);
-        }
 
-        if ($_SESSION['estProfUtilisateur']) {
+            if ($_SESSION['estProfUtilisateur']) {
 
-            echo <<<HTML
+                echo <<<HTML
             <div class="p-3">
                 <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-rendu">Créer un rendu</button>
             </div>
 HTML;
-        }
-        echo <<<HTML
+            }
+            echo <<<HTML
                 </div>
             </div>
 HTML;
         }
-        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']){
-        // Soutenances
-        echo <<<HTML
+        if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']) {
+            // Soutenances
+            echo <<<HTML
             <!-- Soutenance(s) -->
             <div>
                 <h3 class="fw-bold d-flex align-items-center">
@@ -316,31 +316,31 @@ HTML;
                 </h3>
                 <div class="d-flex flex-column">
 HTML;
-        if (!empty($soutenance)) {
-            foreach ($soutenance as $s) {
-                $id = htmlspecialchars($s['idSoutenance'] ?? "default");
-                $titre = htmlspecialchars($s['titre'] ?? "default");
-                $dateSoutenance = htmlspecialchars($s['date'] ?? "default");
-                $salle = htmlspecialchars($s['salle'] ?? "default");
-                $idSoutenance = htmlspecialchars($s['idSoutenance'] ?? "default");
-                $supportDeposer = $supportsDeposer[$id] ?? false;
-                echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance, $supportDeposer);
+            if (!empty($soutenance)) {
+                foreach ($soutenance as $s) {
+                    $id = htmlspecialchars($s['idSoutenance'] ?? "default");
+                    $titre = htmlspecialchars($s['titre'] ?? "default");
+                    $dateSoutenance = htmlspecialchars($s['date'] ?? "default");
+                    $salle = htmlspecialchars($s['salle'] ?? "default");
+                    $idSoutenance = htmlspecialchars($s['idSoutenance'] ?? "default");
+                    $supportDeposer = $supportsDeposer[$id] ?? false;
+                    echo $this->lineSoutenance($titre, $dateSoutenance, $salle, $idSoutenance, $supportDeposer);
+                }
+            } else {
+                echo $this->lineSoutenance("default", "default", "default", "default", "default");
             }
-        } else {
-            echo $this->lineSoutenance("default", "default", "default", "default", "default");
-        }
 
-        if ($_SESSION['estProfUtilisateur']) {
+            if ($_SESSION['estProfUtilisateur']) {
 
-            echo <<<HTML
+                echo <<<HTML
             <div class="p-3">
                 <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-soutenance">Créer une soutenance</button>
             </div>
 HTML;
-        }
+            }
 
 
-        echo <<<HTML
+            echo <<<HTML
                 </div>
             </div>
         </div>
@@ -392,8 +392,8 @@ HTML;
             $nom = htmlspecialchars($etudiant['nom']);
             $prenom = htmlspecialchars($etudiant['prenom']);
             $inputs .= '<div class="form-check">
-                            <input class="form-check-input" name="student[]" type="checkbox" value="'.$id.'" id="'.$id.'">
-                            <label class="form-check-label" for="'.$id.'">'.$prenom . ' ' . $nom.'</label>
+                            <input class="form-check-input" name="student[]" type="checkbox" value="' . $id . '" id="' . $id . '">
+                            <label class="form-check-label" for="' . $id . '">' . $prenom . ' ' . $nom . '</label>
                         </div>';
         }
 
@@ -500,11 +500,12 @@ HTML;
     HTML;
     }
 
-    function lineGroupes($groupe, $etudiants, $idSAE) {
+    function lineGroupes($groupe, $etudiants, $idSAE)
+    {
         if ($groupe == "default") {
             return <<<HTML
             <div class="align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
-                    {$this->initCreerGroupe($etudiants, $idSAE)}
+                    {$this->initCreerGroupe($etudiants,$idSAE)}
                 </div>
         HTML;
         }
@@ -512,7 +513,7 @@ HTML;
         $etudiants = '';
         $idGroupe = $groupe['idGroupe'];
 
-        foreach($groupe['etudiants'] as $etudiant) {
+        foreach ($groupe['etudiants'] as $etudiant) {
             $etudiants .= '<span class="badge bg-primary me-1">' . $etudiant['nom'] . ' ' . $etudiant['prenom'] . '</span>';
         }
 
@@ -523,12 +524,12 @@ HTML;
                     <form method="POST" action="index.php?module=sae&action=gererGroupe&id=$idSAE&idproposition=$idGroupe" style="margin: 0;">
                         $etudiants
 HTML;
-                        for($i = 0 ; $i < count($groupe['etudiants']) ; $i++) {
-                            $idEtudiant = $groupe['etudiants'][$i]['idEleve'];
-                            echo <<<HTML
+        for ($i = 0; $i < count($groupe['etudiants']); $i++) {
+            $idEtudiant = $groupe['etudiants'][$i]['idEleve'];
+            echo <<<HTML
                                 <input type="hidden" id="etudiant$i" name="etudiant$i" value="$idEtudiant">
 HTML;
-                        }
+        }
         echo <<<HTML
                         <button type="submit" name="Accepter" class="btn btn-success btn-sm">Accepter</button>
                         <button type="submit" name="Refuser" class="btn btn-danger btn-sm">Refuser</button>
@@ -624,7 +625,7 @@ HTML;
                     </button>
                 </form>
 HTML;
-}        else
+        } else
             $depotousupression = '<span class="text-primary text-decoration-none cursor-pointer fw-bold rendusoutenance-' . $idSoutenance . '">Déposer un support</span>';
 
 
@@ -654,7 +655,7 @@ HTML;
                     <div class="d-flex flex-column">
                     $depotousupression
 HTML .
-(  !empty($voirSupport) ? $voirSupport : '') . 
+            (!empty($voirSupport) ? $voirSupport : '') .
             <<<HTML
                         
                     </div>
@@ -664,7 +665,7 @@ HTML .
         HTML;
     }
 
-    
+
 
 
     /* Groupes */
@@ -679,7 +680,7 @@ HTML .
         echo <<<HTML
     <div class="container mt-5">
         <h1 class="fw-bold">$nomSAE</h1>
-        <div class="card shadow bg-white rounded p-4 min-h75">
+        <div class="card-general shadow bg-white rounded p-4 min-h75">
             <!-- MEMBRE DU GROUPE -->
             <div class="mb-5">
                 <h3 class="d-flex align-items-center">
@@ -763,7 +764,7 @@ HTML;
         echo <<<HTML
         <div class="container mt-5">
             <h1 class="fw-bold">$nom</h1>
-            <div class="card shadow bg-white rounded p-4 min-h75">
+            <div class="card-general shadow bg-white rounded p-4 min-h75">
                 <!-- Notes des rendus -->
                 <div class="mb-5">
                     <h3 class="d-flex align-items-center">
@@ -785,7 +786,7 @@ HTML;
                 $noteValue = $noteAttribuee ? htmlspecialchars($note['note']) : "~";
                 $coeff = htmlspecialchars($note['coef']) ?? "";
 
-                if($noteAttribuee){
+                if ($noteAttribuee) {
                     $totalRendus += $noteValue * $coeff;
                     $totalCoeffRendus += $coeff;
                 }
@@ -821,7 +822,7 @@ HTML;
                 $noteValue = $noteAttribuee ? htmlspecialchars($note['note']) : "~";
                 $coeff = htmlspecialchars($note['coeff']);
 
-                if($noteAttribuee){
+                if ($noteAttribuee) {
                     $totalSoutenance += $noteValue * $coeff;
                     $totalCoeffSoutenance += $coeff;
                 }
@@ -853,7 +854,7 @@ HTML;
         echo <<<HTML
         <div class="container mt-5">
             <h1 class="fw-bold">$nom</h1>
-            <div class="card shadow bg-white rounded p-4 min-h75">
+            <div class="card-general shadow bg-white rounded p-4 min-h75">
                 <div class="mb-5">
                     <h3 class="d-flex align-items-center">
                         <svg class="me-2" width="25" height="25">
@@ -875,7 +876,6 @@ HTML;
         } else {
             echo "Vous n'êtes jury d'aucunes soutenances de cette SAE";
         }
-
     }
     function initLineSoutenance($titre, $idsoutenance, $idSae)
     {
@@ -894,11 +894,12 @@ HTML;
         HTML;
     }
 
-    function initPageSoutenance($titre, $idsoutenance, $idSae, $listeGroupe, $temps){
+    function initPageSoutenance($titre, $idsoutenance, $idSae, $listeGroupe, $temps)
+    {
         echo <<<HTML
                 <div class="container mt-5">
                 <h1 class="fw-bold">$titre</h1>
-                <div class="card shadow bg-white rounded p-4 min-h75">
+                <div class="card-general shadow bg-white rounded p-4 min-h75">
                     <div class="mb-5">
                         <div class="alert alert-info mt-3">
                             <p>
@@ -920,24 +921,23 @@ HTML;
                                     <div id="blocks" class="blocks overflow-auto border p-2 bg-light" style="max-height: 600px;">
                                         
         HTML;
-                                        foreach($listeGroupe as $groupe){
-                                            $nomGroupe = $groupe['nom'];
-                                            $idGroupe = $groupe['idgroupe'];
-                                            $passage = $groupe['passage'];
-                                            if($passage==null){
-                                                echo <<<HTML
+        foreach ($listeGroupe as $groupe) {
+            $nomGroupe = $groupe['nom'];
+            $idGroupe = $groupe['idgroupe'];
+            $passage = $groupe['passage'];
+            if ($passage == null) {
+                echo <<<HTML
                                                     <div class="p-3 mb-2 bg-light border rounded block" draggable="true" data-id=$idGroupe>
                                                         <input type="hidden" id="idgroupesoutenance" name="idgroupesoutenance" class="form-control block-input">$nomGroupe</input>
                                                     </div>
         HTML;
-                                            }
-                                            else{
-                                                echo <<<HTML
+            } else {
+                echo <<<HTML
                                                     <div type="hidden" class="groupeAvecPassage:$idGroupe:$nomGroupe:$passage"></div>
         HTML;
-                                            }
-                                        }
-                                        echo <<<HTML
+            }
+        }
+        echo <<<HTML
                                     </div>
 
                                     <!-- Nouvelle zone pour les groupes avec horaire -->
@@ -945,20 +945,20 @@ HTML;
                                     <div class="overflow-auto border p-2 bg-light" style="max-height: 400px;">
                                         <!-- Affichage des groupes avec passage -->
         HTML;
-                                    foreach ($listeGroupe as $groupe) {
-                                        $nomGroupe = $groupe['nom'];
-                                        $idGroupe = $groupe['idgroupe'];
-                                        $passage = $groupe['passage'];
-                                        if ($passage != null) {
-                                            echo <<<HTML
+        foreach ($listeGroupe as $groupe) {
+            $nomGroupe = $groupe['nom'];
+            $idGroupe = $groupe['idgroupe'];
+            $passage = $groupe['passage'];
+            if ($passage != null) {
+                echo <<<HTML
                                                 <div class="p-3 mb-2 bg-light border rounded" >
                                                     <span><strong>$nomGroupe</strong></span><br>
                                                     <span>Passage : $passage</span>
                                                 </div>
         HTML;
-                                        }
-                                    }
-                                    echo <<<HTML
+            }
+        }
+        echo <<<HTML
                                     </div>
                                 </div>
             
@@ -1046,8 +1046,9 @@ HTML;
     }
 
     // Pop up pour les support / rendus
-   
-    function popUpDepot($typeDepot, $idSae){
+
+    function popUpDepot($typeDepot, $idSae)
+    {
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalDepot$typeDepot">
             <div class="modal-dialog">
@@ -1082,7 +1083,8 @@ HTML;
 HTML;
     }
 
-    function popUpSupressionDepot($typeDepot, $idSae){
+    function popUpSupressionDepot($typeDepot, $idSae)
+    {
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalSupressionDepot$typeDepot">
             <div class="modal-dialog">
@@ -1448,7 +1450,8 @@ HTML;
 HTML;
     }
 
-    function initCreerGroupe($etudiants, $idSae) {
+    function initCreerGroupe($etudiants, $idSae)
+    {
         $options = '';
         foreach ($etudiants as $etudiant) {
             $options .= '<option value="' . htmlspecialchars($etudiant['idEleve']) . '">' . htmlspecialchars($etudiant['prenom']) . htmlspecialchars($etudiant['nom']) . '</option>';
@@ -1487,7 +1490,7 @@ HTML;
         echo <<<HTML
     <div class="container mt-5">
         <h1 class="fw-bold">LISTE DES RESSOURCES</h1>
-        <div class="card shadow bg-white rounded min-h75 p-3">
+        <div class="card-general shadow bg-white rounded min-h75 p-3">
             <div class="d-flex align-items-center p-4 mx-5">
                 <div class="me-3">
                     <svg width="35" height="35">

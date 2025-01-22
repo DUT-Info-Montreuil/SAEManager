@@ -14,7 +14,7 @@ class RendusView extends GenericView
             echo <<<HTML
             <div class="container mt-5">
                 <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
-                <div class="card shadow bg-white rounded min-h75">
+                <div class="card-general shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
                         <div class="me-3">
                             <svg width="35" height="35">
@@ -25,25 +25,25 @@ class RendusView extends GenericView
                     </div>
                     <div class="rendu-list">
 HTML;
-            if(empty($rendus)){
+            if (empty($rendus)) {
                 echo <<<HTML
                     <h5 class="p-5">Vous êtes associés à aucun rendus.</h5>
 
             HTML;
-                }
+            }
             foreach ($rendus as $rendu) {
                 $renduNom = $rendu['Rendu_nom'];
                 $saeNom = $rendu['SAE_nom'];
                 $dateLimite = $rendu['dateLimite'];
                 $idSAE = $rendu['idSAE'];
                 $idRendu = $rendu['idRendu'];
-                
+
                 // Filtrer les notes liées au rendu actuel
                 $notesForRendu = array_filter($notes, function ($note) use ($rendu) {
                     return $note['idRendu'] === $rendu['idRendu'];
                 });
                 // var_dump($notes);lineRendusProf
-                echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu,$idRendu);
+                echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu, $idRendu);
             }
 
             echo <<<HTML
@@ -67,14 +67,14 @@ HTML;
                     <div class="rendu-list">
 HTML;
 
-        foreach ($rendus as $rendu) {
-            $renduNom = htmlspecialchars($rendu['Rendu_nom']);
-            $saeNom = htmlspecialchars($rendu['SAE_nom']);
-            $dateLimite = htmlspecialchars($rendu['dateLimite']);
-            $idSAE = htmlspecialchars($rendu['idSAE']);
-            echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
-        }
-        <<<HTML
+            foreach ($rendus as $rendu) {
+                $renduNom = htmlspecialchars($rendu['Rendu_nom']);
+                $saeNom = htmlspecialchars($rendu['SAE_nom']);
+                $dateLimite = htmlspecialchars($rendu['dateLimite']);
+                $idSAE = htmlspecialchars($rendu['idSAE']);
+                echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
+            }
+            <<<HTML
         </div>
             </div>
                 
@@ -101,25 +101,26 @@ HTML;
 HTML;
     }
 
-    function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes, $idRendu) {
+    function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes, $idRendu)
+    {
         $notesTable = '';
         $uniqueNotes = [];
-    
+
         foreach ($notes as $note) {
             $uniqueKey = $note['idEval'] . '_' . $note['idRendu'];
             if (!isset($uniqueNotes[$uniqueKey])) {
                 $uniqueNotes[$uniqueKey] = $note;
             }
         }
-    
+
         foreach ($uniqueNotes as $note) {
             $noteNom = $note['Eval_nom'] ? htmlspecialchars($note['Eval_nom'], ENT_QUOTES, 'UTF-8') : "";
             $noteId = $note['idEval'] ? $note['idEval'] : "";
             $coef = $note['Eval_coef'] ? htmlspecialchars($note['Eval_coef'], ENT_QUOTES, 'UTF-8') : "";
-            $canEvaluate = $note['PeutEvaluer'] 
-                ? '<a href="index.php?module=rendus&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>' 
+            $canEvaluate = $note['PeutEvaluer']
+                ? '<a href="index.php?module=rendus&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>'
                 : 'Vous n\'êtes pas évaluateur';
-    
+
             if ($noteId !== "") {
                 $notesTable .= <<<HTML
                 <tr>
@@ -138,8 +139,8 @@ HTML;
                 HTML;
             }
         }
-    
-        $notesSection = $notesTable 
+
+        $notesSection = $notesTable
             ? <<<HTML
             <tbody id="table-body-$idRendu">
                 <thead>
@@ -154,17 +155,17 @@ HTML;
             HTML
             : '<p class="text-muted mt-3">Aucune note disponible pour ce rendu.</p>';
 
-            $dateToCheck = date('Y-m-d H:i:s');
+        $dateToCheck = date('Y-m-d H:i:s');
 
-            $dateTime = new DateTime($dateLimite);
-            $dateTimeToCheck = new DateTime($dateToCheck);
+        $dateTime = new DateTime($dateLimite);
+        $dateTimeToCheck = new DateTime($dateToCheck);
 
-            if ($dateTimeToCheck > $dateTime)
-                $color = "danger";
-            else if ($dateTimeToCheck > (clone $dateTime)->modify('-24 hours'))
-                $color = "warning";
-            else
-                $color = "success";
+        if ($dateTimeToCheck > $dateTime)
+            $color = "danger";
+        else if ($dateTimeToCheck > (clone $dateTime)->modify('-24 hours'))
+            $color = "warning";
+        else
+            $color = "success";
 
         return <<<HTML
         <div class="px-5 mx-5 my-4">
@@ -201,16 +202,17 @@ HTML;
         </div>
     HTML;
     }
-    
-    
-    
-    
-    public function initEvaluerPage($rendus, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe) {
+
+
+
+
+    public function initEvaluerPage($rendus, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe)
+    {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
             <div class="container mt-5">
                 <h1 class="fw-bold">ATTRIBUTION DES NOTES</h1>
-                <div class="card shadow bg-white rounded min-h75">
+                <div class="card-general shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
                         <div class="me-3">
                             <svg width="35" height="35">
@@ -222,16 +224,16 @@ HTML;
                     <div class="rendu-list">
                         <form method="POST" action="index.php?module=rendus&action=maj&eval=2">
             HTML;
-            
+
             $groupedNotes = [];
             foreach ($notesDesElvesParGroupe as $note) {
                 $groupedNotes[$note['idEleve']] = $note;
             }
-            
+
             foreach ($tousLesGroupes as $groupeId => $eleves) {
                 $groupeNom = htmlspecialchars($eleves['nom'], ENT_QUOTES, 'UTF-8');
                 $groupeId = htmlspecialchars($groupeId, ENT_QUOTES, 'UTF-8');
-                
+
                 echo <<<HTML
                 <div class="group-section mt-4">
                     <div class="d-flex align-items-center table-header" onclick="toggleGroup('$groupeId')">
@@ -255,13 +257,13 @@ HTML;
                             </thead>
                             <tbody>
                 HTML;
-    
+
                 foreach ($eleves['etudiants'] as $eleve) {
                     $eleveNom = htmlspecialchars($eleve['Eleve_nom'], ENT_QUOTES, 'UTF-8');
                     $elevePrenom = htmlspecialchars($eleve['Eleve_prenom'], ENT_QUOTES, 'UTF-8');
                     $idEleve = $eleve['idPersonne'];
                     $noteValeur = isset($groupedNotes[$idEleve]) ? $groupedNotes[$idEleve]['Note_valeur'] : '';
-    
+
                     echo <<<HTML
                                 <input type="hidden" name="idEval" class="form-control" value="{$infoTitre['idEval']}">
                                 <tr>
@@ -271,7 +273,7 @@ HTML;
                                 </tr>
                     HTML;
                 }
-    
+
                 echo <<<HTML
                             </tbody>
                         </table>
@@ -279,7 +281,7 @@ HTML;
                 </div>
                 HTML;
             }
-    
+
             if ($tousLesElevesSansGroupe) { // Élèves sans groupes
                 echo '<h3 class="fw-bold mt-5">Élèves sans groupe</h3>';
                 echo <<<HTML
@@ -293,13 +295,13 @@ HTML;
                     </thead>
                     <tbody>
                 HTML;
-    
+
                 foreach ($tousLesElevesSansGroupe as $eleve) {
                     $eleveNom = htmlspecialchars($eleve['nom'], ENT_QUOTES, 'UTF-8');
                     $elevePrenom = htmlspecialchars($eleve['prenom'], ENT_QUOTES, 'UTF-8');
                     $idEleve = $eleve['idPersonne'];
                     $noteValeur = isset($groupedNotes[$idEleve]) ? htmlspecialchars($groupedNotes[$idEleve]['Note_valeur'], ENT_QUOTES, 'UTF-8') : '';
-    
+
                     echo <<<HTML
                         <tr>
                             <td>$eleveNom</td>
@@ -308,13 +310,13 @@ HTML;
                         </tr>
                     HTML;
                 }
-    
+
                 echo <<<HTML
                 </tbody>
             </table>
             HTML;
             }
-    
+
             echo <<<HTML
                 <div class="w_100 d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary btn-success m-3">Valider</button>
@@ -325,13 +327,4 @@ HTML;
         HTML;
         }
     }
-    
-    
-    
-    
-    
-    
-
-    
-    
 }
