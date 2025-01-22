@@ -44,6 +44,12 @@
     background: var(--create-sae-color);
 }
 
+@media (min-width: 768px) {
+    .card-connexion {
+        height: 75%!important;
+    }
+}
+
 .card-sae:hover,
 .card-sae-content:hover,
 .card-rendus:hover,
@@ -177,6 +183,16 @@
 .card-connexion {
     max-width: 900px;
     height: 600px;
+}
+
+.card-connexion {
+    height: auto;
+}
+
+@media (min-width: 768px) {
+    .card-connexion {
+        height: 75%!important;
+    }
 }
 
   

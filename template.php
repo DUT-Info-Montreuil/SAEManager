@@ -7,11 +7,9 @@
     <title>SAE Manager</title>
     <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/sae-manager.css">
-
-
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
     <!-- Page de chargement -->
     <div id="loading-screen" class="loading-screen">
@@ -21,9 +19,20 @@
         </div>
     </div>
 
-    <header><?php echo $menu->getAffichage(); ?></header>
+    <!-- Header -->
+    <header>
+        <?php echo $menu->getAffichage(); ?>
+    </header>
 
-    <main><?= $module ?></main>
+    <!-- Contenu principal -->
+    <main class="flex-fill">
+        <?= $module ?>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <?php echo $footer->getAffichage(); ?>
+    </footer>
 
     <script src="js/navbar/navbar.js"></script>
 
