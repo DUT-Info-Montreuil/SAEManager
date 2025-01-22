@@ -439,15 +439,17 @@ class SaeModel extends Connexion
 
     function getNote($idSAE,  $groupeID)
     {
-
+        if($groupeID == null){
+            return null;
+        }
         foreach ($groupeID as $id) {
             $idGroupe = $id['idGroupe'];
         }
-        $req = "SELECT r.nom, note, coeff
+        $req = "SELECT r.nom, note, coef
                 FROM Note
-                INNER JOIN Evaluation ON Evaluation.idEvaluation = Note.idEval
+                INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
                 INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
-                INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEvaluation
+                INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
                 WHERE EtudiantGroupe.idGroupe = :groupeID AND r.idSAE = :idSAE";
 
         $pdo_req = self::$bdd->prepare($req);
@@ -459,16 +461,18 @@ class SaeModel extends Connexion
 
     function getNoteSoutenance($idSAE, $groupeID)
     {
-
+        if($groupeID == null){
+            return null;
+        }
         foreach ($groupeID as $id) {
             $idGroupe = $id['idGroupe'];
         }
 
-        $req = "SELECT s.titre, note, coeff
+        $req = "SELECT s.titre, note, coef
                 FROM Note
-                INNER JOIN Evaluation ON Evaluation.idEvaluation = Note.idEval
+                INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
                 INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
-                INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEvaluation
+                INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEval
                 WHERE EtudiantGroupe.idGroupe = :groupeID AND s.idSAE = :idSAE";
 
         $pdo_req = self::$bdd->prepare($req);
@@ -654,7 +658,7 @@ class SaeModel extends Connexion
 
     function createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants)
     {
-        $reqEval = "INSERT INTO Evaluation (nom, coeff, responsableEvaluation) VALUES (:nom, :coeff, NULL)";
+        $reqEval = "INSERT INTO Evaluation (nom, coef, IntervenantEvaluateur) VALUES (:nom, :coeff, NULL)";
         $pdo_req_eval = self::$bdd->prepare($reqEval);
         $pdo_req_eval->bindValue(":nom", $titre);
         $pdo_req_eval->bindValue(":coeff", 1);
