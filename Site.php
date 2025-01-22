@@ -50,6 +50,11 @@ class Site
 						require_once 'modules/mod_rendus/RendusModule.php';
 					}
 					break;
+				case "soutenance":
+					if(isset($_SESSION['loginUtilisateur'])){
+						require_once 'modules/mod_soutenance/SoutenanceModule.php';
+					}
+					break;
 				case "creerSae":
 					if(isset($_SESSION['loginUtilisateur'])){
 						require_once 'modules/mod_creerSae/CreerSaeModule.php';
