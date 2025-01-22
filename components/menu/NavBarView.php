@@ -76,6 +76,8 @@ HTML;
 		$module = $_GET['module'] ?? '';
 		$action = $_GET['action'] ?? '';
 
+        $estProfUtilisateur = isset($_SESSION['loginUtilisateur']) && $_SESSION['estProfUtilisateur'] == 1;
+
 		if ($module == 'sae' && $action != 'home') {
 			$saeID = $_GET['id'] ?? "";
 			$this->affichage .= <<<HTML
@@ -84,7 +86,12 @@ HTML;
 				<li>Général</li>
 				<li><a href="index.php?module=home">Sujet</a></li>
 				<li><a href="index.php?module=sae&action=ressources">Ressources</a></li>
-				<li><a href="index.php?module=home">Rendus</a></li>
+HTML;
+            if($estProfUtilisateur)
+                $this->affichage .= <<<HTML
+				<li><a href="index.php?module=sae&action=listeRendusGroupe&id=$saeID">Rendus</a></li>
+HTML;
+                $this->affichage .= <<<HTML
 				<li><a href="index.php?module=sae&action=soutenance&id=$saeID">Soutenance</a></li>
 				<li><a href="index.php?module=sae&action=groupe&id=$saeID">Groupe</a></li>
 				<li><a href="index.php?module=home">Cloud</a></li>

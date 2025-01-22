@@ -1146,7 +1146,7 @@ class SaeModel extends Connexion
         $pdo_reqRessource->execute();
     }
 
-    private function creeNotification($idUtilisateur, $message, $idSAE, $redirect)
+    public static function creeNotification($idUtilisateur, $message, $idSAE, $redirect)
     {
         $req = "INSERT INTO Notifications VALUES (DEFAULT, :idPersonne, :message, :idSaeProvenance, :lienForm, :date)";
         $pdo_req = self::$bdd->prepare($req);
@@ -1172,5 +1172,21 @@ class SaeModel extends Connexion
         foreach($idEtudiants as $id) {
             $this->inscrireEtudiantSAE($idSAE, $id);
         }
+    }
+
+    public function getRenduGroupeBySae($idSAE)
+    {
+        $req = "SELECT Rendu.idRendu, Rendu.nom as nomRendu, RenduGroupe.idGroupe, RenduGroupe.dateDepot, RenduGroupe.fichier, Groupe.nom
+        FROM Rendu
+        INNER JOIN RenduGroupe ON RenduGroupe.idRendu = Rendu.idRendu
+        INNER JOIN Groupe ON Groupe.idgroupe = RenduGroupe.idGroupe
+        AND Rendu.idSAE = :idSAE
+        ORDER BY Rendu.idRendu ASC";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+
+        return $pdo_req->fetchAll();
     }
 }

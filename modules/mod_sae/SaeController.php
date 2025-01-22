@@ -126,6 +126,9 @@ class SaeController
             case "ajoutEtudiantSAE":
                 $this->ajoutEtudiantSAE();
                 break;
+            case "listeRendusGroupe":
+                $this->initPageListeRenduGroupe();
+                break;
         }
     }
 
@@ -229,10 +232,9 @@ class SaeController
 
     private function initNote()
     {
-
         $groupeID = $this->model->getMyGroupId($_GET['id']);
 
-        $notes = $this->model->getNoteRenduBySae($_GET['id']);
+        $notes = $this->model->getNote($_GET['id'], $groupeID);
         $sae = $this->model->getSaeById($_GET['id']);
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 
@@ -585,5 +587,13 @@ class SaeController
         $this->model->inscrireEtudiantsSAE($idSAE, $idEtudiants);
 
         header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function initPageListeRenduGroupe()
+    {
+        $idSAE = $_GET['id'];
+        $listeRenduSae = $this->model->getRenduGroupeBySae($idSAE);
+        $sae = $this->model->getSAEById($idSAE);
+        $this->view->initPageListeRenduGroupe($sae, $listeRenduSae);
     }
 }

@@ -219,7 +219,7 @@ HTML;
                         </div>
                         <h3 class="fw-bold">SAE : {$infoTitre['SAE_nom']} <br> Rendu : {$infoTitre['Rendu_nom']} <br> Évaluation : {$infoTitre['Eval_nom']}</h3>
                     </div>
-                    <div class="rendu-list">
+                    <div class="rendu-list p-3">
                         <form method="POST" action="index.php?module=rendus&action=maj&eval=2">
             HTML;
             
@@ -242,7 +242,6 @@ HTML;
                             <input type="number" class="form-control" id="global-note-$groupeId" value="" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
                         </div>
                     </div>
-    
                     <!-- Tableau des élèves -->
                     <div class="group-table mt-3 collapsed" id="table-wrapper-$groupeId">
                         <table class="table table-bordered mt-3">

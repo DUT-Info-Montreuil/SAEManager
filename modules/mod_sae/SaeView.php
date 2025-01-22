@@ -847,6 +847,63 @@ HTML;
         HTML;
     }
 
+    function initPageListeRenduGroupe($sae, $listeRendus){
+        $nom = htmlspecialchars($sae[0]['nomSae']);
+        echo <<<HTML
+        <div class="container mt-5">
+            <h1 class="fw-bold">$nom</h1>
+            <div class="card shadow bg-white rounded p-4 min-h75">
+                <div class="mb-5">
+                    <h3 class="d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Liste des rendu(s) des groupe(s) de la SAE
+                    </h3>
+                    <div>
+HTML;
+                        $renduId = $listeRendus[0]['idRendu'];
+                        echo "rendu ".$renduId;
+                        foreach($listeRendus as $rendu){
+                            if($rendu['idRendu'] != $renduId){
+                                echo "rendu".$rendu['idRendu'];
+                            }
+                            echo $this->lineRenduTelechargeableGroupe($rendu['nom'], $rendu['fichier'], $sae[0]['idSAE']);
+                        }
+                        echo <<<HTML
+                    </div>
+HTML;
+
+        return <<<HTML
+            
+        HTML;
+    }
+
+    function lineRenduTelechargeableGroupe($nomGroupe, $nomFichier, $idSAE){
+        $nomFichierSplit = explode('-', $nomFichier);
+        array_shift($nomFichierSplit);
+        $nomFichierAffichage = implode('-', $nomFichierSplit);
+
+        return <<<HTML
+        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+            <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold">Rendu du groupe : $nomGroupe</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <a href="http://saemanager-api.atwebpages.com/api/api.php?file=$nomFichier"  
+               class="resource-item d-flex align-items-center p-2 border-bottom cursor-pointer text-decoration-none text-dark btn-download" 
+               data-name="$nomFichier" 
+               data-sae="$idSAE">
+                <div class="d-flex flex-column w-100">
+                    <p class="mb-0 fw-bold text-primary resource-name">Télécharger</p>
+                    <p class="mb-0 text-muted">Contenu : $nomFichierAffichage</p>
+                </div>
+                </a>
+            </div>
+        </div>
+        HTML;
+    }
+
     function initPageListeSoutenance($sae, $soutenances, $idSae)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
