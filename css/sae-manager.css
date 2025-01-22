@@ -4,6 +4,7 @@
     --sae-color: #7171FF;
     --rendus-color: #F1B2FD;
     --create-sae-color: #B2B2FD;
+    --ressource-color: #B4FFEA;
 }
 
 .cursor-pointer {
@@ -44,13 +45,18 @@
     background: var(--create-sae-color);
 }
 
+.card-ressource {
+    background: var(--ressource-color);
+}
+
 .card-sae:hover,
 .card-sae-content:hover,
 .card-rendus:hover,
 .card-rendus-content:hover,
 .card-create-sae:hover,
 .card-ressources:hover
-.card-ressources-content:hover {
+.card-ressources-content:hover,
+.card-ressource:hover {
     transform: scale(1.05);
 }
 
@@ -333,7 +339,7 @@
     }
 
     .card-sae, .card-create-sae, .card-rendus {
-        height: 30% !important;
+        height: 10% !important;
     }
 
     .card-sae-content, .card-rendus-content {

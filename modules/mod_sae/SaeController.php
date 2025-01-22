@@ -114,9 +114,6 @@ class SaeController
             case "deposerFichierSupport":
                 $this->deposerFichierSupport();
                 break;
-            case "ressources":
-                $this->initRessource();
-                break;
             case "depotRessource":
                 $this->deposerFichierRessource();
                 break;
@@ -559,15 +556,6 @@ class SaeController
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
-
-    private function initRessource()
-    {
-
-        $ressource = $this->model->getRessource();
-        $myRessources = $this->model->getRessourceInscrit();
-        $this->view->initRessources($ressource, $myRessources);
-    }
-
     private function delRessource()
     {
 
@@ -577,10 +565,11 @@ class SaeController
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    private function ajoutEtudiantSAE() {
+    private function ajoutEtudiantSAE()
+    {
         $idEtudiants = $_POST['student'];
         $idSAE = $_GET['id'];
-        
+
 
         $this->model->inscrireEtudiantsSAE($idSAE, $idEtudiants);
 
