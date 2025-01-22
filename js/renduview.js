@@ -22,3 +22,27 @@ function toggleTableBody(id) {
         chevron.classList.add('fa-chevron-up');
     }
 }
+
+// Fonction pour afficher/masquer les élèves d'un groupe et changer le chevron
+function toggleGroup(groupeId) {
+    var groupTable = document.getElementById("table-wrapper-" + groupeId);
+    var chevron = document.getElementById("chevron-" + groupeId);
+    
+    // Vérifie si le tableau est déjà replié
+    if (groupTable.classList.contains('collapsed')) {
+        // Déplier le tableau
+        groupTable.classList.remove('collapsed');
+        
+        // Changer l'icône du chevron en haut
+        chevron.classList.remove('fa-chevron-down');
+        chevron.classList.add('fa-chevron-up');
+    } else {
+        // Replier le tableau
+        groupTable.classList.add('collapsed');
+        
+        // Changer l'icône du chevron en bas
+        chevron.classList.remove('fa-chevron-up');
+        chevron.classList.add('fa-chevron-down');
+    }
+}
+

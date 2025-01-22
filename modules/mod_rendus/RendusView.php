@@ -11,7 +11,7 @@ class RendusView extends GenericView
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
-                <script src="js/renduview.js"></script>
+                
                 <style>
     /* Par défaut, le tableau est visible, si tu veux qu'il soit caché au départ, tu peux ajouter "display: none;" */
 .table-wrapper {
@@ -239,25 +239,35 @@ HTML;
                     </div>
                     <div class="rendu-list">
                         <form method="POST" action="index.php?module=rendus&action=maj&eval=2">
-        HTML;
-        
-                // Organisation des données
-                $groupedNotes = [];
-                foreach ($notesDesElvesParGroupe as $note) {
-                    $groupedNotes[$note['idEleve']] = $note;
-                }
-                // Afficher les groupes et leurs élèves
-                foreach ($tousLesGroupes as $groupeId => $eleves) {
-                    $groupeNom = htmlspecialchars($eleves['nom'], ENT_QUOTES, 'UTF-8');
-                    echo <<<HTML
-                    <div class="group-section mt-4">
-                        <table class="table table-bordered mt-3 ">
-                            <thead class="table-primary">
-                                <tr class="table-primary">
-                                    <h4 class="fw-bold text-primary">$groupeNom</h4>
-                                </tr>
-                            </thead>
-                            <thead>
+            HTML;
+            
+            // Organisation des données
+            $groupedNotes = [];
+            foreach ($notesDesElvesParGroupe as $note) {
+                $groupedNotes[$note['idEleve']] = $note;
+            }
+            
+            // Afficher les groupes et leurs élèves
+            foreach ($tousLesGroupes as $groupeId => $eleves) {
+                $groupeNom = htmlspecialchars($eleves['nom'], ENT_QUOTES, 'UTF-8');
+                $groupeId = htmlspecialchars($groupeId, ENT_QUOTES, 'UTF-8');
+                
+                echo <<<HTML
+                <div class="group-section mt-4">
+                    <div class="d-flex align-items-center table-header" onclick="toggleGroup('$groupeId')">
+                        <!-- Chevron avant le nom du groupe -->
+                        <i id="chevron-$groupeId" class="fas fa-chevron-down me-2"></i>
+                        <h4 class="fw-bold text-primary mb-0">$groupeNom</h4>
+                        <div class="ml-auto">
+                            <label for="note">Ajouter une note globale au groupe :</label>
+                            <input type="number" class="form-control" id="global-note-$groupeId" value="" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
+                        </div>
+                    </div>
+    
+                    <!-- Tableau des élèves -->
+                    <div class="group-table mt-3 collapsed" id="table-wrapper-$groupeId">
+                        <table class="table table-bordered mt-3">
+                            <thead class="table-secondary">
                                 <tr>
                                     <th>Nom</th>
                                     <th>Prénom</th>
@@ -265,72 +275,171 @@ HTML;
                                 </tr>
                             </thead>
                             <tbody>
-        HTML;
-        
-                    foreach ($eleves['etudiants'] as $eleve) {
-                        // var_dump($groupedNotes);
-                        $idEleve = $eleve['idPersonne'];
-                        $eleveNom = htmlspecialchars($eleve['Eleve_nom'], ENT_QUOTES, 'UTF-8');
-                        $elevePrenom = htmlspecialchars($eleve['Eleve_prenom'], ENT_QUOTES, 'UTF-8');
-                        $noteValeur = isset($groupedNotes[$idEleve]['Note_valeur']) && $groupedNotes[$idEleve]['Note_valeur'] !== null 
-                        ? htmlspecialchars($groupedNotes[$idEleve]['Note_valeur'], ENT_QUOTES, 'UTF-8') 
-                        : '';                    echo <<<HTML
+                HTML;
+    
+                foreach ($eleves['etudiants'] as $eleve) {
+                    $eleveNom = htmlspecialchars($eleve['Eleve_nom'], ENT_QUOTES, 'UTF-8');
+                    $elevePrenom = htmlspecialchars($eleve['Eleve_prenom'], ENT_QUOTES, 'UTF-8');
+                    $idEleve = $eleve['idPersonne'];
+                    $noteValeur = isset($groupedNotes[$idEleve]) ? $groupedNotes[$idEleve]['Note_valeur'] : '';
+    
+                    echo <<<HTML
+                                <input type="hidden" name="idEval" class="form-control" value="{$infoTitre['idEval']}">
                                 <tr>
                                     <td>$eleveNom</td>
                                     <td>$elevePrenom</td>
-                                    <td><input type="number" name="note_$idEleve" class="form-control" value="$noteValeur" /></td>
+                                    <td><input type="number" name="note_idEleve_$idEleve" class="form-control" value="$noteValeur" id="note-$idEleve" /></td>
                                 </tr>
-        HTML;
-                    }
-        
-                    echo <<<HTML
+                    HTML;
+                }
+    
+                echo <<<HTML
                             </tbody>
                         </table>
                     </div>
-        HTML;
-                }
-
-                if($tousLesElevesSansGroupe){ //ELEves sans groupes
-
-                    echo '<h3 class="fw-bold mt-5">Élèves sans groupe</h3>';
-                    echo <<<HTML
-                    <table class="table table-bordered mt-3">
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Prénom</th>
-                                <th>Note</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            HTML;
-            
-                    foreach ($tousLesElevesSansGroupe as $eleve) {
-                        $idEleve = $eleve['idPersonne'];
-                        $eleveNom = htmlspecialchars($eleve['nom'], ENT_QUOTES, 'UTF-8');
-                        $elevePrenom = htmlspecialchars($eleve['prenom'], ENT_QUOTES, 'UTF-8');
-                        $noteValeur = isset($groupedNotes[$idEleve]) ? htmlspecialchars($groupedNotes[$idEleve]['Note_valeur'], ENT_QUOTES, 'UTF-8') : '';
-                        echo <<<HTML
-                            <tr>
-                                <td>$eleveNom</td>
-                                <td>$elevePrenom</td>
-                                <td><input type="float" name="note_$idEleve" class="form-control" value="$noteValeur" /></td>
-                            </tr>
-            HTML;
-                    }
+                </div>
+                HTML;
             }
+    
+            if ($tousLesElevesSansGroupe) { // Élèves sans groupes
+                echo '<h3 class="fw-bold mt-5">Élèves sans groupe</h3>';
                 echo <<<HTML
-                    </tbody>
-                </table>
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                HTML;
+    
+                foreach ($tousLesElevesSansGroupe as $eleve) {
+                    $eleveNom = htmlspecialchars($eleve['nom'], ENT_QUOTES, 'UTF-8');
+                    $elevePrenom = htmlspecialchars($eleve['prenom'], ENT_QUOTES, 'UTF-8');
+                    $idEleve = $eleve['idPersonne'];
+                    $noteValeur = isset($groupedNotes[$idEleve]) ? htmlspecialchars($groupedNotes[$idEleve]['Note_valeur'], ENT_QUOTES, 'UTF-8') : '';
+    
+                    echo <<<HTML
+                        <tr>
+                            <td>$eleveNom</td>
+                            <td>$elevePrenom</td>
+                            <td><input type="number" name="note_$idEleve" class="form-control" value="$noteValeur" /></td>
+                        </tr>
+                    HTML;
+                }
+    
+                echo <<<HTML
+                </tbody>
+            </table>
+            HTML;
+            }
+    
+            echo <<<HTML
                 <div class="w_100 d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary btn-success m-3">Valider</button>
                 </div>
             </form>
+            </div>
         </div>
-        </div>
-    HTML;
+        <style>
+            .table-header {
+                cursor: pointer;
+                padding: 10px;
+                background-color: #f8f9fa;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                width: 100%;
+            }
+    
+            .table-header:hover {
+                background-color: #e9ecef;
+            }
+    
+            .table-header h4 {
+                margin: 0;
+                font-size: 1.2rem;
+            }
+    
+            .ml-auto {
+                margin-left: auto;
+            }
+    
+            .group-table {
+                display: none;
+                margin-top: 15px;
+            }
+    
+            .group-table.collapsed {
+                display: block;
+            }
+    
+            .table-secondary th {
+                background-color: #e9ecef;
+                font-weight: bold;
+            }
+    
+            .fas {
+                font-size: 18px;
+                color: #007bff;
+                transition: transform 0.3s ease;
+            }
+    
+            .fas.fa-chevron-up {
+                transform: rotate(180deg);
+            }
+    
+        </style>
+        <script>
+            // Fonction pour afficher/masquer les élèves d'un groupe et changer le chevron
+            function toggleGroup(groupeId) {
+                var groupTable = document.getElementById("table-wrapper-" + groupeId);
+                var chevron = document.getElementById("chevron-" + groupeId);
+                
+                // Vérifie si le tableau est déjà replié
+                if (groupTable.classList.contains('collapsed')) {
+                    // Déplier le tableau
+                    groupTable.classList.remove('collapsed');
+                    
+                    // Changer l'icône du chevron en haut
+                    chevron.classList.remove('fa-chevron-down');
+                    chevron.classList.add('fa-chevron-up');
+                } else {
+                    // Replier le tableau
+                    groupTable.classList.add('collapsed');
+                    
+                    // Changer l'icône du chevron en bas
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            }
+    
+            // Fonction pour mettre à jour la note de tous les élèves du groupe
+            function updateGroupNotes(groupeId) {
+                var globalNote = document.getElementById("global-note-" + groupeId).value;
+                var elevesNotes = document.querySelectorAll("#table-wrapper-" + groupeId + " input[name^='note_']");
+                
+                elevesNotes.forEach(function(input) {
+                    input.value = globalNote;
+                });
+            }
+    
+            // Fonction pour empêcher le repliage du tableau quand on clique sur l'input
+            function preventGroupToggle(event, groupeId) {
+                event.stopPropagation(); // Empêche la propagation de l'événement "click" vers l'élément parent
+            }
+        </script>
+        HTML;
         }
     }
+    
+    
+    
+    
+    
     
 
     

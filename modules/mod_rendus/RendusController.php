@@ -76,6 +76,7 @@ class RendusController
                     $infoTitre['SAE_nom'] = $note['SAE_nom'];
                     $infoTitre['Rendu_nom'] = $note['Rendu_nom'];
                     $infoTitre['Eval_nom'] = $note['Eval_nom'];
+                    $infoTitre['idEval'] = $note['idEval'];
                     $idSAE = $note['idSAE']; // Récupération de l'idSAE
                     $flag = 1;
                     break;
@@ -119,14 +120,34 @@ class RendusController
         }
     }
 
-    private function initMettreAJourLesNotes(){
+    private function initMettreAJourLesNotes() {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
-            $idEval = $_GET['eval'];
-            //$_POST['']
-        }else { // Est un étudiant
+            $notes = [];
+            foreach ($_POST as $key => $value) {
+                // Vérifie si la clé commence par 'note_idEleve_'
+                if (strpos($key, 'note_idEleve_') === 0) {
+                    // Extrait l'ID de l'élève à partir de la clé (la partie numérique après 'note_idEleve_')
+                    $idEleve = substr($key, strlen('note_idEleve_'));
+    
+                    // Récupère la note associée à cet élève
+                    $note = isset($_POST['note_idEleve_'.$idEleve]) ? $_POST['note_idEleve_'.$idEleve] : '';
+    
+                    // Ajoute les données dans le tableau $notes
+                    $notes[] = [
+                        'idEleve' => $idEleve,
+                        'idEval' => $_POST['idEval'],
+                        'note' => $note
+                    ];
+                }
+            }
+    
+            $this->model->MettreAJourLesNotes($notes);
+            header('Location: index.php?module=rendus&action=home');
+        } else { // Est un étudiant
             $this->initRendus();
         }
     }
+    
 
     private function validerModifHomePage(){
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur

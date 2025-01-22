@@ -192,6 +192,17 @@ class RendusModel extends Connexion{
         $pdo_req->execute();
     }
 
+    function MettreAJourLesNotes($notes){
+        $req = "UPDATE Notes SET note = :note WHERE idEval = :idEval AND idEleve = :idEleve";
+        $pdo_req = self::$bdd->prepare($req);
+        foreach ($notes as $note) {
+            $pdo_req->bindParam("idEval", $note['idEval'], PDO::PARAM_INT);
+            $pdo_req->bindParam("idEleve", $note['idEleve'], PDO::PARAM_INT);
+            $pdo_req->bindParam("note", $note['note'], PDO::PARAM_INT);
+            $pdo_req->execute();
+        }
+    }
+
     
     
     
