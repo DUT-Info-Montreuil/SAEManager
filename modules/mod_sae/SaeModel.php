@@ -339,7 +339,7 @@ class SaeModel extends Connexion
     public function didGroupDropRendu($idRendu, $idSae)
     {
         $count = $this->getRenduEleve($idRendu, $idSae);
-        if ($count)
+        if($count)
             return count($count) != 0;
         return false;
     }
@@ -788,8 +788,21 @@ class SaeModel extends Connexion
         $pdo_req->execute();
     }
 
-    public function getEtudiantsBySAE($idSAE)
-    {
+    public function getEtudiantsPasInscrits($idSAE) {
+        $req = "SELECT idPersonne, prenom, nom
+                FROM Personne
+                WHERE estProf = 0
+                AND idPersonne not in (SELECT idEleve
+                                    FROM EleveInscritSae
+                                    INNER JOIN Personne ON idPersonne = idEleve
+                                    WHERE idSAE = :idSAE)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getEtudiantsBySAE($idSAE) {
         $req = "SELECT idEleve, prenom, nom
                 FROM EleveInscritSae
                 INNER JOIN Personne ON idPersonne = idEleve
@@ -1137,5 +1150,20 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":date", date("Y-m-d H:i:s"));
         $pdo_req->execute();
         return true;
+    }
+
+    public function inscrireEtudiantSAE($idSAE, $idEtudiant) {
+        $req = "INSERT INTO EleveInscritSae (idSAE, idEleve) VALUES (:idSAE, :idEleve)";
+        $stmt = self::$bdd->prepare($req);
+        $stmt->execute([
+            ':idSAE' => $idSAE,
+            ':idEleve' => $idEtudiant
+        ]);
+    }
+
+    public function inscrireEtudiantsSAE($idSAE, $idEtudiants) {
+        foreach($idEtudiants as $id) {
+            $this->inscrireEtudiantSAE($idSAE, $id);
+        }
     }
 }

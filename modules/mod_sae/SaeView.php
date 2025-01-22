@@ -71,7 +71,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($groupes, $infosEtudiant, $etudiants,$profs,$sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
+    function initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants,$profs,$sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -119,7 +119,36 @@ HTML;
             </div>
 HTML;
         if ($_SESSION['estProfUtilisateur']) {
+            echo <<<HTML
+            <div class="d-flex">
+                <div class="mb-5 w-50 me-3">  
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Professeur(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+    HTML;
             echo $this->initAjoutProf($profs, $idSAE);
+            echo <<<HTML
+                    </div>
+                </div>
+                <div class="mb-5 w-50">
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Etudiants(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+    HTML;
+            echo $this->initAjoutEtudiant($pasinscrits, $idSAE);
+            echo <<<HTML
+                    </div>
+                </div>
+            </div>
+    HTML;
         } elseif (!$infosEtudiant['inGroupe']) {
             if ($infosEtudiant['inProposition']) {
                 echo '<h1 class="my-4">Vous faites déjà partie d\'une proposition de groupe</h1>';
@@ -354,6 +383,45 @@ HTML;
         return $html;
     }
 
+    function initAjoutEtudiant($etudiants, $idSAE)
+    {
+        $inputs = '';
+
+        foreach ($etudiants as $etudiant) {
+            $id = htmlspecialchars($etudiant['idPersonne']);
+            $nom = htmlspecialchars($etudiant['nom']);
+            $prenom = htmlspecialchars($etudiant['prenom']);
+            $inputs .= '<div class="form-check">
+                            <input class="form-check-input" name="student[]" type="checkbox" value="'.$id.'" id="'.$id.'">
+                            <label class="form-check-label" for="'.$id.'">'.$prenom . ' ' . $nom.'</label>
+                        </div>';
+        }
+
+        return <<<HTML
+                <form method="POST" action="index.php?module=sae&action=ajoutEtudiantSAE&id=$idSAE" class="p-3 border rounded shadow-sm bg-light" id="studentForm">
+                    <label class="form-label fw-bold">Ajouter des étudiants à la SAE :</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdownButton">Rechercher des étudiants</button>
+                        <div class="dropdown-menu p-2 w-100" id="dropdownContent" style="display: none;">
+                            <!-- Barre de recherche -->
+                            <input 
+                                type="text" 
+                                class="form-control mb-2" 
+                                id="searchInput" 
+                                placeholder="Rechercher...">
+                            <!-- Options avec cases à cocher -->
+                            $inputs
+                        </div>
+                    </div>
+                    <div class="text-danger mt-2" id="errorMessage" style="display: none;">
+                        Vous devez sélectionner au moins un étudiant.
+                    </div>
+                    <div class="d-flex justify-content-end mt-5">
+                        <button type="submit" class="btn btn-primary">Valider</button>
+                    </div>
+                </form>
+    HTML;
+    }
 
     function lineChamp($nomChamp, $idChamps, $param, $idSAE)
     {

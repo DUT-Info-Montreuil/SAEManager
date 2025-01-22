@@ -123,6 +123,9 @@ class SaeController
             case "delRessource":
                 $this->delRessource();
                 break;
+            case "ajoutEtudiantSAE":
+                $this->ajoutEtudiantSAE();
+                break;
         }
     }
 
@@ -179,8 +182,9 @@ class SaeController
                 'inProposition' => $proposition
             );
             $groupes = $this->model->formationGroupes($_GET['id']);
+            $pasinscrits = $this->model->getEtudiantsPasInscrits($_GET['id']);
 
-            $this->view->initSaeDetails($groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
+            $this->view->initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
         } else {
             header('Location: index.php');
         }
@@ -570,6 +574,16 @@ class SaeController
         $idRessource = $_GET['idRessource'];
 
         $this->model->delRessource($idRessource);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function ajoutEtudiantSAE() {
+        $idEtudiants = $_POST['student'];
+        $idSAE = $_GET['id'];
+        
+
+        $this->model->inscrireEtudiantsSAE($idSAE, $idEtudiants);
+
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }

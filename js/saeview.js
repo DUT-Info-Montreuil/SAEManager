@@ -366,3 +366,60 @@ function removeField(button) {
   const field = button.parentNode;
   field.remove();
 }
+
+const searchInput = document.getElementById('searchInput');
+const checkboxes = document.querySelectorAll('.form-check');
+const dropdownButton = document.querySelector('.dropdown-toggle');
+const dropdownContent = document.getElementById('dropdownContent');
+const errorMessage = document.getElementById('errorMessage');
+const form = document.getElementById('studentForm');
+
+dropdownButton.addEventListener('click', function () {
+  const isVisible = dropdownContent.style.display === 'block';
+  dropdownContent.style.display = isVisible ? 'none' : 'block';
+  if (!isVisible) searchInput.focus();
+});
+
+// Mettre à jour texte bouton
+function updateDropdownButton() {
+  const selected = Array.from(checkboxes)
+    .filter(checkbox => checkbox.querySelector('input').checked)
+    .map(checkbox => checkbox.querySelector('label').textContent.trim());
+      
+  dropdownButton.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des étudiants';
+}
+
+// Filtrer options
+searchInput.addEventListener('input', () => {
+  const filter = searchInput.value.toLowerCase();
+  checkboxes.forEach((checkbox) => {
+    const label = checkbox.querySelector('label').textContent.toLowerCase();
+    checkbox.style.display = label.includes(filter) ? 'block' : 'none';
+  });
+});
+
+checkboxes.forEach(checkbox => {
+  checkbox.querySelector('input').addEventListener('change', () => {
+    updateDropdownButton();
+  });
+});
+
+document.addEventListener('click', function (event) {
+  const isClickInside = dropdownButton.contains(event.target) || dropdownContent.contains(event.target);
+  if (!isClickInside) {
+    dropdownContent.style.display = 'none';
+  }
+});
+
+form.addEventListener('submit', function (event) {
+  // Vérifie cases cochées
+  const isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+  if (!isChecked) {
+      // Annule soumission formulaire
+      event.preventDefault();
+      errorMessage.style.display = 'block';
+  } else {
+      errorMessage.style.display = 'none';
+  }
+});
