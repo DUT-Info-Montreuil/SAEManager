@@ -640,13 +640,13 @@ class SaeModel extends Connexion
 
     // POST
 
-    function createRendu($titre, $date, $idSAE, $estNote, $coeff, $etudiants)
+    function createRendu($titre, $date, $idSAE, $estNote, $coef, $etudiants)
     {
         if ($estNote) {
-            $reqEval = "INSERT INTO Evaluation (nom, coeff, responsableEvaluation) VALUES (:nom, :coeff, NULL)";
+            $reqEval = "INSERT INTO Evaluation (nom, coef, IntervenantEvaluateur) VALUES (:nom, :coef, NULL)";
             $pdo_reqEval = self::$bdd->prepare($reqEval);
             $pdo_reqEval->bindValue(":nom", $titre);
-            $pdo_reqEval->bindValue(":coeff", $coeff);
+            $pdo_reqEval->bindValue(":coef", $coef);
             $pdo_reqEval->execute();
 
             $idEvaluation = self::$bdd->lastInsertId();
@@ -679,10 +679,10 @@ class SaeModel extends Connexion
 
     function createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants, $profs)
     {
-        $reqEval = "INSERT INTO Evaluation (nom, coef, IntervenantEvaluateur) VALUES (:nom, :coeff, NULL)";
+        $reqEval = "INSERT INTO Evaluation (nom, coef, IntervenantEvaluateur) VALUES (:nom, :coef, NULL)";
         $pdo_req_eval = self::$bdd->prepare($reqEval);
         $pdo_req_eval->bindValue(":nom", $titre);
-        $pdo_req_eval->bindValue(":coeff", 1);
+        $pdo_req_eval->bindValue(":coef", 1);
         $pdo_req_eval->execute();
 
         $idEvaluation = self::$bdd->lastInsertId();
@@ -1001,8 +1001,6 @@ class SaeModel extends Connexion
             $this->creeNotification($etudiant, $message, $idSAE, $redirect);
         }
 
-
-
         $req = "INSERT INTO Groupe (idgroupe, nom, imageTitre, idSAE) VALUES (DEFAULT, 
                                         (SELECT nomGroupe FROM PropositionsGroupe WHERE idProposition = :idProposition), DEFAULT, 
                                         (SELECT idSAE FROM PropositionsGroupe WHERE idProposition = :idProposition))";
@@ -1030,6 +1028,22 @@ class SaeModel extends Connexion
             $pdo_req->bindValue(":idGroupe", $idGroupe);
             $pdo_req->bindValue(":idEtudiant", $id['idEleve']);
             $pdo_req->execute();
+
+            // Insérer les notes (NULL) pour les étudiants qui veinnent d'être ajoutés a un groupe pour toute les eval de tous les rendus de la SAE
+            $notesReq = "
+                INSERT INTO Notes (idEval, idEleve, idRendu, note)
+                SELECT 
+                    Evaluation.idEval, 
+                    EleveInscritSae.idEleve, 
+                    Rendu.idRendu, 
+                    NULL
+                FROM EleveInscritSae
+                JOIN Rendu ON Rendu.idSAE = EleveInscritSae.idSAE
+                JOIN Evaluation ON Evaluation.idEval = Rendu.idEvaluation
+                WHERE EleveInscritSae.idSAE = :idSAE
+            ";
+            $insertNotes = self::$bdd->prepare($notesReq);
+            $insertNotes->execute();
         }
         $this->eraseProposition($idProposition);
     }

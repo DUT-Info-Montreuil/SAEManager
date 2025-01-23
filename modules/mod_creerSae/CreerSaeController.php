@@ -27,16 +27,15 @@ class CreerSaeController
                 echo "Oups, il y a un problème...";
                 break;
         }
+        $this->view->initScript();
     }
 
-    private function initRendus(){
+    private function initRendus($msg = null){
         $listePersonne = $this->model->recupListePersonneSansMoi();
-        $this->view->initCreerSaePage($listePersonne);
+        $this->view->initCreerSaePage($listePersonne,$msg);
     }
 
-    private function handleFormSubmission()
-    {
-        // Récupérer les valeurs du formulaire
+    private function handleFormSubmission(){
         $nomSae = $_POST['nomSae'] ?? null;
         $semestre = $_POST['semestre'] ?? null;
         $sujet = $_POST['sujet'] ?? null;
@@ -44,11 +43,20 @@ class CreerSaeController
         $intervenants = $_POST['intervenants'] ?? [];
         $eleves = $_POST['eleves'] ?? [];
 
-        // Envoyer les données au modèle
+        foreach($coResponsables as $respo){
+            foreach($intervenants as $interv){
+                if($respo == $interv){
+                    $msg = "Un intervenant ne peut pas être co-responsable.";
+                    $this->initRendus($msg);
+                    return;
+                }
+            }
+        }
+
         $result = $this->model->createSae($nomSae, $semestre, $sujet, $coResponsables, $intervenants, $eleves);
 
         if ($result) {
-        header("Location: index.php?module=sae&action=home");
+            header("Location: index.php?module=sae&action=home");
         } else {
             echo "Erreur lors de la création de la SAE.";
         }
