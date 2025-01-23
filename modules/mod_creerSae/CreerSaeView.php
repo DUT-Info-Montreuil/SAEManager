@@ -11,7 +11,7 @@ class CreerSaeView extends GenericView
     public function initCreerSaePage($listePersonne)
     {
         echo <<<HTML
-        <div class="container mt-5">
+        <div class="container mt-5 h-100">
             <h1 class="fw-bold text-left">CRÉER UNE SAE</h1>
             <div class="card-general shadow bg-white rounded p-4">
                 <div class="d-flex align-items-center mb-4">

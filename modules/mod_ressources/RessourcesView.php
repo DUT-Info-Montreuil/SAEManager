@@ -11,7 +11,7 @@ class RessourcesView extends GenericView
         $isProf = isset($_SESSION['estProfUtilisateur']) && $_SESSION['estProfUtilisateur'];
 
         echo <<<HTML
-    <div class="container mt-5">
+    <div class="container mt-5 h-100">
         <h1 class="fw-bold">LISTE DES RESSOURCES</h1>
         <div class="card-general shadow bg-white rounded min-h75 p-3">
             <div class="d-flex align-items-center p-4 mx-5">
@@ -42,7 +42,7 @@ HTML;
         foreach ($ressources as $ressource) {
             $nomRessource = htmlspecialchars($ressource['nom']);
             $idSAE = htmlspecialchars($ressource['idRessource']);
-            $contenue = htmlspecialchars($ressource['contenu']);
+            $contenue = explode('-', htmlspecialchars($ressource['contenu']))[1];
             $idRessource = htmlspecialchars($ressource['idRessource']);
 
             $isMySae = in_array($idRessource, $myRessourcesIds) ? "true" : "false";
