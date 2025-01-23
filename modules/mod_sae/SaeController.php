@@ -126,6 +126,9 @@ class SaeController
             case "uploadGroupImage":
                 $this->uploadGroupImage();
                 break;
+            case "modifierNomGroupe":
+                $this->modifierNomGroupe();
+                break;
         }
     }
 
@@ -582,15 +585,23 @@ class SaeController
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
-    public function uploadGroupImage() {
-        
+    private function uploadGroupImage()
+    {
+
         $file = isset($_FILES['groupImage']) ? $_FILES['groupImage'] : exit("file not set");
         $fileName = $_FILES['groupImage']['name'];
         $idGroupe = $_GET['idGroupe'];
 
-    
+
         $this->model->uploadGroupImage($file, $idGroupe, $fileName);
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
-    
+
+    private function modifierNomGroupe()
+    {
+        $idGroupe = $_GET['idGroupe'];
+        $nom = $_POST['nomGroupe'];
+        $this->model->updateGroupeName($idGroupe, $nom);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
 }

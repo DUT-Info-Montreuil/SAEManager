@@ -677,10 +677,13 @@ HTML .
         if (!$_SESSION['estProfUtilisateur']) {
             $groupeName = htmlspecialchars($groupe[0]['GroupeName']);
             $groupePhoto = htmlspecialchars($groupe[0]['imageTitre']);
+            $idGroupe = htmlspecialchars($groupe[0]['idGroupe']);
+            echo $this->popUpModifierNomGroupe($sae[0]['idSAE'], $idGroupe);
         }
 
-        $idGroupe = htmlspecialchars($groupe[0]['idGroupe']);
+
         $nomSAE = htmlspecialchars($sae[0]['nomSae']);
+
 
         echo <<<HTML
     <div class="container mt-5">
@@ -702,68 +705,85 @@ HTML;
                 <div class="d-flex flex-wrap">
 HTML;
 
-        if ($members) {
-            foreach ($members as $membre) {
-                $nom = htmlspecialchars($membre['nom']);
-                $prenom = htmlspecialchars($membre['prenom']);
-                $photo = htmlspecialchars($membre['photoDeProfil']);
-                echo $this->linePersonne($prenom, $nom, $photo);
+            if ($members) {
+                foreach ($members as $membre) {
+                    $nom = htmlspecialchars($membre['nom']);
+                    $prenom = htmlspecialchars($membre['prenom']);
+                    $photo = htmlspecialchars($membre['photoDeProfil']);
+                    echo $this->linePersonne($prenom, $nom, $photo);
+                }
             }
-        }
-    
-        echo <<<HTML
+
+            echo <<<HTML
                 </div>
             </div>
 HTML;
         } else {
             echo <<<HTML
-            <div class="mb-5">
-                <div class="d-flex align-items-center justify-content-between">
-                    <!-- Titre et icône -->
-                    <h3 class="d-flex align-items-center">
-                        <svg class="me-2" width="25" height="25">
-                            <use xlink:href="#arrow-icon"></use>
-                        </svg>
-                        Membre du groupe
-                    </h3>
-                    <!-- Nom du groupe et image -->
-                    <div class="d-flex align-items-center">
-                        <!-- Formulaire d'upload d'image -->
-                        <form id="groupImageForm" action="index.php?module=sae&action=uploadGroupImage&idGroupe=$idGroupe" method="POST" enctype="multipart/form-data">
-                            <label for="groupImage" style="cursor: pointer; margin-right: 10px;">
-                                <img src="http://saemanager-api.atwebpages.com/api/api.php?file=$groupePhoto" 
-                                    alt="Logo du groupe $groupeName" 
-                                    class="rounded-circle" 
-                                    style="width: 40px; height: 40px; object-fit: cover;">
-                            </label>
-HTML;               if ($groupe[0]['estModifiableParEleve']) {
-                        echo <<<HTML
-                            <input type="file" id="groupImage" name="groupImage" accept="image/*" style="display: none;" onchange="document.getElementById('groupImageForm').submit();">
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between">
+        <!-- Titre et icône -->
+        <h3 class="d-flex align-items-center">
+            <svg class="me-2" width="25" height="25">
+                <use xlink:href="#arrow-icon"></use>
+            </svg>
+            Membre du groupe
+        </h3>
+        <!-- Nom du groupe et image -->
+        <div class="d-flex align-items-center">
+            <!-- Formulaire d'upload d'image -->
+            <form id="groupImageForm" action="index.php?module=sae&action=uploadGroupImage&idGroupe=$idGroupe" method="POST" enctype="multipart/form-data">
+                <label for="groupImage" style="cursor: pointer; margin-right: 10px;">
+                    <img src="http://saemanager-api.atwebpages.com/api/api.php?file=$groupePhoto" 
+                        alt="Logo du groupe $groupeName" 
+                        class="rounded-circle" 
+                        style="width: 40px; height: 40px; object-fit: cover;">
+                </label>
 HTML;
-                    }
-
-                    echo <<<HTML
-                        </form>
-                        <span class="text-muted">Groupe : $groupeName</span>
-                    </div>
-                </div>
-                <div class="d-flex flex-wrap">
-            HTML;
-
-        if ($groupe) {
-            foreach ($groupe as $membre) {
-                $nom = htmlspecialchars($membre['nom']);
-                $prenom = htmlspecialchars($membre['prenom']);
-                $photo = htmlspecialchars($membre['photoDeProfil']);
-                echo $this->linePersonne($prenom, $nom, $photo);
+            if ($groupe[0]['estModifiableParEleve']) {
+                echo <<<HTML
+                <input type="file" id="groupImage" name="groupImage" accept="image/*" style="display: none;" onchange="document.getElementById('groupImageForm').submit();">
+HTML;
             }
-        }
-    
-        echo <<<HTML
+            echo <<<HTML
+            </form>
+            <!-- Nom du groupe avec bouton Modifier -->
+HTML;
+
+            if ($groupe[0]['estModifiableParEleve']) {
+                echo <<<HTML
+            <span class="fw-bold me-3" style="font-size: 1rem;">Groupe  : $groupeName</span>
+            <a id="edit-group-name" class="text-primary text-decoration-underline cursor-pointer">Modifier</a>
+
+HTML;
+            } else {
+                echo <<<HTML
+            <span class="fw-bold me-3" style="font-size: 1rem;">Groupe : $groupeName</span>
+HTML;
+            }
+
+            echo <<<HTML
+        </div>
+    </div>
+    <div class="d-flex flex-wrap">
+HTML;
+
+
+
+            if ($groupe) {
+                foreach ($groupe as $membre) {
+                    $nom = htmlspecialchars($membre['nom']);
+                    $prenom = htmlspecialchars($membre['prenom']);
+                    $photo = htmlspecialchars($membre['photoDeProfil']);
+                    echo $this->linePersonne($prenom, $nom, $photo);
+                }
+            }
+
+            echo <<<HTML
                 </div>
             </div>
 HTML;
-    }
+        }
         echo <<<HTML
             <!-- RESPONSABLE -->
             <div class="mb-5">
@@ -799,6 +819,8 @@ HTML;
 
         </div>
     </div>
+
+    <script src="js/groupe.js"></script>
     HTML;
     }
 
@@ -813,7 +835,6 @@ HTML;
             </div>
         </div>
     </div>
-HTML;
 HTML;
     }
 
@@ -1145,6 +1166,32 @@ HTML;
             </div>
         </div>
 HTML;
+    }
+    function popUpModifierNomGroupe($idSae, $idGroupe)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierNomGroupe">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Modifier le nom du groupe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierNomGroupe&id=$idSae&idGroupe=$idGroupe" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="nomGroupe" id="nomGroupe" placeholder="Nom du groupe" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-groupe-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
     }
 
     function popUpSupressionDepot($typeDepot, $idSae)
@@ -1526,11 +1573,11 @@ HTML;
             $edit = '<div class="form-check my-3">
             <input class="form-check-input" type="checkbox" id="editableGroup" name="editableGroup">
             <label class="form-check-label" for="editableGroup">
-                Nom du groupe et photo modifiables par le groupe
+                Permettre aux membres de modifier le nom et la photo du groupe.
             </label>
         </div>';
         }
-        
+
 
         return <<<HTML
             <h1 class="my-4">Sélectionnez les élèves</h1>
@@ -1553,6 +1600,5 @@ HTML;
                 </form>
             </div>
         HTML;
-
     }
 }

@@ -1159,7 +1159,8 @@ class SaeModel extends Connexion
         }
     }
 
-    public function getSAEMembers($idSAE) {
+    public function getSAEMembers($idSAE)
+    {
 
         $req = "SELECT idEleve, nom, prenom, photoDeProfil
                 FROM EleveInscritSae
@@ -1170,10 +1171,10 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
-
     }
 
-    public function uploadGroupImage($file, $idGroupe, $fileName) {
+    public function uploadGroupImage($file, $idGroupe, $fileName)
+    {
         $newFileName = $this->uploadFichier($file, "none");
 
         if ($newFileName) {
@@ -1190,5 +1191,13 @@ class SaeModel extends Connexion
         return false;
     }
 
-    
+    public function updateGroupeName($idGroupe, $nom)
+    {
+
+        $req = "UPDATE Groupe SET nom = :nom WHERE idgroupe = :idgroupe";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":nom", $nom);
+        $pdo_req->bindValue(":idgroupe", $idGroupe);
+        $pdo_req->execute();
+    }
 }
