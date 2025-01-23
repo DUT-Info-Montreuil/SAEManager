@@ -367,6 +367,9 @@ function removeField(button) {
   field.remove();
 }
 
+/**
+ * Pour ajouter eleve
+ */
 const searchInput = document.getElementById('searchInput');
 const checkboxes = document.querySelectorAll('.form-check');
 const dropdownButton = document.querySelector('.dropdown-toggle');
@@ -405,5 +408,49 @@ document.addEventListener('click', function (event) {
   const isClickInside = dropdownButton.contains(event.target) || dropdownContent.contains(event.target);
   if (!isClickInside) {
     dropdownContent.style.display = 'none';
+  }
+});
+
+/**
+ * Pour ajouter jurySoutenance
+ */
+const searchInputProf = document.getElementById('searchInput-profs');
+const checkboxesProf = document.querySelectorAll('.form-check-profs');
+const dropdownButtonProf = document.querySelector('.dropdown-toggle-profs');
+const dropdownContentProf = document.getElementById('dropdownContent-profs');
+const errorMessageProf = document.getElementById('errorMessage-profs');
+
+dropdownButtonProf.addEventListener('click', function () {
+  const isVisible = dropdownContentProf.style.display === 'block';
+  dropdownContentProf.style.display = isVisible ? 'none' : 'block';
+  if (!isVisible) searchInputProf.focus();
+});
+
+function updateDropdownButtonProf() {
+  const selected = Array.from(checkboxesProf)
+      .filter(checkbox => checkbox.querySelector('input').checked)
+      .map(checkbox => checkbox.querySelector('label').textContent.trim());
+
+  dropdownButtonProf.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des professeurs';
+}
+
+searchInputProf.addEventListener('input', () => {
+  const filter = searchInputProf.value.toLowerCase();
+  checkboxesProf.forEach((checkbox) => {
+    const label = checkbox.querySelector('label').textContent.toLowerCase();
+    checkbox.style.display = label.includes(filter) ? 'block' : 'none';
+  });
+});
+
+checkboxesProf.forEach(checkbox => {
+  checkbox.querySelector('input').addEventListener('change', () => {
+    updateDropdownButtonProf();
+  });
+});
+
+document.addEventListener('click', function (event) {
+  const isClickInside = dropdownButtonProf.contains(event.target) || dropdownContentProf.contains(event.target);
+  if (!isClickInside) {
+    dropdownContentProf.style.display = 'none'; // Correction ici
   }
 });

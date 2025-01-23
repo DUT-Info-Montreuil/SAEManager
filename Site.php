@@ -69,6 +69,11 @@ class Site
 						require_once 'modules/mod_ressources/RessourcesModule.php';
 					}
 					break;
+                case "paneladmin":
+                    if(isset($_SESSION['loginUtilisateur']) && isset($_SESSION['estAdmin']) && $_SESSION['estAdmin'] == 1){
+                        require_once 'modules/mod_paneladmin/PanelAdminModule.php';
+                    }
+                    break;
 				default:
 					if (isset($_SESSION['loginUtilisateur'])) {
 						die("Module inexistant");
@@ -80,11 +85,13 @@ class Site
 
 	public function execModule()
 	{
+        require_once 'modules/mod_paneladmin/PanelAdminModule.php';
 		if (!isset($_SESSION['loginUtilisateur'])) {
 			$this->moduleName = "connexion";
 		} else if (isset($_SESSION['loginUtilisateur']) && $this->moduleName == "connexion") {
 			$this->moduleName = "dashboard";
 		}
+
 
 		$moduleClass = $this->moduleName . "Module";
 		$this->module = new $moduleClass();

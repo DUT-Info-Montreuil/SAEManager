@@ -64,30 +64,35 @@ HTML;
 					<a href="index.php?module=home" class="my-auto mx-3 text-decoration-none text-reset">Accueil</a>
 					<a href="index.php?module=sae&action=home" class="my-auto mx-3 text-decoration-none text-reset">SAÉs</a>
 					<a href="index.php?module=rendus&action=home" class="my-auto mx-3 text-decoration-none text-reset">Rendus</a>
-HTML;		
+
+HTML;
+            if ($_SESSION['estAdmin'])
+                $this->affichage .= <<<HTML
+                <a href="index.php?module=paneladmin&action=home" class="my-auto mx-3 text-decoration-none text-reset">Panel Admin</a>
+HTML;
 			if ($module == 'sae' && $action != 'home') {
-				$saeID = $_GET['id'] ?? "";
-				$this->affichage .= <<<HTML
+                $saeID = $_GET['id'] ?? "";
+                $this->affichage .= <<<HTML
 				|<a href="index.php?module=sae&action=details&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Détails SAE</a>
 HTML;
-			if($estProfUtilisateur)
-			$this->affichage .= <<<HTML
+                if ($estProfUtilisateur)
+                    $this->affichage .= <<<HTML
 				<a href="index.php?module=sae&action=listeRendusGroupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Fichiers des rendus</a>
 				<a href="index.php?module=sae&action=reponsesAuxChamps&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Réponses aux champs</a>
 				<a href="index.php?module=sae&action=listeSupportGroupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Supports des soutenances</a>
 				<a href="index.php?module=sae&action=soutenance&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Soutenance</a>
 
 HTML;
-			if(!$estProfUtilisateur)
-			$this->affichage .= <<<HTML
+                if (!$estProfUtilisateur)
+                    $this->affichage .= <<<HTML
 				<a href="index.php?module=sae&action=groupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Groupe</a>
 				<a href="index.php?module=sae&action=cloud&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Cloud</a>
 				<a href="index.php?module=sae&action=note&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Notes</a>
 HTML;
-			}
-			$this->affichage .= <<<HTML
+                $this->affichage .= <<<HTML
 			</div>
 HTML;
+            }
 		}
 	}
 }
