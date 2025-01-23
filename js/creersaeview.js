@@ -1,4 +1,3 @@
-// Barre de recherche pour les élèves
 document.getElementById('searchEleves').addEventListener('input', function () {
     const searchQuery = this.value.toLowerCase();
     const eleveItems = document.querySelectorAll('.eleve-item');
@@ -13,7 +12,6 @@ document.getElementById('searchEleves').addEventListener('input', function () {
     });
 });
 
-// Barre de recherche pour les co-responsables
 document.getElementById('searchCoResponsables').addEventListener('input', function () {
     const searchQuery = this.value.toLowerCase();
     const coResponsableItems = document.querySelectorAll('.co-responsable-item');
@@ -28,7 +26,6 @@ document.getElementById('searchCoResponsables').addEventListener('input', functi
     });
 });
 
-// Barre de recherche pour les intervenants
 document.getElementById('searchIntervenants').addEventListener('input', function () {
     const searchQuery = this.value.toLowerCase();
     const intervenantItems = document.querySelectorAll('.intervenant-item');

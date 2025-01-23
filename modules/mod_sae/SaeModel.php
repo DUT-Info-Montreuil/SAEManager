@@ -934,8 +934,6 @@ class SaeModel extends Connexion
 
     public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe, $edit)
     {
-
-        var_dump($edit);
         if ($this->isInscrivablesBySAE($id_etudiants, $idSAE)) {
             $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe, edit) VALUES (DEFAULT, :idSAE, :nomGroupe, :edit)";
             $pdo_req = self::$bdd->prepare($req);

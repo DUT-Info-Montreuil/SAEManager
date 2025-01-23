@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const existingBlock = slot.querySelector('.block');
                 if (existingBlock) {
                     alert("Cette plage horaire contient déjà un groupe !");
-                    slot.classList.remove('bg-light'); // Retire le style visuel
-                    return; // Empêche le drop
+                    slot.classList.remove('bg-light'); 
+                    return; 
                 }
 
                 const blockId = e.dataTransfer.getData('text/plain'); // Récupère l'id du bloc
@@ -46,10 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (block) {
                     slot.appendChild(block); // Ajoute le bloc au slot
                     block.draggable = !block.parentElement.className.includes("time-slot");
-                    updateRemoveButtonVisibility(slot); // Met à jour la visibilité du bouton dans le slot
+                    updateRemoveButtonVisibility(slot); 
                 }
 
-                slot.classList.remove('bg-light'); // Enlève le style visuel
+                slot.classList.remove('bg-light'); 
             });
         });
     }

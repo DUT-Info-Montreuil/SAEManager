@@ -21,12 +21,9 @@ class Site
 		$infoConnexion = isset($_GET['infoConnexion']) ? $_GET['infoConnexion'] : null;
 
 		if ($infoConnexion) {
-			// Si une action liée à la connexion est demandée
 			$moduleConnexion = new ConnexionModule();
 			$moduleConnexion->exec();
 
-			// Optionnel : Afficher le contenu généré
-			//echo $moduleConnexion->getAffichage();
 		} else {
 			switch ($this->moduleName) {
 				case "connexion":

@@ -49,7 +49,6 @@ listRenduButtons.forEach((element) => {
  * Gestion du modal (pop up) "Dépot Support"
  **/
 
-// const listSupportButtons = document.querySelectorAll('[class*="supportdrop-"]');
 const idSaeDepotSupport = document.getElementById("idSaeDepotSupport");
 const modalDepotSupport = document.getElementById("modalDepotSupport");
 const dropSupportFileCancelButton = document.getElementById(
