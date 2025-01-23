@@ -1482,48 +1482,6 @@ HTML;
     HTML;
     }
 
-
-    // A continuer lorsque laidRendu page "Cloud" des SAE sera réalisé.
-    function ajouterFichierCloud($idSae)
-    {
-        return <<<HTML
-        <div class="modal" tabindex="-1" id="modalAjouterFichierCloud">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bolder text-center w-100">Déposer un fichier</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="index.php?module=sae&action=uploadFichierCloud&id=$idSae" id="fileUploadForm" method="POST" enctype="multipart/form-data">
-                        <div class="modal-body d-flex flex-column text-center">
-                        <div class="form-group mb-3">
-                            <input type="text" class="form-control" name="fileName" id="fileName" placeholder="Entrer le nom du fichier">
-                            <small class="form-text text-muted">Veilliez à choisir un nom qui n'existe pas déjà dans le cloud de cette SAE.</small>
-                        </div>
-                            <input type="color" class="form-control form-control-color" name="colorChoice" id="colorChoice" value="#563d7c" title="Choisissez votre couleur">
-                            <div class="card border rounded-3 mb-3">
-                                <div class="card-body d-flex flex-column align-items-center">
-                                    <svg class="icon" width="100" height="100" style="fill: #0AF;">
-                                        <use xlink:href="#upload-icon"></use>
-                                    </svg>
-                                    <p>Déposer ou glisser un fichier ici</p>
-                                    <p class="fs-10 fw-light">Taille max : 20 Mo</p>
-                                    <input type="file" class="form-control-file" name="fileInput" id="fileInput" required style="display: none;">
-                                    <button type="button" class="btn btn-light w-50" id="selectFileButton">Sélectionner fichier</button>
-                                </div>
-                            </div>
-                            <div>
-                                <button type="submit" class="btn btn-success m-3">Valider</button>
-                                <button type="button" class="btn btn-danger m-3" id="addFileToCloudCancelButton" data-bs-dismiss="modal">Annuler</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-HTML;
-    }
-
     function initCreerGroupe($etudiants, $idSae)
     {
         $options = '';
