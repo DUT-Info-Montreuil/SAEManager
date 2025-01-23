@@ -40,11 +40,9 @@ HTML;
                         </div>
                         <div class="d-flex w-100 m-auto mt-5 mb-5">   
                             {$this->cardRessource()}
+                            {$this->cardSoutenance()}
+
                         </div>
-                    </div>
-                    <div class="d-flex w-100 h-75 justify-content-center m-auto">
-                        {$this->cardSoutenance()}
-                        {$this->cardSoutenance()}
                     </div>
                 </div>
             </div>
@@ -129,8 +127,7 @@ HTML;
         return <<<HTML
         <div class="card shadow px-3 mx-5 rounded-bottom w-25 card-rendus-content">
             <a href="index.php?module=ressources&action=home" class="text-decoration-none text-reset">
-                <div class="card card-ressource shadow w-100" style="min-height: 150px;">
-                </div>
+                <div class="card card-ressource shadow w-100" style="min-height: 150px;"></div>
                 <div class="m-4">
                     <h4>Ressources</h4>
                     <p>Accéder à vos Ressources</p>
@@ -141,9 +138,10 @@ HTML;
     }
     function cardSoutenance(){
         return <<<HTML
-        <div class="card shadow px-3 mx-5 rounded-bottom w-25 h-75 card-rendus-content">
+        <div class="card shadow px-3 mx-5 rounded-bottom w-25 card-rendus-content">
             <a href="index.php?module=soutenance&action=home" class="text-decoration-none text-reset">
-                <div style="min-height: 50px;" class="card card-soutenance shadow w-100 h-100"></div>
+                <div class="card card-soutenance shadow w-100" style="min-height: 150px;"></div>
+
                 <div class="m-4">
                     <h4>Soutenances</h4>
                     <p>Retrouvez ici la liste de toutes les soutenances.</p>
