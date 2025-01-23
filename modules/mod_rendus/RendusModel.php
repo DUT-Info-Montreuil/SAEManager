@@ -214,6 +214,20 @@ class RendusModel extends Connexion
         }
     }
 
+    function supprimerEval($idEval){
+        // supprime les notes associé à l'évaluation
+        $reqNotes = "DELETE FROM Notes WHERE idEval = :idEval";
+        $pdo_reqNotes = self::$bdd->prepare($reqNotes);
+        $pdo_reqNotes->bindParam("idEval", $idEval, PDO::PARAM_INT);
+        $pdo_reqNotes->execute();
+
+        //supprime mauntenant l'évaluation
+        $reqEval = "DELETE FROM Evaluation WHERE idEval = :idEval";
+        $pdo_reqEval = self::$bdd->prepare($reqEval);
+        $pdo_reqEval->bindParam("idEval", $idEval, PDO::PARAM_INT);
+        $pdo_reqEval->execute();
+    }
+
     
     
     

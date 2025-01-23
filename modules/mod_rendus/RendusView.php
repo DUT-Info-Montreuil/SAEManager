@@ -140,6 +140,7 @@ HTML;
                         <td class="align-center d-flex">
                             $canEvaluate
                             <button type="submit" class="btn btn-primary btn-sm btn-success ms-2">Valider</button>
+                            <a href="index.php?module=rendus&action=supprimerEval&idEval=$noteId" type="submit" class="btn btn-outline-danger btn-sm ms-2">Supprimer</a>
                         </td>
                     </form>
                 </tr>
@@ -325,6 +326,32 @@ HTML;
         </div>
         HTML;
         }
+    }
+
+    function initSupprimerEval($idEval){
+        echo <<<HTML
+        <div class="container mt-5">
+            <h1 class="fw-bold">SUPPRIMER UNE ÉVALUATION</h1>
+            <div class="card shadow bg-white rounded min-h75">
+                <div class="d-flex align-items-center p-5 mx-5">
+                    <div class="me-3">
+                        <svg width="35" height="35">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                    </div>
+                    <h3 class="fw-bold">Voulez-vous vraiment supprimer cette évaluation ?</h3>
+                </div>
+                <div class="rendu-list">
+                    <form method="POST" action="index.php?module=rendus&action=confirmationSupprimerEval&idEval=$idEval">
+                        <div class="w_100 d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary btn-danger m-3">Oui, supprimer l'évaluation et toutes les notes liés</button>
+                            <a href="javascript:history.go(-1)" class="btn btn-primary btn-success m-3">Non, annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        HTML;
     }
     
     
