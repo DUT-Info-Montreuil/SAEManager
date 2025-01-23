@@ -26,7 +26,7 @@
 
     <main><?= $module ?></main>
 
-    <script src="js/navbar/navbar.js"></script>
+    <script src="js/loading.js"></script>
 
 </body>
 

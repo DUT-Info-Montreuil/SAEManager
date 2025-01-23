@@ -483,26 +483,12 @@ class SaeModel extends Connexion
     function getNote($idSAE, $groupeID)
     {
         $idEleve = $_SESSION['idUtilisateur'];
-        // $req = "SELECT r.nom, note, coef
-        //         FROM Note
-        //         INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
-        //         INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
-        //         INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
-        //         WHERE EtudiantGroupe.idGroupe = :groupeID AND r.idSAE = :idSAE";
 
         $req = "SELECT r.nom, Notes.note, Evaluation.coef,Notes.idRendu
                 FROM Notes
                 INNER JOIN Evaluation ON Evaluation.idEval = Notes.idEval
                 INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
                 WHERE Notes.idEleve = :idEleve AND r.idSAE = :idSAE";
-
-        // $req = "SELECT n.idRendu, r.nom, note, Evaluation.coef, AVG(note) as moyenne
-        //         FROM Notes n
-        //         INNER JOIN Evaluation ON Evaluation.idEval = n.idEval
-        //         INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
-        //         WHERE n.ideleve = :idEleve AND r.idSAE = :idSAE
-        //         GROUP BY n.idRendu, r.nom
-        //         ";
 
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
@@ -515,24 +501,11 @@ class SaeModel extends Connexion
     {
         $idEleve = $_SESSION['idUtilisateur'];
 
-        // $req = "SELECT s.titre, note, coef
-        //         FROM Note
-        //         INNER JOIN Evaluation ON Evaluation.idEval = Note.idEval
-        //         INNER JOIN EtudiantGroupe ON Note.idEleve = EtudiantGroupe.idEtudiant
-        //         INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEval
-        //         WHERE EtudiantGroupe.idGroupe = :groupeID AND s.idSAE = :idSAE";
-
         $req = "SELECT s.titre, NotesSoutenance.note, Evaluation.coef, NotesSoutenance.idSoutenance
                 FROM NotesSoutenance
                 INNER JOIN Evaluation ON Evaluation.idEval = NotesSoutenance.idEval
                 INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEval
                 WHERE NotesSoutenance.idEleve = :idEleve AND s.idSAE = :idSAE";
-
-        // $req = "SELECT r.nom, Notes.note, Evaluation.coef,Notes.idRendu
-        // FROM Notes
-        // INNER JOIN Evaluation ON Evaluation.idEval = Notes.idEval
-        // INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
-        // WHERE Notes.idEleve = :idEleve AND r.idSAE = :idSAE";
 
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
