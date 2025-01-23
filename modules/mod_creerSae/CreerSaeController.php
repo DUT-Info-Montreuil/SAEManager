@@ -10,8 +10,8 @@ class CreerSaeController
 
     public function __construct()
     {
-        $this->view = new PanelAdminView();
-        $this->model = new PanelAdminModel();
+        $this->view = new CreerSaeView();
+        $this->model = new CreerSaeModel();
     }
 
     public function exec()

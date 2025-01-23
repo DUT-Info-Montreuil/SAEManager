@@ -82,7 +82,6 @@ class Site
 
 	public function execModule()
 	{
-        require_once 'modules/mod_paneladmin/PanelAdminModule.php';
 		if (!isset($_SESSION['loginUtilisateur'])) {
 			$this->moduleName = "connexion";
 		} else if (isset($_SESSION['loginUtilisateur']) && $this->moduleName == "connexion") {

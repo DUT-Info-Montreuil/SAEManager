@@ -10,6 +10,6 @@ class CreerSaeModule extends GenericModule
     public function __construct()
     {
         parent::__construct();
-        $this->controller = new PanelAdminController();
+        $this->controller = new CreerSaeController();
     }
 }
