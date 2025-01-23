@@ -570,6 +570,28 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
+    public function lesProfDeLaSAE($idSAE){
+        $req = "SELECT idPersonne, prenom, nom
+                FROM Personne
+                WHERE estProf = 1
+                AND idPersonne in (
+                                        SELECT idResp
+                                        FROM ResponsablesSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idIntervenant
+                                        FROM IntervenantSAE
+                                        WHERE idSAE = :idSAE
+                                        UNION
+                                        SELECT idResponsable
+                                        FROM SAE
+                                        WHERE idSAE = :idSAE)";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
     public function estProfSae($idSae, $idPersonne)
     {
         $req = "SELECT Personne.idPersonne , Personne.prenom, Personne.nom
@@ -655,7 +677,7 @@ class SaeModel extends Connexion
         }
     }
 
-    function createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants)
+    function createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants, $profs)
     {
         $reqEval = "INSERT INTO Evaluation (nom, coef, IntervenantEvaluateur) VALUES (:nom, :coeff, NULL)";
         $pdo_req_eval = self::$bdd->prepare($reqEval);
@@ -675,11 +697,27 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->bindValue(":idEvaluation", $idEvaluation);
         $pdo_req->execute();
+        
+        $idSoutenance = self::$bdd->lastInsertId();
+    
+        
+        foreach($profs as $prof){
+            $req = "INSERT INTO JurySoutenance VALUES (:idSoutenance, :idPersonne)";
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+            $pdo_req->bindValue(":idPersonne", $prof);
+            $pdo_req->execute();
+
+            $nomSae = $this->getSAEById($idSAE)[0]['nomSae'];
+            $message = "Vous avez été ajouter en tant que Jury sur une soutenance de la SAE $nomSae!";
+            $redirect = "index.php?module=sae&action=details&id=$idSAE";
+            $this->creeNotification($prof, $message, $idSAE, $redirect);
+
+        }
 
         $nomSae = $this->getSAEById($idSAE)[0]['nomSae'];
         $message = "Une nouvelle soutenance à été ajoutée à la sae $nomSae!";
         $redirect = "index.php?module=sae&action=details&id=$idSAE";
-
         foreach ($etudiants as $etudiant) {
             $this->creeNotification($etudiant['idPersonne'], $message, $idSAE, $redirect);
         }
@@ -1118,6 +1156,7 @@ class SaeModel extends Connexion
     {
         $req = "SELECT *
                 FROM Soutenance
+                INNER JOIN JurySoutenance
                 WHERE Soutenance.idSoutenance IN (SELECT idSoutenance
                                 FROM JurySoutenance
                                 WHERE idPersonne = :idPersonne)

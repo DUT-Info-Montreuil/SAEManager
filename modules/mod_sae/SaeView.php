@@ -71,7 +71,7 @@ HTML;
 
     // Détails
 
-    function initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources)
+    function initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants, $profs, $sae, $champs, $repId, $ressource, $rendus, $soutenance, $rendusDeposer, $supportsDeposer, $ressources, $listeProfSae)
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         $dateModif = htmlspecialchars($sae[0]['dateModificationSujet']);
@@ -109,7 +109,7 @@ HTML;
         echo $this->popUpSupressionDepot("Support", $idSAE);
         echo $this->popUpCreateRendu($idSAE);
         echo $this->popUpModifierRendu($idSAE);
-        echo $this->popUpCreateSoutenance($idSAE);
+        echo $this->popUpCreateSoutenance($idSAE, $listeProfSae);
         echo $this->popUpModifierSoutenance($idSAE);
         echo $this->popUpCreateChamp($idSAE);
         echo $this->popUpModifierSujet($idSAE, $sae);
@@ -699,7 +699,7 @@ HTML .
             // Documents
             echo <<<HTML
                 <!-- Documents(s) -->
-                <div class="container mt-5">
+                <div class="container mt-5 h-100">
                     <h1 class="fw-bold">Cloud du groupe</h1>
                     <div class="card shadow bg-white rounded p-4 min-h75">
                         <div class="mb-5">
@@ -819,7 +819,7 @@ HTML;
         }
 
         echo <<<HTML
-        <div class="container mt-5">
+        <div class="container mt-5 h-100">
             <h1 class="fw-bold">$nom</h1>
             <div class="card-general shadow bg-white rounded p-4 min-h75">
                 <!-- Notes des rendus -->
@@ -1146,7 +1146,6 @@ HTML;
             foreach ($soutenances as $soutenance) {
                 $id = htmlspecialchars($soutenance['idSoutenance']);
                 $titre = htmlspecialchars($soutenance['titre']);
-
                 echo $this->initLineSoutenance($titre, $id, $idSae);
             }
         } else {
@@ -1542,8 +1541,19 @@ HTML;
     HTML;
     }
 
-    function popUpCreateSoutenance($idSae)
+    function popUpCreateSoutenance($idSae, $profsSae)
     {
+        $inputs = '';
+        foreach($profsSae as $prof){
+            $nom = $prof['nom'];
+            $prenom = $prof['prenom'];
+            $inputs.='
+            <div class="form-check profs">
+                <input class="form-check-input" name="profs[]" type="checkbox" value="' . $prof['idPersonne'] . '" id="' . $prof['idPersonne'] . '">
+                <label class="form-check-label" for="' . $prof['idPersonne'] . '">' . $prenom . ' ' . $nom . '</label>
+            </div>';
+        }
+
         return <<<HTML
         <div class="modal" tabindex="-1" id="modalCreateSoutenance">
             <div class="modal-dialog">
@@ -1568,6 +1578,21 @@ HTML;
                             </div>
                             <div class="form-group mb-3">
                                 <input type="number" class="form-control" name="dureeSoutenance" id="dureeSoutenance" placeholder="Durée (en minutes)" required>
+                            </div>
+                            <label class="form-label fw-bold">Ajoutez un jury à la soutenance:</label>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdownButton">Rechercher des profs</button>
+                                <div class="dropdown-menu p-2 w-100" id="dropdownContent" style="display: none;">
+                                <input 
+                                type="text" 
+                                class="form-control mb-2" 
+                                id="searchInput" 
+                                placeholder="Rechercher...">    
+                                $inputs
+                                </div>
+                            </div>
+                            <div class="text-danger mt-2" id="errorMessage" style="display: none;">
+                                Vous devez sélectionner au moins un étudiant.
                             </div>
                             <div>
                                 <button type="submit" class="btn btn-success m-3">Valider</button>

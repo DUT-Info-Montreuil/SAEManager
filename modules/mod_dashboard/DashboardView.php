@@ -213,9 +213,9 @@ HTML;
         $dateTime = new DateTime($dateLimite);
         $dateTimeToCheck = new DateTime($dateToCheck);
 
-        if ($dateTimeToCheck < $dateTime)
+        if ($dateTimeToCheck < (clone $dateTime)->modify('-24 hours'))
             return "success";
-        else if ($dateTimeToCheck > $dateTime && $dateTimeToCheck < (clone $dateTime)->modify('+24 hours'))
+        else if ($dateTimeToCheck < $dateTime)
             return "warning";
         else
             return "danger";

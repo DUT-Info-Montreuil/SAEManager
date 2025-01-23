@@ -171,6 +171,7 @@ class SaeController
             $champs = $this->model->getChampBySae($_GET['id']);
             $repId = $this->model->getReponseIdBySAE($_GET['id']);
             $allRessource = $this->model->getRessource();
+            $listeProfSae = $this->model->lesProfDeLaSAE($_GET['id']);
 
             $rendusDeposer = [];
 
@@ -202,7 +203,7 @@ class SaeController
             $groupes = $this->model->formationGroupes($_GET['id']);
             $pasinscrits = $this->model->getEtudiantsPasInscrits($_GET['id']);
 
-            $this->view->initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource);
+            $this->view->initSaeDetails($pasinscrits, $groupes, $infosEtudiant, $etudiants, $profs, $saes, $champs, $repId, $ressource, $rendus, $soutenances, $rendusDeposer, $supportsDeposer, $allRessource, $listeProfSae);
         } else {
             header('Location: index.php');
         }
@@ -373,10 +374,12 @@ class SaeController
         $date = $_POST['dateSoutenance'];
         $duree = $_POST['dureeSoutenance'];
         $salle = $_POST['salleSoutenance'];
+        $profs = $_POST['profs'];
 
         $etudiants = $this->model->etudiantQuiOnGroupeDansSAE($idSAE);
-        $this->model->createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants);
-        header("Location: " . $_SERVER['HTTP_REFERER']);
+        $this->model->createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants, $profs);
+  
+        //header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
     private function delSoutenance()

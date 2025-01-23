@@ -4,7 +4,6 @@
 class DashboardModel extends Connexion{
     public function getRenduNonRenduPersonne($idPersonne)
     {
-
         $req = "SELECT distinct(Rendu.idRendu) as idRendu, Rendu.nom, Rendu.dateLimite, Rendu.idSAE, Rendu.idEvaluation, SAE.nomSae
         FROM Rendu
         INNER JOIN SAE ON Rendu.idSAE = SAE.idSAE
@@ -14,7 +13,7 @@ class DashboardModel extends Connexion{
                                   WHERE EtudiantGroupe.idEtudiant = :idPersonne)
         AND Groupe.idgroupe NOT IN (SELECT idGroupe
                                       FROM RenduGroupe
-                                      WHERE RenduGroupe.idRendu = idRendu)
+                                      WHERE RenduGroupe.idRendu = Rendu.idRendu)
         ORDER BY Rendu.dateLimite ASC
          ";
 
