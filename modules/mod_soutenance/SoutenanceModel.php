@@ -64,7 +64,7 @@ class SoutenanceModel extends Connexion
                     p.nom AS Eleve_nom,
                     p.prenom AS Eleve_prenom
                 FROM Evaluation e
-                JOIN Notes n ON e.idEval = n.idEval
+                JOIN NotesSoutenance n ON e.idEval = n.idEval
                 JOIN Personne p ON n.idEleve = p.idPersonne
                 WHERE e.idEval = :idEval
                 ORDER BY n.idEleve;";

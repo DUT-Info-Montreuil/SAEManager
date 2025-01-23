@@ -380,7 +380,6 @@ dropdownButton.addEventListener('click', function () {
   if (!isVisible) searchInput.focus();
 });
 
-// Mettre à jour texte bouton
 function updateDropdownButton() {
   const selected = Array.from(checkboxes)
     .filter(checkbox => checkbox.querySelector('input').checked)
@@ -389,7 +388,6 @@ function updateDropdownButton() {
   dropdownButton.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des étudiants';
 }
 
-// Filtrer options
 searchInput.addEventListener('input', () => {
   const filter = searchInput.value.toLowerCase();
   checkboxes.forEach((checkbox) => {
@@ -412,11 +410,9 @@ document.addEventListener('click', function (event) {
 });
 
 form.addEventListener('submit', function (event) {
-  // Vérifie cases cochées
   const isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-
+  alert(checkboxes);
   if (!isChecked) {
-      // Annule soumission formulaire
       event.preventDefault();
       errorMessage.style.display = 'block';
   } else {

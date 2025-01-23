@@ -37,17 +37,23 @@ class RendusController
                 $this->initRendus();
                 break;
         }
+        $this->view->initScript();
     }
 
     private function initRendus(){
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
             $rendus = $this->model->getRendusProfByPersonne($_SESSION['idUtilisateur']);
             $notes = $this->model->getNotesdesRendusProfByPersonne($_SESSION['idUtilisateur']);
+            $intervenants = $this->model->getAllIntervenantbyAllSaebyProf($_SESSION['idUtilisateur']);
+            //var_dump($intervenants);
+            //Recupérer toute les sae avec leur intervenants
         }else{
             $rendus = $this->model->getRendusByPersonne($_SESSION['idUtilisateur']);
             $notes = "";
+            $intervenants = "";
         }
-        $this->view->initRendusPage($rendus,$notes);
+        $this->view->initRendusPage($rendus,$notes,$intervenants);
+        
     }
     private function initAjouterUneNote(){
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
@@ -150,7 +156,8 @@ class RendusController
             $idEval = $_POST['idEval'];
             $noteNom = $_POST['noteNom'];
             $coef = $_POST['coef'];
-            $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef);
+            $idIntervenants = isset($_POST['intervenant']) ? $_POST['intervenant'] : [];
+            $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef,$idIntervenants);
             header('Location: index.php?module=rendus&action=home');
 
             

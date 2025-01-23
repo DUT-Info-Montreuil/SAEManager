@@ -4,16 +4,15 @@ class RendusView extends GenericView
 {
     public function __construct()
     {
-        echo '<script src="js/renduview.js"></script>';
         parent::__construct();
     }
 
-    public function initRendusPage($rendus, $notes)
+    public function initRendusPage($rendus, $notes,$intervenants)
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
             <div class="container mt-5">
-                <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
+                <h1 class="fw-bold">ÉVALUER DES RENDU(S)</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
                         <div class="me-3">
@@ -21,7 +20,7 @@ class RendusView extends GenericView
                                 <use xlink:href="#arrow-icon"></use>
                             </svg>
                         </div>
-                        <h3 class="fw-bold">Tous les rendus auxquels vous êtes responsable, co-responsable ou intervenant</h3>
+                        <h3 class="fw-bold">Tous les rendus auxquels vous êtes responsable, co-responsable ou intervenant des SAE</h3>
                     </div>
                     <div class="rendu-list">
 HTML;
@@ -42,8 +41,7 @@ HTML;
                 $notesForRendu = array_filter($notes, function ($note) use ($rendu) {
                     return $note['idRendu'] === $rendu['idRendu'];
                 });
-                // var_dump($notes);lineRendusProf
-                echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu,$idRendu);
+                echo $this->lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notesForRendu,$idRendu,$intervenants);
             }
 
             echo <<<HTML
@@ -75,12 +73,15 @@ HTML;
             echo $this->lineRendus($renduNom, $saeNom, $dateLimite, $idSAE);
         }
         <<<HTML
+                </div>
+            </div>        
         </div>
-            </div>
-                
-            </div>
+        
 HTML;
         }
+    }
+    function initScript(){
+        echo '<script src="js/renduview.js"></script>';
     }
 
     function lineRendus($renduNom, $saeNom, $dateLimite, $idSAE)
@@ -101,7 +102,7 @@ HTML;
 HTML;
     }
 
-    function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes, $idRendu) {
+    function lineRendusProf($renduNom, $saeNom, $dateLimite, $idSAE, $notes, $idRendu,$intervenants) {
         $notesTable = '';
         $uniqueNotes = [];
     
@@ -116,6 +117,8 @@ HTML;
             $noteNom = $note['Eval_nom'] ? htmlspecialchars($note['Eval_nom'], ENT_QUOTES, 'UTF-8') : "";
             $noteId = $note['idEval'] ? $note['idEval'] : "";
             $coef = $note['Eval_coef'] ? htmlspecialchars($note['Eval_coef'], ENT_QUOTES, 'UTF-8') : "";
+            $idDeCetteSae = $note['idSAE'] ? htmlspecialchars($note['idSAE']) : "";
+            $idIntervenantEvaluateur = $note['idIntervenantEvaluateur'] ? htmlspecialchars($note['idIntervenantEvaluateur']) : "";
             $canEvaluate = $note['PeutEvaluer'] 
                 ? '<a href="index.php?module=rendus&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>' 
                 : 'Vous n\'êtes pas évaluateur';
@@ -125,13 +128,18 @@ HTML;
                 <tr>
                     <form method="POST" action="index.php?module=rendus&action=homeMaj">
                         <input type="hidden" name="idEval" value="$noteId">
-                        <td>
+                        <td class="text-center">
                             <input class="input-group form-control" type="text" name="noteNom" value="$noteNom" placeholder="Nom de l'évaluation">
                         </td>
-                        <td>$canEvaluate</td>
-                        <td class="d-flex">
+                        <td class="text-center">
                             <input type="number" name="coef" class="form-control form-control-sm w-auto" value="$coef" placeholder="Coef">
-                            <button type="submit" class="btn btn-primary btn-sm btn-success">Valider</button>
+                        </td>
+                        <td class="text-center">
+                            {$this->initAjoutIntervenant($intervenants,$idDeCetteSae,$idIntervenantEvaluateur)}
+                        </td>
+                        <td class="align-center d-flex">
+                            $canEvaluate
+                            <button type="submit" class="btn btn-primary btn-sm btn-success ms-2">Valider</button>
                         </td>
                     </form>
                 </tr>
@@ -145,8 +153,9 @@ HTML;
                 <thead>
                     <tr>
                         <th>Nom de la note</th>
-                        <th>Action</th>
                         <th>Coefficient</th>
+                        <th>Intervenant</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 $notesTable
@@ -202,6 +211,31 @@ HTML;
     HTML;
     }
     
+    
+    function initAjoutIntervenant($intervenants, $idEval,$idIntervenantEvaluateur) {
+        $options = '';
+        
+        foreach ($intervenants as $intervenant) {
+            $testIdEval = $intervenant['idSAE'] ? htmlspecialchars($intervenant['idSAE']) : "";
+            $id = $intervenant['Intervenant_id'] ? htmlspecialchars($intervenant['Intervenant_id']) : "";
+            $nom = $intervenant['Intervenant_nom'] ? htmlspecialchars($intervenant['Intervenant_nom']) : "";
+            $prenom = $intervenant['Intervenant_prenom'] ? htmlspecialchars($intervenant['Intervenant_prenom']) : "";
+            if ($id && $testIdEval == $idEval) {
+                $options .= '<option name="id_intervenent_'.$id.'" value="' . $id . '" ';
+                if ($idIntervenantEvaluateur==$id){
+                    $options .= "selected";
+                }  
+                $options .= '>' . $prenom . ' ' . $nom . '</option>';
+            }
+        }
+        
+        return <<<HTML
+        <select class="form-select" name="intervenant[]">
+            <option value="" >Aucun intervenant</option>
+            $options
+        </select>
+    HTML;
+    }
     
     
     

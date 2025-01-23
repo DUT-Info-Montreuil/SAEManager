@@ -19,7 +19,7 @@ class RendusModel extends Connexion
     }
     
     function getRendusProfByPersonne($idPersonne){
-        $req = "SELECT DISTINCT Rendu.idRendu,Rendu.nom AS Rendu_nom,SAE.nomSae AS SAE_nom,Rendu.dateLimite,Rendu.idSAE
+        $req = "SELECT DISTINCT Rendu.idRendu, Rendu.nom AS Rendu_nom, SAE.nomSae AS SAE_nom, Rendu.dateLimite, Rendu.idSAE
                 FROM SAE
                 JOIN Rendu ON SAE.idSAE = Rendu.idSAE
                 LEFT JOIN ResponsablesSAE ON SAE.idSAE = ResponsablesSAE.idSAE
@@ -43,11 +43,12 @@ class RendusModel extends Connexion
             e.nom AS Eval_nom,
             e.coef AS Eval_coef,
             n.note AS Note_valeur,
+            e.IntervenantEvaluateur AS idIntervenantEvaluateur,
             CASE 
-                WHEN s.idResponsable = :idPersonne THEN 1
-                WHEN rs.idResp = :idPersonne THEN 1
-                WHEN e.IntervenantEvaluateur = :idPersonne THEN 1
-                ELSE 0 
+            WHEN s.idResponsable = :idPersonne THEN 1
+            WHEN rs.idResp = :idPersonne THEN 1
+            WHEN e.IntervenantEvaluateur = :idPersonne THEN 1
+            ELSE 0 
             END AS PeutEvaluer
         FROM Rendu r
         JOIN SAE s ON r.idSAE = s.idSAE
@@ -134,6 +135,29 @@ class RendusModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    
+    function getAllIntervenantbyAllSaebyProf($idPersonne) {
+        $req = "
+        SELECT 
+            s.idSAE,
+            s.nomSae AS SAE_nom,
+            p.idPersonne AS Intervenant_id,
+            p.nom AS Intervenant_nom,
+            p.prenom AS Intervenant_prenom
+        FROM SAE s
+        LEFT JOIN ResponsablesSAE rs ON s.idSAE = rs.idSAE
+        LEFT JOIN IntervenantSAE i ON s.idSAE = i.idSAE
+        LEFT JOIN Personne p ON i.idIntervenant = p.idPersonne
+        WHERE s.idResponsable = :idPersonne OR rs.idResp = :idPersonne
+        ORDER BY s.idSAE, p.nom, p.prenom;
+        ";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
     
     function creerNotePourUnRendu($idRendu) {
         // Créer une nouvelle évaluation pour le rendu s'il n'en a pas déjà
@@ -163,12 +187,13 @@ class RendusModel extends Connexion
         $insertNotes->execute();
     }
     
-    function MettreAJourInfoUneEval($idEval, $noteNom, $coef){
-        $req = "UPDATE Evaluation SET nom = :noteNom, coef = :coef WHERE idEval = :idEval";
+    function MettreAJourInfoUneEval($idEval, $noteNom, $coef,$intervenants){
+        $req = "UPDATE Evaluation SET nom = :noteNom, coef = :coef, IntervenantEvaluateur = :idIntervenant WHERE idEval = :idEval";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idEval", $idEval, PDO::PARAM_INT);
         $pdo_req->bindParam("noteNom", $noteNom, PDO::PARAM_STR);
         $pdo_req->bindParam("coef", $coef, PDO::PARAM_INT);
+        $pdo_req->bindParam("idIntervenant", $intervenants[0], PDO::PARAM_INT);
         $pdo_req->execute();
     }
 

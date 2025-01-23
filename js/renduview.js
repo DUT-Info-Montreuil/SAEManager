@@ -57,8 +57,79 @@ function updateGroupNotes(groupeId) {
     });
 }
 
-// Fonction pour empêcher le repliage du tableau quand on clique sur l'input
+// fonction pour empêcher le repliage du tableau quand on clique sur l'input
 function preventGroupToggle(event, groupeId) {
-    event.stopPropagation(); // Empêche la propagation de l'événement "click" vers l'élément parent
+    event.stopPropagation(); 
 }
 
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Gestion des boutons dropdown
+    const dropdownButtons = document.querySelectorAll('.dropdown-toggle');
+    dropdownButtons.forEach((button) => {
+        button.addEventListener('click', function () {
+            const dropdownId = this.dataset.id; // Récupère l'ID unique (idEval)
+            const dropdownContent = document.querySelector(`#dropdownContent_${dropdownId}`);
+
+            // Ferme tous les autres dropdowns
+            document.querySelectorAll('.dropdownContent').forEach((content) => {
+                if (content !== dropdownContent) {
+                    content.style.display = 'none';
+                }
+            });
+
+            // Ouvre ou ferme le dropdown actuel
+            const isVisible = dropdownContent.style.display === 'block';
+            dropdownContent.style.display = isVisible ? 'none' : 'block';
+
+            // Focus sur le champ de recherche si ouvert
+            if (!isVisible) {
+                const searchInput = dropdownContent.querySelector('.searchInput');
+                searchInput.focus();
+            }
+        });
+    });
+
+    // Gestion de la recherche
+    const searchInputs = document.querySelectorAll('.searchInput');
+    searchInputs.forEach((searchInput) => {
+        searchInput.addEventListener('input', function () {
+            const dropdownId = this.dataset.id; // ID unique du dropdown (idEval)
+            const filter = this.value.toLowerCase();
+            const checkboxes = document.querySelectorAll(`#dropdownContent_${dropdownId} .form-check`);
+
+            checkboxes.forEach((checkbox) => {
+                const label = checkbox.querySelector('label').textContent.toLowerCase();
+                checkbox.style.display = label.includes(filter) ? 'block' : 'none';
+            });
+        });
+    });
+
+    // Gestion des clics en dehors du dropdown
+    document.addEventListener('click', function (event) {
+        const isClickInside = event.target.closest('.dropdown');
+        if (!isClickInside) {
+            document.querySelectorAll('.dropdownContent').forEach((content) => {
+                content.style.display = 'none';
+            });
+        }
+    });
+
+    // Mise à jour du texte du bouton dropdown
+    const checkboxes = document.querySelectorAll('.form-check-input');
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', function () {
+            const dropdownId = this.closest('.dropdownContent').id.split('_')[1];
+            const button = document.querySelector(`#dropdownButton_${dropdownId}`);
+            const selected = Array.from(
+                document.querySelectorAll(`#dropdownContent_${dropdownId} .form-check-input:checked`)
+            ).map((input) => {
+                const label = input.closest('.form-check').querySelector('label').textContent.trim();
+                return label;
+            });
+
+            button.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des intervenants';
+        });
+    });
+});

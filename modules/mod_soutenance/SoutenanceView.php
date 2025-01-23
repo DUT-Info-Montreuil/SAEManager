@@ -12,7 +12,7 @@ class SoutenanceView extends GenericView
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">LISTE DES SOUTENANCE(S)</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
@@ -97,10 +97,13 @@ HTML;
                             <input class="input-group form-control" type="text" name="noteNom" value="$noteNom" placeholder="Nom de l'évaluation">
                         </td>
                         <td>$canEvaluate</td>
-                        <td class="d-flex">
+                        <td>
                             <input type="number" name="coef" class="form-control form-control-sm w-auto" value="$coef" placeholder="Coef">
+                        </td>
+                        <td>
                             <button type="submit" class="btn btn-primary btn-sm btn-success">Valider</button>
                         </td>
+                        
                     </form>
                 </tr>
                 HTML;
