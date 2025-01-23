@@ -13,7 +13,7 @@ class SoutenanceView extends GenericView
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
             <div class="container mt-5 h-100">
-                <h1 class="fw-bold">LISTE DES SOUTENANCE(S)</h1>
+                <h1 class="fw-bold">ÉVALUER DES SOUTENANCE(S)</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
                         <div class="me-3">

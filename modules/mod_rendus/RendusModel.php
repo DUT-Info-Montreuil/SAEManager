@@ -24,7 +24,8 @@ class RendusModel extends Connexion
                 JOIN Rendu ON SAE.idSAE = Rendu.idSAE
                 LEFT JOIN ResponsablesSAE ON SAE.idSAE = ResponsablesSAE.idSAE
                 LEFT JOIN IntervenantSAE ON SAE.idSAE = IntervenantSAE.idSAE
-                WHERE SAE.idResponsable = :idPersonne OR ResponsablesSAE.idResp = :idPersonne OR IntervenantSAE.idIntervenant = :idPersonne;";
+                WHERE SAE.idResponsable = :idPersonne OR ResponsablesSAE.idResp = :idPersonne OR IntervenantSAE.idIntervenant = :idPersonne
+                ORDER BY SAE_nom;";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
         $pdo_req->execute();
@@ -61,7 +62,7 @@ class RendusModel extends Connexion
             OR rs.idResp = :idPersonne
             OR i.idIntervenant = :idPersonne
             OR e.IntervenantEvaluateur = :idPersonne
-        ORDER BY r.idRendu, e.idEval;
+        ORDER BY SAE_nom;
         ";
     
         $pdo_req = self::$bdd->prepare($req);
