@@ -1849,12 +1849,16 @@ HTML;
                                 <option value="" disable>-- Sélectionnez un élève --</option>
                                 $options
                             </select>
+                            <select name="edit" class="form-select" id="addEtudiant" required>
+                                <option value="" disable>-- Sélectionnez un élève --</option>
+                                $options
+                            </select>
                         </div>
                     </div>
                     $edit
                     <button type="button" id="addEtudiantField" class="btn btn-secondary">Ajouter un élève</button>
                     <div class="d-flex">
-                        <button type="submit" class="btn btn-primary ms-auto">Envoyer</button>
+                        <button type="submit" class="btn btn-primary ms-auto">Créer le groupe</button>
                     </div>
                 </form>
             </div>

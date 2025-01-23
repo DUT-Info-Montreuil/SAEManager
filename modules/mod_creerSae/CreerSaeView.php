@@ -8,7 +8,7 @@ class CreerSaeView extends GenericView
         parent::__construct();
     }
 
-    public function initCreerSaePage($listePersonne)
+    public function initCreerSaePage($listePersonne,$msg)
     {
         echo <<<HTML
         <div class="container mt-5 h-100">
@@ -45,78 +45,84 @@ class CreerSaeView extends GenericView
                     <!-- Co-responsables -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Co-responsables</label>
-                        <div class="border p-2 choix-responsable" style="max-height: 150px; overflow-y: auto;">
+                        <input type="text" class="form-control mb-2" id="searchCoResponsables" placeholder="Rechercher un co-responsable par nom ou prénom">
+                        <div class="border p-2 choix-responsable" style="max-height: 150px; overflow-y: auto;" id="coResponsablesList">
     HTML;
 
-        // Générer les co-responsables
-        foreach ($listePersonne as $personne) {
-            if ($personne['estProf']) {
-                $id = htmlspecialchars($personne['idPersonne']);
-                $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
-                echo <<<HTML
-                            <div class="form-check">
+                    // Générer les co-responsables
+                    foreach ($listePersonne as $personne) {
+                        if ($personne['estProf']) {
+                            $id = htmlspecialchars($personne['idPersonne']);
+                            $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
+                            echo <<<HTML
+                            <div class="form-check co-responsable-item">
                                 <input class="form-check-input" type="checkbox" id="coResponsable$id" name="coResponsables[]" value="$id">
                                 <label class="form-check-label" for="coResponsable$id">$nomPrenom</label>
                             </div>
     HTML;
-            }
-        }
+                        }
+                    }
 
-        echo <<<HTML
+                    echo <<<HTML
                         </div>
                         <small class="text-muted">Cochez les co-responsables nécessaires. Laissez vide si aucun.</small>
                     </div>
+
     
                     <!-- Intervenants -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Intervenants</label>
-                        <div class="border p-2" style="max-height: 150px; overflow-y: auto;">
+                        <input type="text" class="form-control mb-2" id="searchIntervenants" placeholder="Rechercher un intervenant par nom ou prénom">
+                        <div class="border p-2" style="max-height: 150px; overflow-y: auto;" id="intervenantsList">
     HTML;
 
-        // Générer les intervenants
-        foreach ($listePersonne as $personne) {
-            if ($personne['estProf']) {
-
-                $id = htmlspecialchars($personne['idPersonne']);
-                $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
-                echo <<<HTML
-                            <div class="form-check">
+                    // Générer les intervenants
+                    foreach ($listePersonne as $personne) {
+                        if ($personne['estProf']) {
+                            $id = htmlspecialchars($personne['idPersonne']);
+                            $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
+                            echo <<<HTML
+                            <div class="form-check intervenant-item">
                                 <input class="form-check-input" type="checkbox" id="intervenant$id" name="intervenants[]" value="$id">
                                 <label class="form-check-label" for="intervenant$id">$nomPrenom</label>
                             </div>
     HTML;
-            }
-        }
+                        }
+                    }
 
-        echo <<<HTML
+                    echo <<<HTML
                         </div>
                         <small class="text-muted">Cochez les intervenants nécessaires. Laissez vide si aucun.</small>
                     </div>
+
     
                     <!-- Ajouter des élèves -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Ajouter des élèves</label>
-                        <div class="border p-2" style="max-height: 150px; overflow-y: auto;">
+                        <input type="text" class="form-control mb-2" id="searchEleves" placeholder="Rechercher un élève par nom ou prénom">
+                        <div class="border p-2" style="max-height: 150px; overflow-y: auto;" id="elevesList">
     HTML;
 
-        // Générer les élèves
-        foreach ($listePersonne as $personne) {
-            if (!($personne['estProf'])) {
-
-                $id = htmlspecialchars($personne['idPersonne']);
-                $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
-                echo <<<HTML
-                            <div class="form-check">
+                    // Générer les élèves
+                    foreach ($listePersonne as $personne) {
+                        if (!($personne['estProf'])) {
+                            $id = htmlspecialchars($personne['idPersonne']);
+                            $nomPrenom = htmlspecialchars($personne['prenom'] . ' ' . $personne['nom']);
+                            echo <<<HTML
+                            <div class="form-check eleve-item">
                                 <input class="form-check-input" type="checkbox" id="eleve$id" name="eleves[]" value="$id">
                                 <label class="form-check-label" for="eleve$id">$nomPrenom</label>
                             </div>
     HTML;
-            }
-        }
+                        }
+                    }
 
-        echo <<<HTML
+                    echo <<<HTML
                         </div>
                         <small class="text-muted">Cochez les élèves nécessaires. Laissez vide si aucun.</small>
+                    </div>
+                    <div>
+                        <p class="text-danger">$msg</p>
                     </div>
     
                     <div class="d-flex justify-content-end">
@@ -126,5 +132,8 @@ class CreerSaeView extends GenericView
             </div>
         </div>
     HTML;
+    }
+    function initScript(){
+        echo '<script src="js/creersaeview.js"></script>';
     }
 }

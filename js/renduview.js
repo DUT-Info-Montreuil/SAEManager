@@ -51,7 +51,14 @@ function toggleGroup(groupeId) {
 function updateGroupNotes(groupeId) {
     var globalNote = document.getElementById("global-note-" + groupeId).value;
     var elevesNotes = document.querySelectorAll("#table-wrapper-" + groupeId + " input[name^='note_']");
-    
+    if(globalNote<0){
+        globalNote=0;
+        document.getElementById("global-note-" + groupeId).value=0;
+    }else if(globalNote>20){
+        globalNote=20;
+        document.getElementById("global-note-" + groupeId).value=20;
+    }
+        
     elevesNotes.forEach(function(input) {
         input.value = globalNote;
     });
