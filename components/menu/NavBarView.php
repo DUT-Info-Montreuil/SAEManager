@@ -80,7 +80,6 @@ HTML;
 HTML;
 				if (!$estProfUtilisateur)
 					$this->affichage .= <<<HTML
-				<a href="index.php?module=sae&action=groupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Groupe</a>
 				<a href="index.php?module=sae&action=cloud&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Cloud</a>
 				<a href="index.php?module=sae&action=note&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Notes</a>
 HTML;
