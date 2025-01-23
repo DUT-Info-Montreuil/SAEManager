@@ -1849,10 +1849,6 @@ HTML;
                                 <option value="" disable>-- Sélectionnez un élève --</option>
                                 $options
                             </select>
-                            <select name="edit" class="form-select" id="addEtudiant" required>
-                                <option value="" disable>-- Sélectionnez un élève --</option>
-                                $options
-                            </select>
                         </div>
                     </div>
                     $edit

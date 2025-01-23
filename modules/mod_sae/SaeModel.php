@@ -1049,6 +1049,7 @@ class SaeModel extends Connexion
                 WHERE EleveInscritSae.idSAE = :idSAE
             ";
             $insertNotes = self::$bdd->prepare($notesReq);
+            $insertNotes->bindValue(":idSAE", $idSAE);
             $insertNotes->execute();
         }
         $this->eraseProposition($idProposition);
