@@ -123,6 +123,9 @@ class SaeController
             case "ajoutEtudiantSAE":
                 $this->ajoutEtudiantSAE();
                 break;
+            case "uploadGroupImage":
+                $this->uploadGroupImage();
+                break;
         }
     }
 
@@ -220,8 +223,9 @@ class SaeController
         $groupeID = $this->model->getMyGroupId($_GET['id']);
         $groupe = $this->model->getMyGroup($_GET['id'], $groupeID);
         $responsable = $this->model->getSaeResponsable($_GET['id']);
+        $members = $this->model->getSAEMembers($_GET['id']);
 
-        $this->view->initGroupPage($sae, $groupe, $responsable);
+        $this->view->initGroupPage($sae, $groupe, $responsable, $members);
     }
 
     private function initNote()
@@ -475,15 +479,17 @@ class SaeController
 
     private function creerPropositionGroupe()
     {
+
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
         $nomGroupe = $_POST['nomGroupe'];
+        $editable = $_POST['editableGroup'] === "on" ? 1 : 0;
         if (count($_POST['etudiants']) == count(array_unique($_POST['etudiants']))) {
 
             $_POST['etudiants'] = array_filter($_POST['etudiants']);
             if ($_SESSION['estProfUtilisateur'] != 1)
                 array_push($_POST['etudiants'], $_SESSION['idUtilisateur']);
 
-            $this->model->propositionGroupe($_POST['etudiants'], $idSae, $nomGroupe);
+            $this->model->propositionGroupe($_POST['etudiants'], $idSae, $nomGroupe, $editable);
         }
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
@@ -496,7 +502,7 @@ class SaeController
         $i = 0;
 
         while (isset($_POST['etudiant' . $i])) {
-            echo "here";
+            var_dump($_POST);
             $idEtudiants[$i] = $_POST['etudiant' . $i];
             $i++;
         }
@@ -575,4 +581,16 @@ class SaeController
 
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
+
+    public function uploadGroupImage() {
+        
+        $file = isset($_FILES['groupImage']) ? $_FILES['groupImage'] : exit("file not set");
+        $fileName = $_FILES['groupImage']['name'];
+        $idGroupe = $_GET['idGroupe'];
+
+    
+        $this->model->uploadGroupImage($file, $idGroupe, $fileName);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+    
 }

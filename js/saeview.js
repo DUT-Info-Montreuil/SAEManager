@@ -368,7 +368,7 @@ function removeField(button) {
 }
 
 const searchInput = document.getElementById('searchInput');
-const checkboxes = document.querySelectorAll('.form-check');
+const checkboxes = document.querySelectorAll('.form-check.student');
 const dropdownButton = document.querySelector('.dropdown-toggle');
 const dropdownContent = document.getElementById('dropdownContent');
 const errorMessage = document.getElementById('errorMessage');

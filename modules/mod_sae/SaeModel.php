@@ -376,7 +376,7 @@ class SaeModel extends Connexion
 
     function getMyGroupId($idSAE)
     {
-        $req = "SELECT g.idGroupe
+        $req = "SELECT g.idGroupe, g.imageTitre
                 FROM Personne
                 INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
                 INNER JOIN Groupe g ON g.idGroupe = EtudiantGroupe.idGroupe
@@ -396,7 +396,7 @@ class SaeModel extends Connexion
                 $idGroupe = $id['idGroupe'];
             }
 
-            $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE
+            $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE, p.nom, g.nom AS GroupeName, g.imageTitre, g.estModifiableParEleve
                     FROM Personne p
                     INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = p.idPersonne
                     INNER JOIN Groupe g ON EtudiantGroupe.idGroupe = g.idGroupe
@@ -415,17 +415,17 @@ class SaeModel extends Connexion
     function getSAEResponsable($idSAE)
     {
 
-        $req = "SELECT p.idPersonne, p.nom, p.prenom
+        $req = "SELECT p.idPersonne, p.nom, p.prenom, p.photoDeProfil
                 FROM Personne p
                 INNER JOIN SAE ON p.idPersonne = SAE.idResponsable
                 WHERE SAE.idSAE = :idSAE
                 UNION
-                SELECT p.idPersonne, p.nom, p.prenom
+                SELECT p.idPersonne, p.nom, p.prenom, p.photoDeProfil
                 FROM Personne p
                 INNER JOIN IntervenantSAE ON p.idPersonne = IntervenantSAE.idIntervenant
                 WHERE IntervenantSAE.idSAE = :idSAE
                 UNION
-                SELECT p.idPersonne, p.nom, p.prenom
+                SELECT p.idPersonne, p.nom, p.prenom, p.photoDeProfil
                 FROM Personne p
                 INNER JOIN ResponsablesSAE ON p.idPersonne = ResponsablesSAE.idResp
                 WHERE ResponsablesSAE.idSAE = :idSAE";
@@ -863,13 +863,16 @@ class SaeModel extends Connexion
         return true;
     }
 
-    public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe)
+    public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe, $edit)
     {
+
+        var_dump($edit);
         if ($this->isInscrivablesBySAE($id_etudiants, $idSAE)) {
-            $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe) VALUES (DEFAULT, :idSAE, :nomGroupe)";
+            $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe, edit) VALUES (DEFAULT, :idSAE, :nomGroupe, :edit)";
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idSAE", $idSAE);
             $pdo_req->bindValue(":nomGroupe", $nomGroupe);
+            $pdo_req->bindValue(":edit", $edit);
             $pdo_req->execute();
 
             $req = "SELECT max(idProposition)
@@ -937,9 +940,9 @@ class SaeModel extends Connexion
 
 
 
-        $req = "INSERT INTO Groupe (idgroupe, nom, imageTitre, idSAE) VALUES (DEFAULT, 
-                                        (SELECT nomGroupe FROM PropositionsGroupe WHERE idProposition = :idProposition), DEFAULT, 
-                                        (SELECT idSAE FROM PropositionsGroupe WHERE idProposition = :idProposition))";
+        $req = "INSERT INTO Groupe (idgroupe, nom, imageTitre, idSAE, estModifiableParEleve) VALUES (DEFAULT, 
+                                        (SELECT nomGroupe FROM PropositionsGroupe WHERE idProposition = :idProposition), '67926371864af-groupeImage.png', 
+                                        (SELECT idSAE FROM PropositionsGroupe WHERE idProposition = :idProposition), (SELECT edit FROM PropositionsGroupe WHERE idProposition = :idProposition))";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idProposition", $idProposition);
         $pdo_req->execute();
@@ -1155,4 +1158,37 @@ class SaeModel extends Connexion
             $this->inscrireEtudiantSAE($idSAE, $id);
         }
     }
+
+    public function getSAEMembers($idSAE) {
+
+        $req = "SELECT idEleve, nom, prenom, photoDeProfil
+                FROM EleveInscritSae
+                INNER JOIN SAE ON EleveInscritSae.idSAE = SAE.idSAE
+                INNER JOIN Personne ON EleveInscritSae.idEleve = Personne.idPersonne
+                WHERE EleveInscritSae.idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+
+    }
+
+    public function uploadGroupImage($file, $idGroupe, $fileName) {
+        $newFileName = $this->uploadFichier($file, "none");
+
+        if ($newFileName) {
+            $req = "UPDATE Groupe SET imageTitre = :imageTitre WHERE idgroupe = :idgroupe";
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":imageTitre", $newFileName['file']);
+            $pdo_req->bindValue(":idgroupe", $idGroupe);
+            $pdo_req->execute();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    
 }
