@@ -1331,7 +1331,7 @@ HTML;
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100">Déposer un $typeDepot</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButton$typeDepot"></button>
                     </div>
                     <form action="index.php?module=sae&action=ajoutDepot$typeDepot&id=$idSae" method="POST" id="fileUploadForm" enctype="multipart/form-data">
                         <input type="hidden" id="idSaeDepot$typeDepot" name="idSaeDepot$typeDepot" value="">
@@ -1391,7 +1391,7 @@ HTML;
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100">Créer un rendu</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonCreateRendu"></button>
                     </div>
                     <form action="index.php?module=sae&action=createRendu&id=$idSae" method="POST">
                         <div class="modal-body d-flex flex-column text-center">
@@ -1432,7 +1432,7 @@ HTML;
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bolder text-center w-100">Déposer une ressource</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonCreateRessource"></button>
                 </div>
                 <form action="index.php?module=sae&action=depotRessource&id=$idSae" method="POST" id="ressourceUploadForm" enctype="multipart/form-data">
                     <div class="modal-body d-flex flex-column text-center">
@@ -1493,7 +1493,7 @@ HTML;
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bolder text-center w-100">Ajouter une ressource</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonAjouterRessource"></button>
                 </div>
                 <form action="index.php?module=sae&action=ajouterRessource&id=$idSae" method="POST">
                     <div class="modal-body d-flex flex-column text-center">
@@ -1523,7 +1523,7 @@ HTML;
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100">Créer un champ</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonCreateChamp"></button>
                     </div>
                     <form action="index.php?module=sae&action=createChamp&id=$idSae" method="POST">
                         <div class="modal-body d-flex flex-column text-center">
@@ -1550,7 +1550,7 @@ HTML;
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100">Créer une soutenance</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonCreateSoutenance"></button>
                     </div>
                     <form action="index.php?module=sae&action=createSoutenance&id=$idSae" method="POST">
                         <div class="modal-body d-flex flex-column text-center">
@@ -1589,7 +1589,7 @@ HTML;
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100">Modifier la soutenance</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonModifierSoutenance"></button>
                     </div>
                     <form action="index.php?module=sae&action=modifierSoutenance&id=$idSae" method="POST">
                         <input type="hidden" id="idSoutenanceAModifier" name="idSoutenanceAModifier" value="">
@@ -1629,7 +1629,7 @@ HTML;
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100">Modifier le rendu</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonModifierRendu"></button>
                     </div>
                     <form action="index.php?module=sae&action=modifierRendu&id=$idSae" method="POST">
                     <input type="hidden" id="idRenduAModifier" name="idRenduAModifier" value="">
@@ -1665,7 +1665,7 @@ HTML;
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bolder text-center w-100" id="edit-sujet-btn">Modifier le sujet</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalCancelButtonModifierSujet"></button>
                     </div>
                     <form action="index.php?module=sae&action=modifierSujet&id=$idSae" method="POST">
                         <div class="modal-body d-flex flex-column text-center">

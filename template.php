@@ -25,7 +25,6 @@
 
     <script src="js/loading.js"></script>
 
-    <script src="js/navbar/navbar.js"></script>
 </body>
 
 </html>
