@@ -379,7 +379,7 @@ class SaeController
         $etudiants = $this->model->etudiantQuiOnGroupeDansSAE($idSAE);
         $this->model->createSoutenance($titre, $date, $salle, $duree, $idSAE, $etudiants, $profs);
   
-        //header("Location: " . $_SERVER['HTTP_REFERER']);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
     private function delSoutenance()

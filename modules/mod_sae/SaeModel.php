@@ -772,6 +772,11 @@ class SaeModel extends Connexion
 
     function delSoutenance($idSoutenance)
     {
+        $req = "DELETE FROM JurySoutenance Where idSoutenance =:idSoutenance";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->execute();
+
         $req = "DELETE FROM Soutenance WHERE idSoutenance = :idSou";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSou", $idSoutenance);
@@ -1154,7 +1159,7 @@ class SaeModel extends Connexion
 
     public function listeSoutenanceOuEstJuryParSae($idSae, $idPersonne)
     {
-        $req = "SELECT *
+        $req = "SELECT distinct(Soutenance.idSoutenance), Soutenance.dureeMinutes, Soutenance.titre, Soutenance.salle, Soutenance.date, Soutenance.idSAE, Soutenance.idEvaluation
                 FROM Soutenance
                 INNER JOIN JurySoutenance
                 WHERE Soutenance.idSoutenance IN (SELECT idSoutenance

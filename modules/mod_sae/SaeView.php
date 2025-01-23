@@ -146,9 +146,9 @@ HTML;
             if ($_SESSION['estProfUtilisateur']) {
 
                 echo <<<HTML
-            <div class="d-flex gap-3 p-3">
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="btn-add-ressource">Ajouter une ressource</button>
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4" id="create-ressource">Créer une ressource</button>
+            <div class="d-flex gap-3 w-75">
+                <button class="btn btn-primary shadow-sm px-4 mt-2 p-2 w-25"  id="btn-add-ressource">Ajouter une ressource</button>
+                <button class="btn btn-primary shadow-sm px-4 mt-2 p-2 w-25"  id="create-ressource">Créer une ressource</button>
             </div>
 HTML;
             }
@@ -193,8 +193,8 @@ HTML;
             if ($_SESSION['estProfUtilisateur']) {
 
                 echo <<<HTML
-            <div class="p-3">
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-rendu">Créer un rendu</button>
+            <div class="w-75">
+                <button class="btn btn-primary shadow-sm px-4 mt-2 p-2 w-25"  id="create-rendu">Créer un rendu</button>
             </div>
 HTML;
             }
@@ -233,8 +233,8 @@ HTML;
             if ($_SESSION['estProfUtilisateur']) {
 
                 echo <<<HTML
-            <div class="p-3">
-                <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-soutenance">Créer une soutenance</button>
+            <div class="w-75">
+                <button class="btn btn-primary shadow-sm px-4 mt-2 p-2 w-25" id="create-soutenance">Créer une soutenance</button>
             </div>
 HTML;
             }
@@ -264,8 +264,8 @@ HTML;
                 if ($_SESSION['estProfUtilisateur']) {
     
                     echo <<<HTML
-                <div class=" p-3">
-                    <button class="btn btn-secondary rounded-pill shadow-sm px-4 p-3" id="create-champ">Ajouter un champ</button>
+                <div class="w-75">
+                     <button class="btn btn-primary shadow-sm px-4 p-2 mt-2 w-25" id="create-champ">Ajouter un champ</button>
                 </div>
     HTML;
                 }
@@ -1149,7 +1149,7 @@ HTML;
                 echo $this->initLineSoutenance($titre, $id, $idSae);
             }
         } else {
-            echo "Vous n'êtes jury d'aucunes soutenances de cette SAE";
+            echo "<p class='h5 fw-bold'>Vous n'êtes jury d'aucunes soutenances de cette SAE</p>";
         }
     }
     function initLineSoutenance($titre, $idsoutenance, $idSae)
