@@ -777,6 +777,11 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idSoutenance", $idSoutenance);
         $pdo_req->execute();
 
+        $req = "DELETE FROM PassageSoutenance Where idSoutenance =:idSoutenance";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSoutenance", $idSoutenance);
+        $pdo_req->execute();
+
         $req = "DELETE FROM Soutenance WHERE idSoutenance = :idSou";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSou", $idSoutenance);
