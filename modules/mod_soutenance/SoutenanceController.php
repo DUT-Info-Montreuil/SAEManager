@@ -33,6 +33,12 @@ class SoutenanceController
             case "maj":
                 $this->initMettreAJourLesNotes();
                 break;
+            case "supprimerEval":
+                $this->supprimerEval();
+                break;
+            case "confirmationSupprimerEval":
+                $this->confirmationSupprimerEval();
+                break;
             default :
                 $this->initSoutenance();
                 break;
@@ -166,5 +172,23 @@ class SoutenanceController
             $this->initSoutenance();
         }
     }
-    
+
+    function supprimerEval(){
+        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+            $idEval = $_GET['idEval'];
+            $this->view->initSupprimerEval($idEval);
+        } else { // Est un étudiant
+            $this->initRendus();
+        }
+    }
+
+    function confirmationSupprimerEval(){
+        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+            $idEval = $_GET['idEval'];
+            $this->model->supprimerEval($idEval);
+            header('Location: index.php?module=soutenance&action=home');
+        } else { // Est un étudiant
+            $this->initRendus();
+        }
+    }
 }
