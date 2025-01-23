@@ -99,12 +99,12 @@ HTML;
                             <input class="input-group form-control" type="text" name="noteNom" value="$noteNom" placeholder="Nom de l'évaluation">
                         </td>
                         <td class="text-center">
-                            <input type="number" name="coef" class="form-control form-control-sm w-auto" value="$coef" placeholder="Coef">
+                            <input type="number" name="coef" class="form-control form-control-sm w-auto" value="$coef" min="0" max="100" placeholder="Coef">
                         </td>
                         <td class="text-center">
                             {$this->initAjoutIntervenant($intervenants,$idDeCetteSae,$idIntervenantEvaluateur)}
                         </td>
-                        <td class="align-center d-flex">
+                        <td class="align-middle d-flex">
                             $canEvaluate
                             <button type="submit" class="btn btn-primary btn-sm btn-success ms-2">Valider</button>
                             <a href="index.php?module=soutenance&action=supprimerEval&idEval=$noteId" type="submit" class="btn btn-outline-danger btn-sm ms-2">Supprimer</a>
@@ -121,8 +121,9 @@ HTML;
                 <thead>
                     <tr>
                         <th>Nom de la note</th>
-                        <th>Action</th>
                         <th>Coefficient</th>
+                        <th>Intervenant</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 $notesTable
@@ -238,7 +239,7 @@ HTML;
                         <h4 class="fw-bold text mb-0">$groupeNom</h4>
                         <div class="ml-auto">
                             <label for="note">Ajouter une note globale au groupe :</label>
-                            <input type="number" class="form-control" id="global-note-$groupeId" value="" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
+                            <input type="number" class="form-control" min="0" max="20" id="global-note-$groupeId" value="" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
                         </div>
                     </div>
                     <!-- Tableau des élèves -->
@@ -265,7 +266,7 @@ HTML;
                                 <tr>
                                     <td>$eleveNom</td>
                                     <td>$elevePrenom</td>
-                                    <td><input type="number" name="note_idEleve_$idEleve" class="form-control" value="$noteValeur" id="note-$idEleve" /></td>
+                                    <td><input type="number" name="note_idEleve_$idEleve"  min="0" max="20" class="form-control" value="$noteValeur" id="note-$idEleve" /></td>
                                 </tr>
                     HTML;
                 }
