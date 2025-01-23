@@ -145,8 +145,8 @@ class SoutenanceModel extends Connexion
     
     function creerNotePourUneSoutenance($idSoutenance) {
         $evalReq = "
-            INSERT INTO Evaluation (nom, coef,IntervenantEvaluateur)
-            VALUES ('nom à définir', 1,:IntervenantEvaluateur)
+            INSERT INTO Evaluation (nom, coef)
+            VALUES ('nom à définir', 1)
         ";
         $evalInsert = self::$bdd->prepare($evalReq);
         $evalInsert->execute();

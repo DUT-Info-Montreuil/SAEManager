@@ -277,41 +277,7 @@ HTML;
                 </div>
                 HTML;
             }
-    
-            if ($tousLesElevesSansGroupe) { // Élèves sans groupes
-                echo '<h3 class="fw-bold mt-5">Élèves sans groupe</h3>';
-                echo <<<HTML
-                <table class="table table-bordered mt-3">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Note</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                HTML;
-    
-                foreach ($tousLesElevesSansGroupe as $eleve) {
-                    $eleveNom = htmlspecialchars($eleve['nom'], ENT_QUOTES, 'UTF-8');
-                    $elevePrenom = htmlspecialchars($eleve['prenom'], ENT_QUOTES, 'UTF-8');
-                    $idEleve = $eleve['idPersonne'];
-                    $noteValeur = isset($groupedNotes[$idEleve]) ? htmlspecialchars($groupedNotes[$idEleve]['Note_valeur'], ENT_QUOTES, 'UTF-8') : '';
-    
-                    echo <<<HTML
-                        <tr>
-                            <td>$eleveNom</td>
-                            <td>$elevePrenom</td>
-                            <td><input type="number" name="note_$idEleve" class="form-control" value="$noteValeur" /></td>
-                        </tr>
-                    HTML;
-                }
-    
-                echo <<<HTML
-                </tbody>
-            </table>
-            HTML;
-            }
+            
     
             echo <<<HTML
                 <div class="w_100 d-flex justify-content-center">
