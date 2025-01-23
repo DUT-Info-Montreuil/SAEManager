@@ -1,10 +1,9 @@
 <?php
 
 require_once 'GenericModule.php';
-require_once 'modules/mod_creerSae/CreerSaeController.php';
+require_once 'modules/mod_paneladmin/PanelAdminController.php';
 
-
-class CreerSaeModule extends GenericModule
+class PanelAdminModule extends GenericModule
 {
 
     public function __construct()

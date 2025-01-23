@@ -24,6 +24,7 @@ class ConnexionModel extends Connexion
             $_SESSION['loginUtilisateur'] = $result['login'];
             $_SESSION['idUtilisateur'] = $result['idPersonne'];
             $_SESSION['estProfUtilisateur'] = $result['estProf'];
+            $_SESSION['estAdmin'] = $result['estAdmin'];
             return true;
         } else {
             return false;

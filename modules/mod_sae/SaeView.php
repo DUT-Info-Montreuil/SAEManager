@@ -1671,7 +1671,7 @@ HTML;
             $nom = $prof['nom'];
             $prenom = $prof['prenom'];
             $inputs.='
-            <div class="form-check profs">
+            <div class="form-check-profs">
                 <input class="form-check-input" name="profs[]" type="checkbox" value="' . $prof['idPersonne'] . '" id="' . $prof['idPersonne'] . '">
                 <label class="form-check-label" for="' . $prof['idPersonne'] . '">' . $prenom . ' ' . $nom . '</label>
             </div>';
@@ -1704,17 +1704,17 @@ HTML;
                             </div>
                             <label class="form-label fw-bold">Ajoutez un jury à la soutenance:</label>
                             <div class="dropdown">
-                                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdownButton">Rechercher des profs</button>
-                                <div class="dropdown-menu p-2 w-100" id="dropdownContent" style="display: none;">
+                                <button class="btn btn-outline-secondary dropdown-toggle-profs w-100" type="button" id="dropdownButton">Rechercher des profs</button>
+                                <div class="dropdown-menu p-2 w-100" id="dropdownContent-profs" style="display: none;">
                                 <input 
                                 type="text" 
                                 class="form-control mb-2" 
-                                id="searchInput" 
+                                id="searchInput-profs" 
                                 placeholder="Rechercher...">    
                                 $inputs
                                 </div>
                             </div>
-                            <div class="text-danger mt-2" id="errorMessage" style="display: none;">
+                            <div class="text-danger mt-2" id="errorMessage-profs" style="display: none;">
                                 Vous devez sélectionner au moins un étudiant.
                             </div>
                             <div>
