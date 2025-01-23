@@ -55,7 +55,9 @@ const modalDepotSupport = document.getElementById("modalDepotSupport");
 const dropSupportFileCancelButton = document.getElementById(
   "depotCancelButtonSupport"
 );
-const dropSupportCancelButton = document.getElementById("modalCancelButtonSupport");
+const dropSupportCancelButton = document.getElementById(
+  "modalCancelButtonSupport"
+);
 const listSupportButtons = document.querySelectorAll(
   '[class*="rendusoutenance-"]'
 );
@@ -119,13 +121,17 @@ editRenduBtn.forEach((btn) => {
   });
 });
 
-const modalCancelButtonCreateRendu = document.getElementById("modalCancelButtonCreateRendu");
+const modalCancelButtonCreateRendu = document.getElementById(
+  "modalCancelButtonCreateRendu"
+);
 
 modalCancelButtonCreateRendu.addEventListener("click", function () {
   document.querySelector("#modalCreateRendu").classList.remove("d-block");
 });
 
-const modalCancelButtonModifierRendu = document.getElementById("modalCancelButtonModifierRendu");
+const modalCancelButtonModifierRendu = document.getElementById(
+  "modalCancelButtonModifierRendu"
+);
 
 modalCancelButtonModifierRendu.addEventListener("click", function () {
   document.querySelector("#modalModifierRendu").classList.remove("d-block");
@@ -249,11 +255,17 @@ editSoutenanceBtn.forEach((btn) => {
   });
 });
 
-const modalCancelButtonModifierSoutenance = document.getElementById("modalCancelButtonModifierSoutenance");
-const modalCancelButtonCreateSoutenance = document.getElementById("modalCancelButtonCreateSoutenance");
+const modalCancelButtonModifierSoutenance = document.getElementById(
+  "modalCancelButtonModifierSoutenance"
+);
+const modalCancelButtonCreateSoutenance = document.getElementById(
+  "modalCancelButtonCreateSoutenance"
+);
 
 modalCancelButtonModifierSoutenance.addEventListener("click", function () {
-  document.querySelector("#modalModifierSoutenance").classList.remove("d-block");
+  document
+    .querySelector("#modalModifierSoutenance")
+    .classList.remove("d-block");
 });
 
 modalCancelButtonCreateSoutenance.addEventListener("click", function () {
@@ -276,7 +288,9 @@ if (createChampBtn) {
   });
 }
 
-const modalCancelButtonCreateChamp = document.getElementById("modalCancelButtonCreateChamp");
+const modalCancelButtonCreateChamp = document.getElementById(
+  "modalCancelButtonCreateChamp"
+);
 
 modalCancelButtonCreateChamp.addEventListener("click", function () {
   document.querySelector("#modalCreateChamp").classList.remove("d-block");
@@ -300,7 +314,9 @@ if (editSujetBtn) {
   });
 }
 
-const modalCancelButtonModifierSujet = document.getElementById("modalCancelButtonModifierSujet");
+const modalCancelButtonModifierSujet = document.getElementById(
+  "modalCancelButtonModifierSujet"
+);
 
 modalCancelButtonModifierSujet.addEventListener("click", function () {
   document.querySelector("#modalModifierSujet").classList.remove("d-block");
@@ -309,7 +325,9 @@ modalCancelButtonModifierSujet.addEventListener("click", function () {
 // Ressource
 
 const createRessourceBtn = document.querySelector("#create-ressource");
-const modalCancelButtonCreateRessource = document.getElementById("modalCancelButtonCreateRessource");
+const modalCancelButtonCreateRessource = document.getElementById(
+  "modalCancelButtonCreateRessource"
+);
 
 if (createRessourceBtn) {
   createRessourceBtn.addEventListener("click", function () {
@@ -332,7 +350,9 @@ if (createRessourceBtn) {
 // Ressource
 
 const addRessourceBtn = document.querySelector("#btn-add-ressource");
-const modalCancelButtonAjouterRessource = document.getElementById("modalCancelButtonAjouterRessource");
+const modalCancelButtonAjouterRessource = document.getElementById(
+  "modalCancelButtonAjouterRessource"
+);
 
 if (addRessourceBtn) {
   addRessourceBtn.addEventListener("click", function () {
@@ -393,7 +413,7 @@ listRessourceButtons.forEach((element) => {
 const addEtudiantButton = document.querySelector("#addEtudiantField");
 const etudiantsContainer = document.querySelector("#etudiants-container");
 
-if (addEtudiantButton != null){
+if (addEtudiantButton != null) {
   addEtudiantButton.addEventListener("click", function () {
     const firstSelect = document.querySelector("#addEtudiant");
     if (firstSelect) {
@@ -416,45 +436,49 @@ function removeField(button) {
   field.remove();
 }
 
-const searchInput = document.getElementById('searchInput');
-const checkboxes = document.querySelectorAll('.form-check');
-const dropdownButton = document.querySelector('.dropdown-toggle');
-const dropdownContent = document.getElementById('dropdownContent');
-const errorMessage = document.getElementById('errorMessage');
+const searchInput = document.getElementById("searchInput");
+const checkboxes = document.querySelectorAll(".form-check.student");
+const dropdownButton = document.querySelector(".dropdown-toggle");
+const dropdownContent = document.getElementById("dropdownContent");
+const errorMessage = document.getElementById("errorMessage");
+const form = document.getElementById("studentForm");
 
 if (dropdownButton != null) {
-  dropdownButton.addEventListener('click', function () {
-    const isVisible = dropdownContent.style.display === 'block';
-    dropdownContent.style.display = isVisible ? 'none' : 'block';
+  dropdownButton.addEventListener("click", function () {
+    const isVisible = dropdownContent.style.display === "block";
+    dropdownContent.style.display = isVisible ? "none" : "block";
     if (!isVisible) searchInput.focus();
   });
 
   function updateDropdownButton() {
     const selected = Array.from(checkboxes)
-      .filter(checkbox => checkbox.querySelector('input').checked)
-      .map(checkbox => checkbox.querySelector('label').textContent.trim());
-        
-    dropdownButton.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des étudiants';
+      .filter((checkbox) => checkbox.querySelector("input").checked)
+      .map((checkbox) => checkbox.querySelector("label").textContent.trim());
+
+    dropdownButton.textContent =
+      selected.length > 0 ? selected.join(", ") : "Rechercher des étudiants";
   }
 
-  searchInput.addEventListener('input', () => {
+  searchInput.addEventListener("input", () => {
     const filter = searchInput.value.toLowerCase();
     checkboxes.forEach((checkbox) => {
-      const label = checkbox.querySelector('label').textContent.toLowerCase();
-      checkbox.style.display = label.includes(filter) ? 'block' : 'none';
+      const label = checkbox.querySelector("label").textContent.toLowerCase();
+      checkbox.style.display = label.includes(filter) ? "block" : "none";
     });
   });
 
-  checkboxes.forEach(checkbox => {
-    checkbox.querySelector('input').addEventListener('change', () => {
+  checkboxes.forEach((checkbox) => {
+    checkbox.querySelector("input").addEventListener("change", () => {
       updateDropdownButton();
     });
   });
 
-  document.addEventListener('click', function (event) {
-    const isClickInside = dropdownButton.contains(event.target) || dropdownContent.contains(event.target);
+  document.addEventListener("click", function (event) {
+    const isClickInside =
+      dropdownButton.contains(event.target) ||
+      dropdownContent.contains(event.target);
     if (!isClickInside) {
-      dropdownContent.style.display = 'none';
+      dropdownContent.style.display = "none";
     }
   });
 }

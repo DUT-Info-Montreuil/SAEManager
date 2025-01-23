@@ -9,7 +9,7 @@ class DashboardView extends GenericView
         parent::__construct();
     }
 
-    public function initDashboardPage($listeRendu, $listeSoutenance, $notifications, $nomUtilisateur)
+    public function initDashboardPage($listeRendu, $listeSoutenance, $notifications, $nomUtilisateur, $photoDeProfil)
     {
         $toast = "";
         if (isset($_SESSION['connexion_reussie']) && $_SESSION['connexion_reussie'] === true) {
@@ -26,6 +26,8 @@ HTML;
             unset($_SESSION['connexion_reussie']);
         }
 
+        $photo = $photoDeProfil[0]['photoDeProfil'];
+
         $estProfUtilisateur = $_SESSION["estProfUtilisateur"] == 1;
         $texteRendu = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes associés à ces évaluations de rendu" : "Vos rendus non déposés";
         $texteSoutenance = $_SESSION['estProfUtilisateur'] == 1 ?"Vous êtes associés à ces évaluations de soutenance" : "Vos prochaines soutenances";
@@ -35,10 +37,15 @@ HTML;
                     <div class="card-general shadow bg-white rounded">
                         <div class="d-flex flex-column align-items-center">
                             <!-- Message de bienvenue centré -->
-                            <div class="mt-3 mb-4">
+                            <div class="mt-3 mb-4 d-flex align-items-center">
+                                <form id="profileForm" action="index.php?module=dashboard&action=uploadProfile" method="POST" enctype="multipart/form-data">
+                                    <label for="profileImage" style="cursor: pointer;">
+                                        <img src="http://saemanager-api.atwebpages.com/api/api.php?file=$photo" alt="Photo de $nomUtilisateur" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                    </label>
+                                    <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;" onchange="document.getElementById('profileForm').submit();">
+                                </form>
                                 <h2 class="fw-bold">Bienvenue $nomUtilisateur</h2>
                             </div>
-                
                             <!-- Contenu des listes -->
                             <div class="container-fluid d-flex flex-column">
                                 <div class="row g-4 m-4">

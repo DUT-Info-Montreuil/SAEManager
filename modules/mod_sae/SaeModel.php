@@ -119,7 +119,8 @@ class SaeModel extends Connexion
         return false;
     }
 
-    function uploadDocument($file, $fileName, $idSae) {
+    function uploadDocument($file, $fileName, $idSae)
+    {
         $newFileName = $this->uploadFichier($file, "none");
 
         if ($newFileName) {
@@ -235,15 +236,16 @@ class SaeModel extends Connexion
         return false;
     }
 
-    public function suprimmerDepotGroupeDocument($idDoc) {
-        
+    public function suprimmerDepotGroupeDocument($idDoc)
+    {
+
         $document = $this->getDocument($idDoc);
         $fileName = $document[0]['fichier'];
         $req = "DELETE FROM Document
                 WHERE idDoc = :idDoc";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idDoc", $idDoc);
-        if($pdo_req->execute()){
+        if ($pdo_req->execute()) {
             return $this->deleteFichier($fileName);
         }
         return false;
@@ -400,7 +402,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    function getDocument($idDocument) {
+    function getDocument($idDocument)
+    {
         $req = "SELECT * FROM Document WHERE idDoc = :idDocument";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idDocument", $idDocument, PDO::PARAM_INT);
@@ -421,7 +424,7 @@ class SaeModel extends Connexion
 
     function getMyGroupId($idSAE)
     {
-        $req = "SELECT g.idGroupe
+        $req = "SELECT g.idGroupe, g.imageTitre
                 FROM Personne
                 INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = Personne.idPersonne
                 INNER JOIN Groupe g ON g.idGroupe = EtudiantGroupe.idGroupe
@@ -441,7 +444,7 @@ class SaeModel extends Connexion
                 $idGroupe = $id['idGroupe'];
             }
 
-            $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE
+            $req = "SELECT idPersonne, p.nom, prenom, photoDeProfil, g.idGroupe, idSAE, p.nom, g.nom AS GroupeName, g.imageTitre, g.estModifiableParEleve
                     FROM Personne p
                     INNER JOIN EtudiantGroupe ON EtudiantGroupe.idEtudiant = p.idPersonne
                     INNER JOIN Groupe g ON EtudiantGroupe.idGroupe = g.idGroupe
@@ -460,17 +463,17 @@ class SaeModel extends Connexion
     function getSAEResponsable($idSAE)
     {
 
-        $req = "SELECT p.idPersonne, p.nom, p.prenom
+        $req = "SELECT p.idPersonne, p.nom, p.prenom, p.photoDeProfil
                 FROM Personne p
                 INNER JOIN SAE ON p.idPersonne = SAE.idResponsable
                 WHERE SAE.idSAE = :idSAE
                 UNION
-                SELECT p.idPersonne, p.nom, p.prenom
+                SELECT p.idPersonne, p.nom, p.prenom, p.photoDeProfil
                 FROM Personne p
                 INNER JOIN IntervenantSAE ON p.idPersonne = IntervenantSAE.idIntervenant
                 WHERE IntervenantSAE.idSAE = :idSAE
                 UNION
-                SELECT p.idPersonne, p.nom, p.prenom
+                SELECT p.idPersonne, p.nom, p.prenom, p.photoDeProfil
                 FROM Personne p
                 INNER JOIN ResponsablesSAE ON p.idPersonne = ResponsablesSAE.idResp
                 WHERE ResponsablesSAE.idSAE = :idSAE";
@@ -570,7 +573,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function lesProfDeLaSAE($idSAE){
+    public function lesProfDeLaSAE($idSAE)
+    {
         $req = "SELECT idPersonne, prenom, nom
                 FROM Personne
                 WHERE estProf = 1
@@ -697,11 +701,11 @@ class SaeModel extends Connexion
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->bindValue(":idEvaluation", $idEvaluation);
         $pdo_req->execute();
-        
+
         $idSoutenance = self::$bdd->lastInsertId();
-    
-        
-        foreach($profs as $prof){
+
+
+        foreach ($profs as $prof) {
             $req = "INSERT INTO JurySoutenance VALUES (:idSoutenance, :idPersonne)";
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idSoutenance", $idSoutenance);
@@ -712,7 +716,6 @@ class SaeModel extends Connexion
             $message = "Vous avez été ajouté en tant que Jury sur une soutenance de la SAE $nomSae!";
             $redirect = "index.php?module=sae&action=details&id=$idSAE";
             $this->creeNotification($prof, $message, $idSAE, $redirect);
-
         }
 
         $nomSae = $this->getSAEById($idSAE)[0]['nomSae'];
@@ -929,13 +932,16 @@ class SaeModel extends Connexion
         return true;
     }
 
-    public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe)
+    public function propositionGroupe($id_etudiants, $idSAE, $nomGroupe, $edit)
     {
+
+        var_dump($edit);
         if ($this->isInscrivablesBySAE($id_etudiants, $idSAE)) {
-            $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe) VALUES (DEFAULT, :idSAE, :nomGroupe)";
+            $req = "INSERT INTO PropositionsGroupe (idProposition, idSAE, nomGroupe, edit) VALUES (DEFAULT, :idSAE, :nomGroupe, :edit)";
             $pdo_req = self::$bdd->prepare($req);
             $pdo_req->bindValue(":idSAE", $idSAE);
             $pdo_req->bindValue(":nomGroupe", $nomGroupe);
+            $pdo_req->bindValue(":edit", $edit);
             $pdo_req->execute();
 
             $req = "SELECT max(idProposition)
@@ -1003,9 +1009,9 @@ class SaeModel extends Connexion
 
 
 
-        $req = "INSERT INTO Groupe (idgroupe, nom, imageTitre, idSAE) VALUES (DEFAULT, 
-                                        (SELECT nomGroupe FROM PropositionsGroupe WHERE idProposition = :idProposition), DEFAULT, 
-                                        (SELECT idSAE FROM PropositionsGroupe WHERE idProposition = :idProposition))";
+        $req = "INSERT INTO Groupe (idgroupe, nom, imageTitre, idSAE, estModifiableParEleve) VALUES (DEFAULT, 
+                                        (SELECT nomGroupe FROM PropositionsGroupe WHERE idProposition = :idProposition), '67926371864af-groupeImage.png', 
+                                        (SELECT idSAE FROM PropositionsGroupe WHERE idProposition = :idProposition), (SELECT edit FROM PropositionsGroupe WHERE idProposition = :idProposition))";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idProposition", $idProposition);
         $pdo_req->execute();
@@ -1223,7 +1229,8 @@ class SaeModel extends Connexion
         }
     }
 
-    public function getDocsByGrpId($groupeID) {
+    public function getDocsByGrpId($groupeID)
+    {
         $req = "SELECT Document.Nom, dateDepot, idDoc, Personne.nom, prenom
                 FROM Document
                 INNER JOIN Personne ON idAuteur = idPersonne
@@ -1268,7 +1275,8 @@ class SaeModel extends Connexion
         return $pdo_req->fetchAll();
     }
 
-    public function getReponsesGroupeBySae($idSAE){
+    public function getReponsesGroupeBySae($idSAE)
+    {
         $req = "SELECT Champs.idChamps, Champs.nomchamp , reponsesChamp.idEleve, reponsesChamp.reponse, Personne.prenom, Personne.nom
         FROM Champs
         INNER JOIN reponsesChamp ON reponsesChamp.idChamp = Champs.idChamps
@@ -1281,5 +1289,47 @@ class SaeModel extends Connexion
         $pdo_req->execute();
 
         return $pdo_req->fetchAll();
+    }
+
+    public function getSAEMembers($idSAE)
+    {
+
+        $req = "SELECT idEleve, nom, prenom, photoDeProfil
+                FROM EleveInscritSae
+                INNER JOIN SAE ON EleveInscritSae.idSAE = SAE.idSAE
+                INNER JOIN Personne ON EleveInscritSae.idEleve = Personne.idPersonne
+                WHERE EleveInscritSae.idSAE = :idSAE";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    public function uploadGroupImage($file, $idGroupe, $fileName)
+    {
+        $newFileName = $this->uploadFichier($file, "none");
+
+        if ($newFileName) {
+            $req = "UPDATE Groupe SET imageTitre = :imageTitre WHERE idgroupe = :idgroupe";
+
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":imageTitre", $newFileName['file']);
+            $pdo_req->bindValue(":idgroupe", $idGroupe);
+            $pdo_req->execute();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function updateGroupeName($idGroupe, $nom)
+    {
+
+        $req = "UPDATE Groupe SET nom = :nom WHERE idgroupe = :idgroupe";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":nom", $nom);
+        $pdo_req->bindValue(":idgroupe", $idGroupe);
+        $pdo_req->execute();
     }
 }

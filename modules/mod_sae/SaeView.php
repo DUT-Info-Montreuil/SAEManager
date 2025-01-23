@@ -386,7 +386,7 @@ HTML;
             $id = htmlspecialchars($etudiant['idPersonne']);
             $nom = htmlspecialchars($etudiant['nom']);
             $prenom = htmlspecialchars($etudiant['prenom']);
-            $inputs .= '<div class="form-check">
+            $inputs .= '<div class="form-check student">
                             <input class="form-check-input" name="student[]" type="checkbox" value="' . $id . '" id="' . $id . '">
                             <label class="form-check-label" for="' . $id . '">' . $prenom . ' ' . $nom . '</label>
                         </div>';
@@ -739,39 +739,121 @@ HTML .
 
     /* Groupes */
 
-    function initGroupPage($sae, $groupe, $responsable)
+    function initGroupPage($sae, $groupe, $responsable, $members)
     {
 
-        foreach ($sae as $s) {
-            $nomSAE = htmlspecialchars($s['nomSae']);
+
+        if (!$_SESSION['estProfUtilisateur']) {
+            $groupeName = htmlspecialchars($groupe[0]['GroupeName']);
+            $groupePhoto = htmlspecialchars($groupe[0]['imageTitre']);
+            $idGroupe = htmlspecialchars($groupe[0]['idGroupe']);
+            echo $this->popUpModifierNomGroupe($sae[0]['idSAE'], $idGroupe);
         }
+
+
+        $nomSAE = htmlspecialchars($sae[0]['nomSae']);
+
 
         echo <<<HTML
     <div class="container mt-5 h-100">
         <h1 class="fw-bold">$nomSAE</h1>
         <div class="card-general shadow bg-white rounded p-4 min-h75">
             <!-- MEMBRE DU GROUPE -->
+            
+HTML;
+
+        if ($_SESSION['estProfUtilisateur']) {
+            echo <<<HTML
             <div class="mb-5">
                 <h3 class="d-flex align-items-center">
                     <svg class="me-2" width="25" height="25">
                         <use xlink:href="#arrow-icon"></use>
                     </svg>
-                    Membre du groupe
+                    Liste des étudiants
                 </h3>
                 <div class="d-flex flex-wrap">
 HTML;
 
-        if ($groupe) {
-            foreach ($groupe as $membre) {
-                $nom = htmlspecialchars($membre['nom']);
-                $prenom = htmlspecialchars($membre['prenom']);
-                echo $this->linePersonne($prenom, $nom);
+            if ($members) {
+                foreach ($members as $membre) {
+                    $nom = htmlspecialchars($membre['nom']);
+                    $prenom = htmlspecialchars($membre['prenom']);
+                    $photo = htmlspecialchars($membre['photoDeProfil']);
+                    echo $this->linePersonne($prenom, $nom, $photo);
+                }
             }
-        }
-        echo <<<HTML
+
+            echo <<<HTML
                 </div>
             </div>
+HTML;
+        } else {
+            echo <<<HTML
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between">
+        <!-- Titre et icône -->
+        <h3 class="d-flex align-items-center">
+            <svg class="me-2" width="25" height="25">
+                <use xlink:href="#arrow-icon"></use>
+            </svg>
+            Membre du groupe
+        </h3>
+        <!-- Nom du groupe et image -->
+        <div class="d-flex align-items-center">
+            <!-- Formulaire d'upload d'image -->
+            <form id="groupImageForm" action="index.php?module=sae&action=uploadGroupImage&idGroupe=$idGroupe" method="POST" enctype="multipart/form-data">
+                <label for="groupImage" style="cursor: pointer; margin-right: 10px;">
+                    <img src="http://saemanager-api.atwebpages.com/api/api.php?file=$groupePhoto" 
+                        alt="Logo du groupe $groupeName" 
+                        class="rounded-circle" 
+                        style="width: 40px; height: 40px; object-fit: cover;">
+                </label>
+HTML;
+            if ($groupe[0]['estModifiableParEleve']) {
+                echo <<<HTML
+                <input type="file" id="groupImage" name="groupImage" accept="image/*" style="display: none;" onchange="document.getElementById('groupImageForm').submit();">
+HTML;
+            }
+            echo <<<HTML
+            </form>
+            <!-- Nom du groupe avec bouton Modifier -->
+HTML;
 
+            if ($groupe[0]['estModifiableParEleve']) {
+                echo <<<HTML
+            <span class="fw-bold me-3" style="font-size: 1rem;">Groupe  : $groupeName</span>
+            <a id="edit-group-name" class="text-primary text-decoration-underline cursor-pointer">Modifier</a>
+
+HTML;
+            } else {
+                echo <<<HTML
+            <span class="fw-bold me-3" style="font-size: 1rem;">Groupe : $groupeName</span>
+HTML;
+            }
+
+            echo <<<HTML
+        </div>
+    </div>
+    <div class="d-flex flex-wrap">
+HTML;
+
+
+
+            if ($groupe) {
+                foreach ($groupe as $membre) {
+                    $nom = htmlspecialchars($membre['nom']);
+                    $prenom = htmlspecialchars($membre['prenom']);
+                    $photo = htmlspecialchars($membre['photoDeProfil']);
+                    echo $this->linePersonne($prenom, $nom, $photo);
+                }
+            }
+
+            echo <<<HTML
+                </div>
+            </div>
+HTML;
+        }
+        echo <<<HTML
             <!-- RESPONSABLE -->
             <div class="mb-5">
                 <h3 class="d-flex align-items-center">
@@ -785,7 +867,8 @@ HTML;
         foreach ($responsable as $resp) {
             $nom = htmlspecialchars($resp['nom']);
             $prenom = htmlspecialchars($resp['prenom']);
-            echo $this->linePersonne($prenom, $nom);
+            $photo = htmlspecialchars($resp['photoDeProfil']);
+            echo $this->linePersonne($prenom, $nom, $photo);
         }
         echo <<<HTML
                 </div>
@@ -793,16 +876,18 @@ HTML;
 
         </div>
     </div>
+
+    <script src="js/groupe.js"></script>
     HTML;
     }
 
-    function linePersonne($prenom, $nom)
+    function linePersonne($prenom, $nom, $photo)
     {
         return <<<HTML
     <div class="px-3 my-3 w-200px">
         <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm">
             <div class="d-flex align-items-center">
-            <div class="rounded-circle bg-warning mx-2 w-25px h-25px"></div>
+                <img src="http://saemanager-api.atwebpages.com/api/api.php?file=$photo" alt="Photo de $prenom $nom" class="rounded-circle mx-2" style="width: 25px; height: 25px; object-fit: cover;">
                 <span class="fw-bold mx-1">$prenom $nom</span>
             </div>
         </div>
@@ -1357,6 +1442,32 @@ HTML;
         </div>
 HTML;
     }
+    function popUpModifierNomGroupe($idSae, $idGroupe)
+    {
+        return <<<HTML
+        <div class="modal" tabindex="-1" id="modalModifierNomGroupe">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bolder text-center w-100">Modifier le nom du groupe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="index.php?module=sae&action=modifierNomGroupe&id=$idSae&idGroupe=$idGroupe" method="POST">
+                        <div class="modal-body d-flex flex-column text-center">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" name="nomGroupe" id="nomGroupe" placeholder="Nom du groupe" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success m-3">Valider</button>
+                                <button type="button" class="btn btn-danger m-3" data-bs-dismiss="modal" id="modal-groupe-cancel">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    HTML;
+    }
 
     function popUpSupressionDepot($typeDepot, $idSae)
     {
@@ -1716,6 +1827,17 @@ HTML;
             $options .= '<option value="' . htmlspecialchars($etudiant['idEleve']) . '">' . htmlspecialchars($etudiant['prenom']) . htmlspecialchars($etudiant['nom']) . '</option>';
         }
 
+        $edit = '';
+        if ($_SESSION['estProfUtilisateur']) {
+            $edit = '<div class="form-check my-3">
+            <input class="form-check-input" type="checkbox" id="editableGroup" name="editableGroup">
+            <label class="form-check-label" for="editableGroup">
+                Permettre aux membres de modifier le nom et la photo du groupe.
+            </label>
+        </div>';
+        }
+
+
         return <<<HTML
             <h1 class="my-4">Sélectionnez les élèves</h1>
             <div class="align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
@@ -1729,6 +1851,7 @@ HTML;
                             </select>
                         </div>
                     </div>
+                    $edit
                     <button type="button" id="addEtudiantField" class="btn btn-secondary">Ajouter un élève</button>
                     <div class="d-flex">
                         <button type="submit" class="btn btn-primary ms-auto">Envoyer</button>

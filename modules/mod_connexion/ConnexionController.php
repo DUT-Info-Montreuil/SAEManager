@@ -36,7 +36,7 @@ class ConnexionController
             case "essaieConnexion":
                 if ($this->model->essaieConnexion()) {
                     $_SESSION['connexion_reussie'] = true;
-                    header('Location: index.php?module=dashboard');
+                    header('Location: index.php?module=dashboard&action=home');
                 } else {
                     $this->msg_erreur = "identifiant ou mot de passe incorrect !";
                     $this->view->connexionPage($this->msg_erreur);
@@ -48,7 +48,7 @@ class ConnexionController
             case "essaieInscription":
                 $this->essaieInscription();
                 if ($_SESSION) {
-                    header('Location: index.php?module=dashboard');
+                    header('Location: index.php?module=dashboard&action=home');
                 }
                 break;
         }
