@@ -251,11 +251,12 @@ class SaeModel extends Connexion
 
     public function getRessourceBySAE($idSAE)
     {
-        $req = "SELECT Ressource.idRessource, contenu, nom
+        $req = "SELECT Ressource.idRessource, contenu, nom, misEnAvant 	
                 FROM Ressource
                 INNER JOIN RessourcesSAE ON RessourcesSAE.idRessource = Ressource.idRessource
                 INNER JOIN SAE ON RessourcesSAE.idSAE = SAE.idSAE
-                WHERE SAE.idSAE = :idSAE";
+                WHERE SAE.idSAE = :idSAE
+                ORDER BY misEnAvant DESC";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idSAE", $idSAE, PDO::PARAM_INT);
         $pdo_req->execute();
@@ -742,12 +743,16 @@ class SaeModel extends Connexion
         $pdo_req->execute();
     }
 
-    function addRessourceSAE($idSAE, $idRessource)
+    function addRessourceSAE($idSAE, $idRessource, $MisEnAvant)
     {
-        $req = "INSERT INTO RessourcesSAE (idSAE, idRessource) VALUES (:idSAE, :idRessource)";
+        if (!$MisEnAvant)
+            $MisEnAvant = NULL;
+
+        $req = "INSERT INTO RessourcesSAE (idSAE, idRessource, MisEnAvant) VALUES (:idSAE, :idRessource, :MisEnAvant)";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindValue(":idSAE", $idSAE);
         $pdo_req->bindValue(":idRessource", $idRessource);
+        $pdo_req->bindValue(":MisEnAvant", $MisEnAvant);
         $pdo_req->execute();
     }
 
