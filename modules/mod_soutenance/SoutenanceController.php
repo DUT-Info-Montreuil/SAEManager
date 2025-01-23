@@ -125,6 +125,9 @@ class SoutenanceController
                 if (strpos($key, 'note_idEleve_') === 0) {
                     $idEleve = substr($key, strlen('note_idEleve_'));
                     $note = isset($_POST['note_idEleve_'.$idEleve]) ? $_POST['note_idEleve_'.$idEleve] : '';
+                    if ($note <0 || $note > 20) {
+                        $note = null;
+                    }
                     $notes[] = [
                         'idEleve' => $idEleve,
                         'idEval' => $_POST['idEval'],
@@ -146,6 +149,14 @@ class SoutenanceController
             $idEval = $_POST['idEval'];
             $noteNom = $_POST['noteNom'];
             $coef = $_POST['coef'];
+
+            if($coef <0 || $coef > 100){
+                $coef = 1;
+            }
+            if($noteNom == ""){
+                $noteNom = "nom à définir";
+            }
+
             $idIntervenants = isset($_POST['intervenant']) ? $_POST['intervenant'] : [];
             $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef,$idIntervenants);
             header('Location: index.php?module=soutenance&action=home');

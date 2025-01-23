@@ -125,15 +125,12 @@ class RendusController
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
             $notes = [];
             foreach ($_POST as $key => $value) {
-                // Vérifie si la clé commence par 'note_idEleve_'
                 if (strpos($key, 'note_idEleve_') === 0) {
-                    // Extrait l'ID de l'élève à partir de la clé (la partie numérique après 'note_idEleve_')
                     $idEleve = substr($key, strlen('note_idEleve_'));
-    
-                    // Récupère la note associée à cet élève
                     $note = isset($_POST['note_idEleve_'.$idEleve]) ? $_POST['note_idEleve_'.$idEleve] : '';
-    
-                    // Ajoute les données dans le tableau $notes
+                    if ($note <0 || $note > 20) {
+                        $note = null;
+                    }
                     $notes[] = [
                         'idEleve' => $idEleve,
                         'idEval' => $_POST['idEval'],
@@ -155,6 +152,12 @@ class RendusController
             $idEval = $_POST['idEval'];
             $noteNom = $_POST['noteNom'];
             $coef = $_POST['coef'];
+            if($coef <0 || $coef > 100){
+                $coef = 1;
+            }
+            if($noteNom == ""){
+                $noteNom = "nom à définir";
+            }
             $idIntervenants = isset($_POST['intervenant']) ? $_POST['intervenant'] : [];
             $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef,$idIntervenants);
             header('Location: index.php?module=rendus&action=home');

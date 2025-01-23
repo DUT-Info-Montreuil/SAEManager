@@ -132,7 +132,7 @@ HTML;
                             <input class="input-group form-control" type="text" name="noteNom" value="$noteNom" placeholder="Nom de l'évaluation">
                         </td>
                         <td class="text-center">
-                            <input type="number" name="coef" class="form-control form-control-sm w-auto" value="$coef" placeholder="Coef">
+                            <input type="number" name="coef" class="form-control form-control-sm w-auto" min="0" max="100" value="$coef" placeholder="Coef">
                         </td>
                         <td class="text-center">
                             {$this->initAjoutIntervenant($intervenants,$idDeCetteSae,$idIntervenantEvaluateur)}
@@ -273,7 +273,7 @@ HTML;
                         <h4 class="fw-bold text mb-0">$groupeNom</h4>
                         <div class="ml-auto">
                             <label for="note">Ajouter une note globale au groupe :</label>
-                            <input type="number" class="form-control" id="global-note-$groupeId" value="" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
+                            <input type="number" class="form-control" id="global-note-$groupeId" value="" min="0" max="20" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
                         </div>
                     </div>
     
@@ -301,7 +301,7 @@ HTML;
                                 <tr>
                                     <td>$eleveNom</td>
                                     <td>$elevePrenom</td>
-                                    <td><input type="number" name="note_idEleve_$idEleve" class="form-control" value="$noteValeur" id="note-$idEleve" /></td>
+                                    <td><input type="number" name="note_idEleve_$idEleve" class="form-control" value="$noteValeur" min="0" max="20" id="note-$idEleve" /></td>
                                 </tr>
                     HTML;
                 }
