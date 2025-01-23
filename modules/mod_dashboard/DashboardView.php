@@ -30,7 +30,7 @@ HTML;
         $texteRendu = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes associés à ces évaluations de rendu" : "Vos rendus non déposé";
         $texteSoutenance = $_SESSION['estProfUtilisateur'] == 1 ?"Vous êtes associés à ces évaluations de soutenance" : "Vos prochaines soutenances";
         echo <<<HTML
-                <div class="container mt-5">
+                <div class="container mt-5 h-100">
                     <h1 class="fw-bold">DASHBOARD</h1>
                     <div class="card-general shadow bg-white rounded">
                         <div class="d-flex flex-column align-items-center">

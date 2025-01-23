@@ -8,6 +8,23 @@
     --ressource-color: #B4FFEA;
 }
 
+#background-desature {
+    position: relative;
+}
+
+#background-desature::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('background.png');
+    background-repeat: repeat;
+    filter: contrast(30%) grayscale(100%) brightness(180%);
+    z-index: -1;
+}
+
 .cursor-pointer {
     cursor: pointer;
 }

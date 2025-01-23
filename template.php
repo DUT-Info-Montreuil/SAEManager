@@ -7,13 +7,10 @@
     <title>SAE Manager</title>
     <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/sae-manager.css">
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
 </head>
 
-<body>
-
+<body id="background-desature">
     <!-- Page de chargement -->
     <div id="loading-screen" class="loading-screen">
         <div class="loader-container">
@@ -28,6 +25,7 @@
 
     <script src="js/loading.js"></script>
 
+    <script src="js/navbar/navbar.js"></script>
 </body>
 
 </html>

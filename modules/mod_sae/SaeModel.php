@@ -1185,4 +1185,52 @@ class SaeModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
+
+    public function getRenduGroupeBySae($idSAE)
+    {
+        $req = "SELECT Rendu.idRendu, Rendu.nom as nomRendu, RenduGroupe.idGroupe, RenduGroupe.dateDepot, RenduGroupe.fichier, Groupe.nom
+        FROM Rendu
+        INNER JOIN RenduGroupe ON RenduGroupe.idRendu = Rendu.idRendu
+        INNER JOIN Groupe ON Groupe.idgroupe = RenduGroupe.idGroupe
+        AND Rendu.idSAE = :idSAE
+        ORDER BY Rendu.idRendu ASC";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+
+        return $pdo_req->fetchAll();
+    }
+
+
+    public function getSupportGroupeBySae($idSAE)
+    {
+        $req = "SELECT Soutenance.idSoutenance, Soutenance.titre as nomSoutenance, SupportSoutenance.idGroupe, SupportSoutenance.support as fichier, Groupe.nom
+        FROM Soutenance
+        INNER JOIN SupportSoutenance ON SupportSoutenance.idSoutenance = Soutenance.idSoutenance
+        INNER JOIN Groupe ON Groupe.idgroupe = SupportSoutenance.idGroupe
+        AND Soutenance.idSAE = :idSAE
+        ORDER BY Soutenance.idSoutenance ASC";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+
+        return $pdo_req->fetchAll();
+    }
+
+    public function getReponsesGroupeBySae($idSAE){
+        $req = "SELECT Champs.idChamps, Champs.nomchamp , reponsesChamp.idEleve, reponsesChamp.reponse, Personne.prenom, Personne.nom
+        FROM Champs
+        INNER JOIN reponsesChamp ON reponsesChamp.idChamp = Champs.idChamps
+        INNER JOIN Personne ON Personne.idPersonne = reponsesChamp.idEleve
+        AND Champs.idSAE = :idSAE
+        ORDER BY Champs.idChamps ASC";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+
+        return $pdo_req->fetchAll();
+    }
 }

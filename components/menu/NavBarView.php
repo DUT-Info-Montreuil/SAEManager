@@ -57,6 +57,8 @@ HTML;
 		$module = $_GET['module'] ?? '';
 		$action = $_GET['action'] ?? '';
 
+		$estProfUtilisateur = isset($_SESSION['loginUtilisateur']) && $_SESSION['estProfUtilisateur'] == 1;
+		
 		if (isset($_SESSION['loginUtilisateur'])) {
 			$this->affichage .= <<<HTML
 					<a href="index.php?module=home" class="my-auto mx-3 text-decoration-none text-reset">Accueil</a>
@@ -65,9 +67,19 @@ HTML;
 HTML;		
 			if ($module == 'sae' && $action != 'home') {
 				$saeID = $_GET['id'] ?? "";
+				$this->affichage .= <<<HTML
+				<a href="index.php?module=sae&action=details&id=$saeID">Détails SAE</a>
+HTML;
+			if($estProfUtilisateur)
 			$this->affichage .= <<<HTML
-				<a href="index.php?module=sae&action=ressources" class="my-auto mx-3 text-decoration-none text-reset">Ressources</a>
+				<a href="index.php?module=sae&action=listeRendusGroupe&id=$saeID">Fichiers des rendus</a>
+				<a href="index.php?module=sae&action=reponsesAuxChamps&id=$saeID">Réponses aux champs</a>
+				<a href="index.php?module=sae&action=listeSupportGroupe&id=$saeID">Supports des soutenances</a>
 				<a href="index.php?module=sae&action=soutenance&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Soutenance</a>
+
+HTML;
+			if(!$estProfUtilisateur)
+			$this->affichage .= <<<HTML
 				<a href="index.php?module=sae&action=groupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Groupe</a>
 				<a href="index.php?module=sae&action=cloud&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Cloud</a>
 				<a href="index.php?module=sae&action=note&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Notes</a>

@@ -29,7 +29,7 @@ HTML;
         }
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">ACCUEIL</h1>
                 <div class="card-general shadow bg-white rounded w-100 m-auto">
                     <div class="d-flex flex-column w-100">
@@ -47,7 +47,7 @@ HTML;
 HTML;
         } else { //Est un élève
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">ACCUEIL</h1>
                 <div class="card-general shadow bg-white rounded w-100 m-auto min-h75">
                     <div class="d-flex flex-column w-100">

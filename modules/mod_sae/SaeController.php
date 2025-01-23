@@ -126,6 +126,15 @@ class SaeController
             case "ajoutEtudiantSAE":
                 $this->ajoutEtudiantSAE();
                 break;
+            case "listeRendusGroupe":
+                $this->initPageListeRenduGroupe();
+                break;
+            case "listeSupportGroupe":
+                $this->initPageListeSupportGroupe();
+                break;
+            case "reponsesAuxChamps":
+                $this->initPageReponsesChamps();
+                break;
             case "ajoutDepotDocument":
                 $this->depotDocument();
                 break;
@@ -238,7 +247,6 @@ class SaeController
 
     private function initNote()
     {
-
         $groupeID = $this->model->getMyGroupId($_GET['id']);
 
         $notes = $this->model->getNote($_GET['id'], $groupeID);
@@ -616,6 +624,34 @@ class SaeController
         $this->model->inscrireEtudiantsSAE($idSAE, $idEtudiants);
 
         header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function initPageListeRenduGroupe()
+    {
+        if($_SESSION['estProfUtilisateur'] == 1){
+            $idSAE = $_GET['id'];
+            $listeRenduSae = $this->model->getRenduGroupeBySae($idSAE);
+            $sae = $this->model->getSAEById($idSAE);
+            $this->view->initPageListeRenduGroupe($sae, $listeRenduSae);
+        }
+    }
+
+    private function initPageListeSupportGroupe(){
+        if($_SESSION['estProfUtilisateur'] == 1){
+            $idSAE = $_GET['id'];
+            $listeSupportSae = $this->model->getSupportGroupeBySae($idSAE);
+            $sae = $this->model->getSAEById($idSAE);
+            $this->view->initPageListeSupportGroupe($sae, $listeSupportSae);
+        }
+    }
+
+    private function initPageReponsesChamps(){
+        if($_SESSION['estProfUtilisateur'] == 1){
+            $idSAE = $_GET['id'];
+            $listeReponsesSae = $this->model->getReponsesGroupeBySae($idSAE);
+            $sae = $this->model->getSAEById($idSAE);
+            $this->view->initPageReponsesChampGroupe($sae, $listeReponsesSae);
+        }
     }
 
     private function depotDocument() {
