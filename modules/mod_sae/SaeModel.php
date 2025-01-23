@@ -118,9 +118,8 @@ class SaeModel extends Connexion
         return false;
     }
 
-    function uploadDocument($file, $fileName) {
+    function uploadDocument($file, $fileName, $idSae) {
         $newFileName = $this->uploadFichier($file, "none");
-        var_dump($file);
 
         if ($newFileName) {
             $currentDateTime = date('Y-m-d H:i:s');
@@ -135,7 +134,6 @@ class SaeModel extends Connexion
             $pdo_req->bindValue(":dateDepot", $currentDateTime);
             $pdo_req->bindValue(":idAuteur", $_SESSION['idUtilisateur']);
             $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
-            var_dump($req);
             $pdo_req->execute();
 
             return true;
@@ -236,6 +234,19 @@ class SaeModel extends Connexion
         return false;
     }
 
+    public function suprimmerDepotGroupeDocument($idDoc) {
+        
+        $document = $this->getDocument($idDoc);
+        $fileName = $document[0]['fichier'];
+        $req = "DELETE FROM Document
+                WHERE idDoc = :idDoc";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idDoc", $idDoc);
+        if($pdo_req->execute()){
+            return $this->deleteFichier($fileName);
+        }
+        return false;
+    }
 
     public function getRessourceBySAE($idSAE)
     {
@@ -384,6 +395,14 @@ class SaeModel extends Connexion
         $req = "SELECT * FROM RenduGroupe WHERE idRendu = :idRendu";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idRendu", $idRendu, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    function getDocument($idDocument) {
+        $req = "SELECT * FROM Document WHERE idDoc = :idDocument";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idDocument", $idDocument, PDO::PARAM_INT);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
@@ -1201,7 +1220,7 @@ class SaeModel extends Connexion
     }
 
     public function getDocsByGrpId($groupeID) {
-        $req = "SELECT dateDepot, idDoc, Personne.nom, prenom
+        $req = "SELECT Document.Nom, dateDepot, idDoc, Personne.nom, prenom
                 FROM Document
                 INNER JOIN Personne ON idAuteur = idPersonne
                 WHERE idGroupe = :groupeID";

@@ -30,3 +30,30 @@ listDocumentButtons.forEach((element) => {
     });
   }
 });
+
+/**
+ * Gestion du modal (pop-up) "Suprimmer Document"
+ */
+
+const modalSupressionDocument = document.getElementById(
+  "modalSupressionDepotDocument"
+);
+const modalSupressionDocumentCancelButton = document.getElementById(
+  "modalSupressionDepotDocument"
+);
+const modalValiderDocument = document.getElementById("modalValiderDepotDocument");
+
+const listSupressionDocumentButtons = document.querySelectorAll(
+  '[class*="supressDocumentButton"]'
+);
+
+listSupressionDocumentButtons.forEach((element) => {
+  element.addEventListener("click", function () {
+    matches = element.className.match(/supressDocumentButton-(\d+)/);
+    document.getElementById("idDepotSupressionDocument").value = matches[1];
+    modalSupressionDocument.classList.add("d-block");
+  });
+});
+modalSupressionDocumentCancelButton.addEventListener("click", function () {
+  modalSupressionDocument.classList.remove("d-block");
+});

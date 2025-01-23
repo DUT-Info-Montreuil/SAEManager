@@ -132,6 +132,12 @@ class SaeController
             case "ajoutDepotDocument":
                 $this->depotDocument();
                 break;
+            case "deposerFichierDocument":
+                $this->deposerFichierDocument();
+                break;
+            case "suprimmerDepotGroupeDocument":
+                $this->suprimmerDepotGroupeDocument();
+                break;
         }
     }
 
@@ -246,6 +252,9 @@ class SaeController
     }
 
     private function initCloud() {
+        if ($_SESSION['estProfUtilisateur']){
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+        }
 
         $groupeID = $this->model->getMyGroupId($_GET['id'])[0]['idGroupe'];
 
@@ -481,6 +490,15 @@ class SaeController
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
+    private function suprimmerDepotGroupeDocument() {
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
+        $idDoc = isset($_POST['idDepotSupressionDocument']) ? $_POST['idDepotSupressionDocument'] : exit("idDocument not set");
+
+        $this->model->suprimmerDepotGroupeDocument($idDoc, $idGroupe);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
     private function suprimmerDepotSupportGroupe()
     {
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
@@ -553,6 +571,15 @@ class SaeController
         header("Location: $apiUrl");
     }
 
+    private function deposerFichierDocument() {
+        $idDocument = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $documents = $this->model->getDocument($idDocument);
+        $fichier = $documents[0]['fichier'];
+
+        $apiUrl = "http://saemanager-api.atwebpages.com/api/api.php?file=" . urlencode($fichier);
+        header("Location: $apiUrl");
+    }
+
     private function deposerFichierSupport()
     {
         $idSupport = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
@@ -613,7 +640,7 @@ class SaeController
 
         $groupeID = $this->model->getMyGroupId($_GET['id'])[0]['idGroupe'];
 
-        $this->model->uploadDocument($file, $fileName, $groupeID);
-        //header("Location: " . $_SERVER['HTTP_REFERER']);
+        $this->model->uploadDocument($file, $fileName, $_GET['id']);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }
