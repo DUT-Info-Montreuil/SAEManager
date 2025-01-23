@@ -6,6 +6,7 @@ const modalDepotDocument = document.getElementById("modalDepotDocument");
 const dropDocumentFileCancelButton = document.getElementById(
   "depotCancelButtonDocument"
 );
+const dropDocumentCancelButton = document.getElementById("modalCancelButtonDocument");
 const listDocumentButtons = document.querySelectorAll('[class*="documentdrop-"]');
 const idSaeDepotDocument = document.getElementById("idSaeDepotDocument");
 
@@ -16,6 +17,10 @@ document
   });
 
 dropDocumentFileCancelButton.addEventListener("click", function () {
+  modalDepotDocument.classList.remove("d-block");
+});
+
+dropDocumentCancelButton.addEventListener("click", function () {
   modalDepotDocument.classList.remove("d-block");
 });
 

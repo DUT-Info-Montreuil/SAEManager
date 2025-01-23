@@ -16,6 +16,7 @@ const modalDepotRendu = document.getElementById("modalDepotRendu");
 const dropRenduFileCancelButton = document.getElementById(
   "depotCancelButtonRendu"
 );
+const dropRenduCancelButton = document.getElementById("modalCancelButtonRendu");
 const listRenduButtons = document.querySelectorAll('[class*="rendudrop-"]');
 const idSaeDepotRendu = document.getElementById("idSaeDepotRendu");
 
@@ -26,6 +27,10 @@ document
   });
 
 dropRenduFileCancelButton.addEventListener("click", function () {
+  modalDepotRendu.classList.remove("d-block");
+});
+
+dropRenduCancelButton.addEventListener("click", function () {
   modalDepotRendu.classList.remove("d-block");
 });
 
@@ -50,6 +55,7 @@ const modalDepotSupport = document.getElementById("modalDepotSupport");
 const dropSupportFileCancelButton = document.getElementById(
   "depotCancelButtonSupport"
 );
+const dropSupportCancelButton = document.getElementById("modalCancelButtonSupport");
 const listSupportButtons = document.querySelectorAll(
   '[class*="rendusoutenance-"]'
 );
@@ -59,16 +65,12 @@ document
   .addEventListener("click", function () {
     document.getElementById("fileInputSupport").click();
   });
-dropSupportFileCancelButton.addEventListener("click", function () {
-  modalDepotSupport.classList.remove("d-block");
-  document
-    .getElementById("selectFileButtonSupport")
-    .addEventListener("click", function () {
-      document.getElementById("fileInputSupport").click();
-    });
-});
 
 dropSupportFileCancelButton.addEventListener("click", function () {
+  modalDepotSupport.classList.remove("d-block");
+});
+
+dropSupportCancelButton.addEventListener("click", function () {
   modalDepotSupport.classList.remove("d-block");
 });
 
@@ -115,6 +117,18 @@ editRenduBtn.forEach((btn) => {
           .classList.remove("d-block");
       });
   });
+});
+
+const modalCancelButtonCreateRendu = document.getElementById("modalCancelButtonCreateRendu");
+
+modalCancelButtonCreateRendu.addEventListener("click", function () {
+  document.querySelector("#modalCreateRendu").classList.remove("d-block");
+});
+
+const modalCancelButtonModifierRendu = document.getElementById("modalCancelButtonModifierRendu");
+
+modalCancelButtonModifierRendu.addEventListener("click", function () {
+  document.querySelector("#modalModifierRendu").classList.remove("d-block");
 });
 
 // Ajout coeff
@@ -235,6 +249,17 @@ editSoutenanceBtn.forEach((btn) => {
   });
 });
 
+const modalCancelButtonModifierSoutenance = document.getElementById("modalCancelButtonModifierSoutenance");
+const modalCancelButtonCreateSoutenance = document.getElementById("modalCancelButtonCreateSoutenance");
+
+modalCancelButtonModifierSoutenance.addEventListener("click", function () {
+  document.querySelector("#modalModifierSoutenance").classList.remove("d-block");
+});
+
+modalCancelButtonCreateSoutenance.addEventListener("click", function () {
+  document.querySelector("#modalCreateSoutenance").classList.remove("d-block");
+});
+
 // Champ
 
 const createChampBtn = document.querySelector("#create-champ");
@@ -250,6 +275,12 @@ if (createChampBtn) {
       });
   });
 }
+
+const modalCancelButtonCreateChamp = document.getElementById("modalCancelButtonCreateChamp");
+
+modalCancelButtonCreateChamp.addEventListener("click", function () {
+  document.querySelector("#modalCreateChamp").classList.remove("d-block");
+});
 
 // SUJET
 
@@ -269,9 +300,16 @@ if (editSujetBtn) {
   });
 }
 
+const modalCancelButtonModifierSujet = document.getElementById("modalCancelButtonModifierSujet");
+
+modalCancelButtonModifierSujet.addEventListener("click", function () {
+  document.querySelector("#modalModifierSujet").classList.remove("d-block");
+});
+
 // Ressource
 
 const createRessourceBtn = document.querySelector("#create-ressource");
+const modalCancelButtonCreateRessource = document.getElementById("modalCancelButtonCreateRessource");
 
 if (createRessourceBtn) {
   createRessourceBtn.addEventListener("click", function () {
@@ -285,11 +323,16 @@ if (createRessourceBtn) {
           .classList.remove("d-block");
       });
   });
+
+  modalCancelButtonCreateRessource.addEventListener("click", function () {
+    document.querySelector("#modalCreateRessource").classList.remove("d-block");
+  });
 }
 
 // Ressource
 
 const addRessourceBtn = document.querySelector("#btn-add-ressource");
+const modalCancelButtonAjouterRessource = document.getElementById("modalCancelButtonAjouterRessource");
 
 if (addRessourceBtn) {
   addRessourceBtn.addEventListener("click", function () {
@@ -315,6 +358,10 @@ const modalDepotRessource = document.getElementById("modalCreateRessource");
 const dropRessourceFileCancelButton = document.getElementById(
   "depotCancelButtonRessource"
 );
+
+modalCancelButtonAjouterRessource.addEventListener("click", function () {
+  document.querySelector("#modalAjouterRessource").classList.remove("d-block");
+});
 
 if (dropRessourceFileCancelButton) {
   dropRessourceFileCancelButton.addEventListener("click", function () {
@@ -346,21 +393,23 @@ listRessourceButtons.forEach((element) => {
 const addEtudiantButton = document.querySelector("#addEtudiantField");
 const etudiantsContainer = document.querySelector("#etudiants-container");
 
-addEtudiantButton.addEventListener("click", function () {
-  const firstSelect = document.querySelector("#addEtudiant");
-  if (firstSelect) {
-    const optionsHTML = firstSelect.innerHTML;
-    const newField = document.createElement("div");
-    newField.className = "etudiant-container mb-3 d-flex";
-    newField.innerHTML = `
-      <select name="etudiants[]" class="form-select me-2 w-25">
-        ${optionsHTML}
-      </select>
-      <button type="button" onclick="removeField(this)" class="btn btn-danger">Supprimer</button>
-      `;
-    etudiantsContainer.appendChild(newField);
-  }
-});
+if (addEtudiantButton != null){
+  addEtudiantButton.addEventListener("click", function () {
+    const firstSelect = document.querySelector("#addEtudiant");
+    if (firstSelect) {
+      const optionsHTML = firstSelect.innerHTML;
+      const newField = document.createElement("div");
+      newField.className = "etudiant-container mb-3 d-flex";
+      newField.innerHTML = `
+        <select name="etudiants[]" class="form-select me-2 w-25">
+          ${optionsHTML}
+        </select>
+        <button type="button" onclick="removeField(this)" class="btn btn-danger">Supprimer</button>
+        `;
+      etudiantsContainer.appendChild(newField);
+    }
+  });
+}
 
 function removeField(button) {
   const field = button.parentNode;
@@ -373,37 +422,39 @@ const dropdownButton = document.querySelector('.dropdown-toggle');
 const dropdownContent = document.getElementById('dropdownContent');
 const errorMessage = document.getElementById('errorMessage');
 
-dropdownButton.addEventListener('click', function () {
-  const isVisible = dropdownContent.style.display === 'block';
-  dropdownContent.style.display = isVisible ? 'none' : 'block';
-  if (!isVisible) searchInput.focus();
-});
-
-function updateDropdownButton() {
-  const selected = Array.from(checkboxes)
-    .filter(checkbox => checkbox.querySelector('input').checked)
-    .map(checkbox => checkbox.querySelector('label').textContent.trim());
-      
-  dropdownButton.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des étudiants';
-}
-
-searchInput.addEventListener('input', () => {
-  const filter = searchInput.value.toLowerCase();
-  checkboxes.forEach((checkbox) => {
-    const label = checkbox.querySelector('label').textContent.toLowerCase();
-    checkbox.style.display = label.includes(filter) ? 'block' : 'none';
+if (dropdownButton != null) {
+  dropdownButton.addEventListener('click', function () {
+    const isVisible = dropdownContent.style.display === 'block';
+    dropdownContent.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) searchInput.focus();
   });
-});
 
-checkboxes.forEach(checkbox => {
-  checkbox.querySelector('input').addEventListener('change', () => {
-    updateDropdownButton();
-  });
-});
-
-document.addEventListener('click', function (event) {
-  const isClickInside = dropdownButton.contains(event.target) || dropdownContent.contains(event.target);
-  if (!isClickInside) {
-    dropdownContent.style.display = 'none';
+  function updateDropdownButton() {
+    const selected = Array.from(checkboxes)
+      .filter(checkbox => checkbox.querySelector('input').checked)
+      .map(checkbox => checkbox.querySelector('label').textContent.trim());
+        
+    dropdownButton.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des étudiants';
   }
-});
+
+  searchInput.addEventListener('input', () => {
+    const filter = searchInput.value.toLowerCase();
+    checkboxes.forEach((checkbox) => {
+      const label = checkbox.querySelector('label').textContent.toLowerCase();
+      checkbox.style.display = label.includes(filter) ? 'block' : 'none';
+    });
+  });
+
+  checkboxes.forEach(checkbox => {
+    checkbox.querySelector('input').addEventListener('change', () => {
+      updateDropdownButton();
+    });
+  });
+
+  document.addEventListener('click', function (event) {
+    const isClickInside = dropdownButton.contains(event.target) || dropdownContent.contains(event.target);
+    if (!isClickInside) {
+      dropdownContent.style.display = 'none';
+    }
+  });
+}
