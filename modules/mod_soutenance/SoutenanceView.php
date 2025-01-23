@@ -241,7 +241,6 @@ HTML;
                             <input type="number" class="form-control" id="global-note-$groupeId" value="" onchange="updateGroupNotes('$groupeId')" onclick="preventGroupToggle(event, '$groupeId')" />
                         </div>
                     </div>
-    
                     <!-- Tableau des élèves -->
                     <div class="group-table mt-3 collapsed" id="table-wrapper-$groupeId">
                         <table class="table table-bordered mt-3">

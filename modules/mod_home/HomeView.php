@@ -82,7 +82,7 @@ HTML;
                 </div>
                 <div class="m-4">
                     <h4>SAÉs</h4>
-                    <p>Retrouvez ici la liste de toutes les SAÉs auquel vous avez été associé.</p>
+                    <p>Retrouvez ici la liste de toutes les SAÉs auxquelles vous avez été associé.</p>
                 </div>
             </a>
         </div>

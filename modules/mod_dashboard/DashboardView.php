@@ -27,7 +27,7 @@ HTML;
         }
 
         $estProfUtilisateur = $_SESSION["estProfUtilisateur"] == 1;
-        $texteRendu = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes associés à ces évaluations de rendu" : "Vos rendus non déposé";
+        $texteRendu = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes associés à ces évaluations de rendu" : "Vos rendus non déposés";
         $texteSoutenance = $_SESSION['estProfUtilisateur'] == 1 ?"Vous êtes associés à ces évaluations de soutenance" : "Vos prochaines soutenances";
         echo <<<HTML
                 <div class="container mt-5 h-100">
@@ -71,7 +71,7 @@ HTML;
 HTML;
                                         if(count($listeSoutenance)==0){
                                             echo <<<HTML
-                                                <p class="mb-0">Vous n'avez aucunes soutenances prévues.</p>
+                                                <p class="mb-0">Vous n'avez aucune soutenances prévues.</p>
 HTML;
                                         }
                                         else{
@@ -104,7 +104,7 @@ HTML;
 HTML;
         if(count($notifications)==0){
             echo <<<HTML
-                                                <p class="mb-0">Vous n'avez aucunes notifications.</p>
+                                                <p class="mb-0">Vous n'avez aucune notifications.</p>
 HTML;
         }
         else{

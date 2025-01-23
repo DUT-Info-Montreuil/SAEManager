@@ -317,7 +317,7 @@ class SaeModel extends Connexion
         if ($pdo_req->rowCount() == 0)
             return false;
         else {
-            $this->creeNotification($idResp, "Vous avez été assigné coresponsable à une SAE.", $idSAE, "index.php?module=sae&action=details&id=$idSAE");
+            $this->creeNotification($idResp, "Vous avez été assigné co-responsable à une SAE.", $idSAE, "index.php?module=sae&action=details&id=$idSAE");
             return true;
         }
     }
@@ -709,14 +709,14 @@ class SaeModel extends Connexion
             $pdo_req->execute();
 
             $nomSae = $this->getSAEById($idSAE)[0]['nomSae'];
-            $message = "Vous avez été ajouter en tant que Jury sur une soutenance de la SAE $nomSae!";
+            $message = "Vous avez été ajouté en tant que Jury sur une soutenance de la SAE $nomSae!";
             $redirect = "index.php?module=sae&action=details&id=$idSAE";
             $this->creeNotification($prof, $message, $idSAE, $redirect);
 
         }
 
         $nomSae = $this->getSAEById($idSAE)[0]['nomSae'];
-        $message = "Une nouvelle soutenance à été ajoutée à la sae $nomSae!";
+        $message = "Une nouvelle soutenance a été ajoutée à la sae $nomSae!";
         $redirect = "index.php?module=sae&action=details&id=$idSAE";
         foreach ($etudiants as $etudiant) {
             $this->creeNotification($etudiant['idPersonne'], $message, $idSAE, $redirect);

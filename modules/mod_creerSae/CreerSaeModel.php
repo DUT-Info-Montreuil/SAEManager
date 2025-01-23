@@ -52,7 +52,7 @@ class CreerSaeModel extends Connexion
 
             self::$bdd->commit();
             foreach($coResponsables as $coResponsable)
-                SaeModel::creeNotification($coResponsable, "Vous avez été assigné coresponsable à une SAE qui vient d'être créée.", null, "index.php?module=sae&action=home");
+                SaeModel::creeNotification($coResponsable, "Vous avez été assigné co-responsable à une SAE qui vient d'être créée.", null, "index.php?module=sae&action=home");
             foreach($intervenants as $intervenant)
                 SaeModel::creeNotification($intervenant, "Vous avez été assigné intervenant à une SAE qui vient d'être créée.", null, "index.php?module=sae&action=home");
 

@@ -296,7 +296,7 @@ HTML;
                         <svg class="me-2" width="25" height="25">
                             <use xlink:href="#arrow-icon"></use>
                         </svg>
-                        Etudiants(s)
+                        Étudiant(s)
                     </h3>
                     <div class="d-flex flex-column">
         HTML;
@@ -778,7 +778,7 @@ HTML;
                     <svg class="me-2" width="25" height="25">
                         <use xlink:href="#arrow-icon"></use>
                     </svg>
-                    Responsable(s) et intervenant(e)
+                    Responsable(s) et intervenant(e)(s)
                 </h3>
                 <div class="d-flex flex-wrap">
 HTML;
@@ -916,7 +916,7 @@ HTML;
                         <svg class="me-2" width="25" height="25">
                             <use xlink:href="#arrow-icon"></use>
                         </svg>
-                        Liste des reponses(s) des groupe(s) de la SAE
+                        Liste des réponses des groupe(s) de la SAE
                     </h3>
                     <div>
 HTML;
@@ -1136,7 +1136,7 @@ HTML;
                         <svg class="me-2" width="25" height="25">
                             <use xlink:href="#arrow-icon"></use>
                         </svg>
-                        Soutenance(s) de la SAE que vous jugé
+                        Soutenance(s) de la SAE que vous jugez
                     </h3>
                     <div>
         HTML;
@@ -1181,7 +1181,7 @@ HTML;
                                 Bienvenue sur l'outil de gestion des horaires de passage. Voici comment l'utiliser :
                             </p>
                             <ul>
-                                <li>Utilisez le sélecteur de date et configurez les heures de début, de fin, ainsi que la durée des plages horaires (vous pourez en créer plusieurs).</li>
+                                <li>Utilisez le sélecteur de date et configurez les heures de début, de fin, ainsi que la durée des plages horaires (vous pourrez en créer plusieurs).</li>
                                 <li>Glissez et déposez les groupes de la section "Groupe sans horaire de passage" vers les plages horaires générées dans la section de planning.</li>
                                 <li>Lorsque tout est prêt, cliquez sur le bouton <strong>"Valider"</strong> pour enregistrer le planning.</li>
                             </ul>
@@ -1259,7 +1259,7 @@ HTML;
                                         <label for="slot-duration" class="form-label mt-3">Durée des plages (minutes) :</label>
                                         <input type="number" id="slot-duration" class="form-control" value=$temps min="1">
                                     
-                                        <p class="mt-2 text-muted">Pour changer la durée des plages, valider d'abord une première fois le changement en appuyant sur valider, puis re remplissez les plages (attention, tout les passages de la soutenance seront suprimmés).</p>
+                                        <p class="mt-2 text-muted">Pour changer la durée des plages, valider d'abord une première fois le changement en appuyant sur valider, puis re remplissez les plages (attention, tous les passages de la soutenance seront suprimés).</p>
                                         
                                         <button id="generate-slots" class="btn btn-success mt-3">Générer les plages horaires</button>
                                     </div>
