@@ -13,7 +13,7 @@ class SaeView extends GenericView
     function initSaePage($saes)
     {
         echo <<<HTML
-    <div class="container mt-5">
+    <div class="container mt-5 h-100">
         <h1 class="fw-bold">LISTE DES SAÉ(S)</h1>
         <div class="card shadow bg-white rounded min-h75">
             <div class="d-flex align-items-center p-5 mx-5">
@@ -79,7 +79,7 @@ HTML;
         $idSAE = htmlspecialchars($sae[0]['idSAE']);
 
         echo <<<HTML
-    <div class="container mt-5">
+    <div class="container mt-5 colorSae=100">
         <h1 class="fw-bold">$nom</h1>
         <div class="card shadow bg-white rounded p-4">
             <!-- Sujet -->
@@ -677,7 +677,7 @@ HTML .
         }
 
         echo <<<HTML
-    <div class="container mt-5">
+    <div class="container mt-5 h-100">
         <h1 class="fw-bold">$nomSAE</h1>
         <div class="card shadow bg-white rounded p-4 min-h75">
             <!-- MEMBRE DU GROUPE -->
@@ -718,18 +718,6 @@ HTML;
             echo $this->linePersonne($prenom, $nom);
         }
         echo <<<HTML
-                </div>
-            </div>
-
-            <!-- MESSA E -->
-            <div class="mb-5">
-                <h3 class="d-flex align-items-center">
-                    <svg class="me-2" width="25" height="25">
-                        <use xlink:href="#arrow-icon"></use>
-                    </svg>
-                    Message(s) du groupe
-                </h3>
-                <div class="d-flex flex-column">
                 </div>
             </div>
 
@@ -847,10 +835,153 @@ HTML;
         HTML;
     }
 
+    function initPageReponsesChampGroupe($sae, $listeReponsesSae){
+        $nom = htmlspecialchars($sae[0]['nomSae']);
+        echo <<<HTML
+        <div class="container mt-5 h-100">
+            <h1 class="fw-bold">$nom</h1>
+            <div class="card shadow bg-white rounded p-4 min-h75">
+                <div class="mb-5">
+                    <h3 class="d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Liste des reponses(s) des groupe(s) de la SAE
+                    </h3>
+                    <div>
+HTML;
+                        if($listeReponsesSae){
+                            $idChamp = $listeReponsesSae[0]['idChamps'];
+                            echo $this->catégorieChamp($listeReponsesSae[0]['nomchamp'], $listeReponsesSae[0]['idChamps']);
+                            foreach($listeReponsesSae as $reponse){
+                                if($reponse['idChamps'] != $idChamp){
+                                    $idChamp = $reponse['idChamps'];
+                                    echo $this->catégorieChamp($reponse['nomchamp'], $reponse['idChamps']);
+                                }
+                                echo $this->lineReponsesChampEleve($reponse['nom'], $reponse['prenom'], $reponse['reponse'], $sae[0]['idSAE'], $reponse['idChamps']);
+                            }
+                        }
+                        else{
+                            echo <<<HTML
+                                <p class="h5 fw-bold">Aucuns élèves ont répondus aux différents champs de cette SAE</p>
+
+HTML;
+                        }
+                        echo <<<HTML
+                    </div>
+HTML;
+
+        echo <<<HTML
+            <script src="js/reponseschamp.js"></script>
+        HTML;
+    }
+
+    function initPageListeSupportGroupe($sae, $listesSupport){
+        $nom = htmlspecialchars($sae[0]['nomSae']);
+        echo <<<HTML
+        <div class="container mt-5 h-100">
+            <h1 class="fw-bold">$nom</h1>
+            <div class="card shadow bg-white rounded p-4 min-h75">
+                <div class="mb-5">
+                    <h3 class="d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Liste des support(s) des groupe(s) de la SAE
+                    </h3>
+                    <div>
+HTML;
+                        if($listesSupport){
+                            $soutenanceID = $listesSupport[0]['idSoutenance'];
+                            echo $this->catégorieSupport($listesSupport[0]['nomSoutenance'], $listesSupport[0]['idSoutenance']);
+                            foreach($listesSupport as $soutenance){
+                                if($soutenance['idSoutenance'] != $soutenanceID){
+                                    $soutenanceID = $soutenance['idSoutenance'];
+                                    echo $this->catégorieSupport($soutenance['nomSoutenance'], $soutenance['idSoutenance']);
+                                }
+                                echo $this->lineSupportTelechargeableGroupe($soutenance['nom'], $soutenance['fichier'], $sae[0]['idSAE'], $soutenance['idSoutenance']);
+                            }
+                        }
+                        else{
+                            echo <<<HTML
+                                <p class="h5 fw-bold">Aucuns support n'ont été déposés pour les soutenances de cette SAE</p>
+
+HTML;
+                        }
+                        echo <<<HTML
+                    </div>
+HTML;
+
+        echo <<<HTML
+            <script src="js/supportdownload.js"></script>
+        HTML;
+    }
+
+    function catégorieSupport($nomSoutenance, $idSoutenance){
+        return <<<HTML
+        <div class="d-flex justify-content-between p-3 border bg-light rounded-3 shadow-sm mb-2 w-100"
+        style="cursor: pointer;">
+            <i class="chevronSupport-$idSoutenance fas fa-chevron-up"></i>
+            <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold w-10">$nomSoutenance</p>
+            </div>   
+        </div>
+HTML;
+
+    }
+
+    function catégorieChamp($nomChamp, $idChamp){
+        return <<<HTML
+        <div class="d-flex justify-content-between p-3 border bg-light rounded-3 shadow-sm mb-2 w-100"
+        style="cursor: pointer;">
+            <i class="chevronChamp-$idChamp fas fa-chevron-up"></i>
+            <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold w-10">$nomChamp</p>
+            </div>   
+        </div>
+HTML;
+    }
+
+    function lineReponsesChampEleve($nomEleve, $prenomEleve, $reponse, $idSAE, $idChamp){
+        return <<<HTML
+        <div class="lineReponsesChamp-$idChamp d-flex d-none justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2 w-100">
+            <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold w-10">Élève : $nomEleve $prenomEleve</p>
+            </div>
+            <div class="d-flex flex-column w-75">
+                <p class="mb-0 text-muted fw-bold">Réponse : </p>$reponse
+            </div>
+        </div>
+        HTML;
+    }
+
+    function lineSupportTelechargeableGroupe($nomGroupe, $nomFichier, $idSAE, $idSoutenance){
+        $nomFichierSplit = explode('-', $nomFichier);
+        array_shift($nomFichierSplit);
+        $nomFichierAffichage = implode('-', $nomFichierSplit);
+
+        return <<<HTML
+        <div class="lineSupportTelechargeable-$idSoutenance d-flex d-none justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2 w-100">
+            <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold w-10">Support du groupe : $nomGroupe</p>
+            </div>
+            <div class="d-flex flex-column w-25">
+                <a href="http://saemanager-api.atwebpages.com/api/api.php?file=$nomFichier"  
+                class="d-flex align-items-center cursor-pointer text-decoration-none text-dark" 
+                data-name="$nomFichier" 
+                data-sae="$idSAE">
+                        <p class="mb-0 fw-bold text-primary resource-name">Télécharger</p>
+                </a>
+                <p class="mb-0 text-muted">Contenu : $nomFichierAffichage</p>
+            </div>
+        </div>
+        HTML;
+    }
+
     function initPageListeRenduGroupe($sae, $listeRendus){
         $nom = htmlspecialchars($sae[0]['nomSae']);
         echo <<<HTML
-        <div class="container mt-5">
+        <div class="container mt-5 h-100">
             <h1 class="fw-bold">$nom</h1>
             <div class="card shadow bg-white rounded p-4 min-h75">
                 <div class="mb-5">
@@ -862,43 +993,62 @@ HTML;
                     </h3>
                     <div>
 HTML;
-                        $renduId = $listeRendus[0]['idRendu'];
-                        echo "rendu ".$renduId;
-                        foreach($listeRendus as $rendu){
-                            if($rendu['idRendu'] != $renduId){
-                                echo "rendu".$rendu['idRendu'];
+                        if($listeRendus){
+                            $renduId = $listeRendus[0]['idRendu'];
+                            echo $this->catégorieRendu($listeRendus[0]['nomRendu'], $listeRendus[0]['idRendu']);
+                            foreach($listeRendus as $rendu){
+                                if($rendu['idRendu'] != $renduId){
+                                    $renduId = $rendu['idRendu'];
+                                    echo $this->catégorieRendu($rendu['nomRendu'], $rendu['idRendu']);
+                                }
+                                echo $this->lineRenduTelechargeableGroupe($rendu['nom'], $rendu['fichier'], $sae[0]['idSAE'], $rendu['idRendu']);
                             }
-                            echo $this->lineRenduTelechargeableGroupe($rendu['nom'], $rendu['fichier'], $sae[0]['idSAE']);
+                        }
+                        else{
+                            echo <<<HTML
+                                <p class="h5 fw-bold">Aucuns fichier n'ont été déposés pour les rendus de cette SAE</p>
+
+HTML;
                         }
                         echo <<<HTML
                     </div>
 HTML;
 
-        return <<<HTML
-            
+        echo <<<HTML
+            <script src="js/rendudownload.js"></script>
         HTML;
     }
 
-    function lineRenduTelechargeableGroupe($nomGroupe, $nomFichier, $idSAE){
+    function catégorieRendu($nomRendu, $idRendu){
+        return <<<HTML
+        <div class="d-flex justify-content-between p-3 border bg-light rounded-3 shadow-sm mb-2 w-100"
+        style="cursor: pointer;">
+            <i class="chevronRendu-$idRendu fas fa-chevron-up"></i>
+            <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold w-10">$nomRendu</p>
+            </div>   
+        </div>
+HTML;
+    }
+
+    function lineRenduTelechargeableGroupe($nomGroupe, $nomFichier, $idSAE, $idRendu){
         $nomFichierSplit = explode('-', $nomFichier);
         array_shift($nomFichierSplit);
         $nomFichierAffichage = implode('-', $nomFichierSplit);
 
         return <<<HTML
-        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+        <div class="lineRenduTelechargeable-$idRendu d-flex d-none justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2 w-100">
             <div class="d-flex align-items-center">
-                <p class="mb-0 fw-bold">Rendu du groupe : $nomGroupe</p>
+                <p class="mb-0 fw-bold w-10">Rendu du groupe : $nomGroupe</p>
             </div>
-            <div class="d-flex align-items-center">
+            <div class="d-flex flex-column w-25">
                 <a href="http://saemanager-api.atwebpages.com/api/api.php?file=$nomFichier"  
-               class="resource-item d-flex align-items-center p-2 border-bottom cursor-pointer text-decoration-none text-dark btn-download" 
-               data-name="$nomFichier" 
-               data-sae="$idSAE">
-                <div class="d-flex flex-column w-100">
-                    <p class="mb-0 fw-bold text-primary resource-name">Télécharger</p>
-                    <p class="mb-0 text-muted">Contenu : $nomFichierAffichage</p>
-                </div>
+                class="d-flex align-items-center cursor-pointer text-decoration-none text-dark" 
+                data-name="$nomFichier" 
+                data-sae="$idSAE">
+                        <p class="mb-0 fw-bold text-primary resource-name">Télécharger</p>
                 </a>
+                <p class="mb-0 text-muted">Contenu : $nomFichierAffichage</p>
             </div>
         </div>
         HTML;
@@ -908,7 +1058,7 @@ HTML;
     {
         $nom = htmlspecialchars($sae[0]['nomSae']);
         echo <<<HTML
-        <div class="container mt-5">
+        <div class="container mt-5 h-100">
             <h1 class="fw-bold">$nom</h1>
             <div class="card shadow bg-white rounded p-4 min-h75">
                 <div class="mb-5">
@@ -1542,7 +1692,7 @@ HTML;
         $isProf = isset($_SESSION['estProfUtilisateur']) && $_SESSION['estProfUtilisateur'];
 
         echo <<<HTML
-    <div class="container mt-5">
+    <div class="container mt-5 h-100">
         <h1 class="fw-bold">LISTE DES RESSOURCES</h1>
         <div class="card shadow bg-white rounded min-h75 p-3">
             <div class="d-flex align-items-center p-4 mx-5">

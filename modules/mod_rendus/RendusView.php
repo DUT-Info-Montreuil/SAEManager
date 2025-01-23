@@ -4,7 +4,6 @@ class RendusView extends GenericView
 {
     public function __construct()
     {
-        echo '<script src="js/renduview.js"></script>';
         parent::__construct();
     }
 
@@ -12,7 +11,7 @@ class RendusView extends GenericView
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
@@ -53,7 +52,7 @@ HTML;
 HTML;
         } else { // Est un étudiant
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
@@ -79,7 +78,7 @@ HTML;
             </div>
                 
             </div>
-HTML;
+HTML;   
         }
     }
 
@@ -171,8 +170,7 @@ HTML;
             <div 
                 class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm w-100 table-header" 
                 onclick="toggleTableBody('$idRendu')" 
-                style="cursor: pointer;"
-            >                
+                style="cursor: pointer;">                
             
                 <div class="align-items-center d-flex">
                     <i id="chevron-$idRendu" class="fas fa-chevron-down"></i>

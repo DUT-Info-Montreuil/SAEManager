@@ -12,7 +12,7 @@ class ConnexionView extends GenericView
     function deconnexionPage($msg)
     {
         echo <<<HTML
-        <div class="container mt-5">
+        <div class="container mt-5 h-100">
             <h1 class="fw-bold">DÉCONNEXION</h1>
             <div class="card shadow bg-white rounded w-100 h-75">
                 <div class="d-flex w-100 h-75 justify-content-center m-auto">
@@ -58,7 +58,7 @@ HTML;
         }
 
         echo <<<HTML
-    <div class="container mt-5">
+    <div class="container mt-5 h-100">
         <h1 class="fw-bold text-center">Connexion</h1>
         <div class="card shadow bg-white rounded mx-auto p-4 d-flex flex-column flex-md-row rounded-2 card-connexion">
             <div class="illustration-container d-flex justify-content-center align-items-center flex-column rounded-2">

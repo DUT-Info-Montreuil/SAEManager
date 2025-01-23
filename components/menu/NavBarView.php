@@ -89,14 +89,20 @@ HTML;
 HTML;
             if($estProfUtilisateur)
                 $this->affichage .= <<<HTML
-				<li><a href="index.php?module=sae&action=listeRendusGroupe&id=$saeID">Rendus</a></li>
+				<li><a href="index.php?module=sae&action=listeRendusGroupe&id=$saeID">Fichiers des rendus</a></li>
+				<li><a href="index.php?module=sae&action=reponsesAuxChamps&id=$saeID">Réponses aux champs</a></li>
 HTML;
                 $this->affichage .= <<<HTML
-				<li><a href="index.php?module=sae&action=soutenance&id=$saeID">Soutenance</a></li>
+				<li><a href="index.php?module=sae&action=soutenance&id=$saeID">Passage soutenance</a></li>
+				<li><a href="index.php?module=sae&action=listeSupportGroupe&id=$saeID">Supports des soutenances</a></li>
 				<li><a href="index.php?module=sae&action=groupe&id=$saeID">Groupe</a></li>
+HTML;
+			if(!$estProfUtilisateur)
+				$this->affichage .= <<<HTML
 				<li><a href="index.php?module=home">Cloud</a></li>
-				<li><a href="index.php?module=home">Messages</a></li>
 				<li><a href="index.php?module=sae&action=note&id=$saeID">Notes</a></li>
+HTML;
+			$this->affichage .= <<<HTML
 			</ul>
 			</div>
 HTML;

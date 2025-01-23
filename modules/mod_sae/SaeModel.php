@@ -1189,4 +1189,36 @@ class SaeModel extends Connexion
 
         return $pdo_req->fetchAll();
     }
+
+
+    public function getSupportGroupeBySae($idSAE)
+    {
+        $req = "SELECT Soutenance.idSoutenance, Soutenance.titre as nomSoutenance, SupportSoutenance.idGroupe, SupportSoutenance.support as fichier, Groupe.nom
+        FROM Soutenance
+        INNER JOIN SupportSoutenance ON SupportSoutenance.idSoutenance = Soutenance.idSoutenance
+        INNER JOIN Groupe ON Groupe.idgroupe = SupportSoutenance.idGroupe
+        AND Soutenance.idSAE = :idSAE
+        ORDER BY Soutenance.idSoutenance ASC";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+
+        return $pdo_req->fetchAll();
+    }
+
+    public function getReponsesGroupeBySae($idSAE){
+        $req = "SELECT Champs.idChamps, Champs.nomchamp , reponsesChamp.idEleve, reponsesChamp.reponse, Personne.prenom, Personne.nom
+        FROM Champs
+        INNER JOIN reponsesChamp ON reponsesChamp.idChamp = Champs.idChamps
+        INNER JOIN Personne ON Personne.idPersonne = reponsesChamp.idEleve
+        AND Champs.idSAE = :idSAE
+        ORDER BY Champs.idChamps ASC";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idSAE", $idSAE);
+        $pdo_req->execute();
+
+        return $pdo_req->fetchAll();
+    }
 }

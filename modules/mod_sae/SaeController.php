@@ -129,6 +129,12 @@ class SaeController
             case "listeRendusGroupe":
                 $this->initPageListeRenduGroupe();
                 break;
+            case "listeSupportGroupe":
+                $this->initPageListeSupportGroupe();
+                break;
+            case "reponsesAuxChamps":
+                $this->initPageReponsesChamps();
+                break;
         }
     }
 
@@ -591,9 +597,29 @@ class SaeController
 
     private function initPageListeRenduGroupe()
     {
-        $idSAE = $_GET['id'];
-        $listeRenduSae = $this->model->getRenduGroupeBySae($idSAE);
-        $sae = $this->model->getSAEById($idSAE);
-        $this->view->initPageListeRenduGroupe($sae, $listeRenduSae);
+        if($_SESSION['estProfUtilisateur'] == 1){
+            $idSAE = $_GET['id'];
+            $listeRenduSae = $this->model->getRenduGroupeBySae($idSAE);
+            $sae = $this->model->getSAEById($idSAE);
+            $this->view->initPageListeRenduGroupe($sae, $listeRenduSae);
+        }
+    }
+
+    private function initPageListeSupportGroupe(){
+        if($_SESSION['estProfUtilisateur'] == 1){
+            $idSAE = $_GET['id'];
+            $listeSupportSae = $this->model->getSupportGroupeBySae($idSAE);
+            $sae = $this->model->getSAEById($idSAE);
+            $this->view->initPageListeSupportGroupe($sae, $listeSupportSae);
+        }
+    }
+
+    private function initPageReponsesChamps(){
+        if($_SESSION['estProfUtilisateur'] == 1){
+            $idSAE = $_GET['id'];
+            $listeReponsesSae = $this->model->getReponsesGroupeBySae($idSAE);
+            $sae = $this->model->getSAEById($idSAE);
+            $this->view->initPageReponsesChampGroupe($sae, $listeReponsesSae);
+        }
     }
 }
