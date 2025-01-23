@@ -30,6 +30,9 @@ class SaeController
             case "note":
                 $this->initNote();
                 break;
+            case "cloud":
+                $this->initCloud();
+                break;
             case "input_champ":
                 $this->inputChamp();
                 break;
@@ -122,6 +125,15 @@ class SaeController
                 break;
             case "ajoutEtudiantSAE":
                 $this->ajoutEtudiantSAE();
+                break;
+            case "ajoutDepotDocument":
+                $this->depotDocument();
+                break;
+            case "deposerFichierDocument":
+                $this->deposerFichierDocument();
+                break;
+            case "suprimmerDepotGroupeDocument":
+                $this->suprimmerDepotGroupeDocument();
                 break;
         }
     }
@@ -234,6 +246,18 @@ class SaeController
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
+    }
+
+    private function initCloud() {
+        if ($_SESSION['estProfUtilisateur']){
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+        }
+
+        $groupeID = $this->model->getMyGroupId($_GET['id'])[0]['idGroupe'];
+
+        $groupeDocs = $this->model->getDocsByGrpId($groupeID);
+
+        $this->view->initCloudPage($groupeID, $groupeDocs, $_GET['id']);
     }
 
     private function initSoutenance()
@@ -463,6 +487,15 @@ class SaeController
         header("Location: index.php?module=sae&action=details&id=" . $idSae);
     }
 
+    private function suprimmerDepotGroupeDocument() {
+        $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $idGroupe = $this->model->getMyGroupId($idSae)[0][0];
+        $idDoc = isset($_POST['idDepotSupressionDocument']) ? $_POST['idDepotSupressionDocument'] : exit("idDocument not set");
+
+        $this->model->suprimmerDepotGroupeDocument($idDoc, $idGroupe);
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
     private function suprimmerDepotSupportGroupe()
     {
         $idSae = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
@@ -535,6 +568,15 @@ class SaeController
         header("Location: $apiUrl");
     }
 
+    private function deposerFichierDocument() {
+        $idDocument = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
+        $documents = $this->model->getDocument($idDocument);
+        $fichier = $documents[0]['fichier'];
+
+        $apiUrl = "http://saemanager-api.atwebpages.com/api/api.php?file=" . urlencode($fichier);
+        header("Location: $apiUrl");
+    }
+
     private function deposerFichierSupport()
     {
         $idSupport = isset($_GET['id']) ? $_GET['id'] : exit("idSae not set");
@@ -573,6 +615,21 @@ class SaeController
 
         $this->model->inscrireEtudiantsSAE($idSAE, $idEtudiants);
 
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function depotDocument() {
+        $fileName = isset($_POST['fileName']) ? $_POST["fileName"] : (isset($_FILES['fileInputDocument']['name']) ? basename($_FILES['fileInputDocument']['name']) : null);
+
+        if (!isset($_FILES['fileInputDocument'])) {
+            echo "Erreur lors du téléchargement du fichier.";
+            exit;
+        }
+        $file = $_FILES['fileInputDocument'];
+
+        $groupeID = $this->model->getMyGroupId($_GET['id'])[0]['idGroupe'];
+
+        $this->model->uploadDocument($file, $fileName, $_GET['id']);
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }

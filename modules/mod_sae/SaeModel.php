@@ -119,6 +119,30 @@ class SaeModel extends Connexion
         return false;
     }
 
+    function uploadDocument($file, $fileName, $idSae) {
+        $newFileName = $this->uploadFichier($file, "none");
+
+        if ($newFileName) {
+            $currentDateTime = date('Y-m-d H:i:s');
+            $idGroupe = $this->getMyGroupId($idSae);
+
+            $req = "INSERT INTO Document (idDoc, Nom, fichier, dateDepot, couleur, idAuteur, idGroupe) 
+                    VALUES (DEFAULT, :Nom, :fichier, :dateDepot, :couleur, :idAuteur, :idGroupe)";
+            $pdo_req = self::$bdd->prepare($req);
+            $pdo_req->bindValue(":fichier", $newFileName['file']);
+            $pdo_req->bindValue(":Nom", $fileName);
+            $pdo_req->bindValue(":couleur", "none");
+            $pdo_req->bindValue(":dateDepot", $currentDateTime);
+            $pdo_req->bindValue(":idAuteur", $_SESSION['idUtilisateur']);
+            $pdo_req->bindValue(":idGroupe", $idGroupe[0][0]);
+            $pdo_req->execute();
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function uploadFichier($fileInput, $color)
     {
         $apiUrl = 'http://saemanager-api.atwebpages.com/api/api.php';
@@ -211,6 +235,19 @@ class SaeModel extends Connexion
         return false;
     }
 
+    public function suprimmerDepotGroupeDocument($idDoc) {
+        
+        $document = $this->getDocument($idDoc);
+        $fileName = $document[0]['fichier'];
+        $req = "DELETE FROM Document
+                WHERE idDoc = :idDoc";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":idDoc", $idDoc);
+        if($pdo_req->execute()){
+            return $this->deleteFichier($fileName);
+        }
+        return false;
+    }
 
     public function getRessourceBySAE($idSAE)
     {
@@ -359,6 +396,14 @@ class SaeModel extends Connexion
         $req = "SELECT * FROM RenduGroupe WHERE idRendu = :idRendu";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idRendu", $idRendu, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
+    }
+
+    function getDocument($idDocument) {
+        $req = "SELECT * FROM Document WHERE idDoc = :idDocument";
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idDocument", $idDocument, PDO::PARAM_INT);
         $pdo_req->execute();
         return $pdo_req->fetchAll();
     }
@@ -1126,7 +1171,7 @@ class SaeModel extends Connexion
         $pdo_reqRessource->execute();
     }
 
-    private function creeNotification($idUtilisateur, $message, $idSAE, $redirect)
+    public static function creeNotification($idUtilisateur, $message, $idSAE, $redirect)
     {
         $req = "INSERT INTO Notifications VALUES (DEFAULT, :idPersonne, :message, :idSaeProvenance, :lienForm, :date)";
         $pdo_req = self::$bdd->prepare($req);
@@ -1154,5 +1199,17 @@ class SaeModel extends Connexion
         foreach ($idEtudiants as $id) {
             $this->inscrireEtudiantSAE($idSAE, $id);
         }
+    }
+
+    public function getDocsByGrpId($groupeID) {
+        $req = "SELECT Document.Nom, dateDepot, idDoc, Personne.nom, prenom
+                FROM Document
+                INNER JOIN Personne ON idAuteur = idPersonne
+                WHERE idGroupe = :groupeID";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindValue(":groupeID", $groupeID);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll();
     }
 }
