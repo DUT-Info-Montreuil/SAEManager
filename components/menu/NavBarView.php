@@ -10,33 +10,11 @@ class NavBarView extends GenericComponentView
 		$this->affichage .= <<<HTML
 		<div class="menu d-flex text-white">
 HTML;
-		if (isset($_SESSION['loginUtilisateur'])) {
-			$this->affichage .= <<<HTML
-			<div class="my-auto icon mx-2 cursor-pointer" id="menu-toggle">
-				<svg class="icon" width="24" height="24">
-					<use xlink:href="#menu-icon"></use>
-				</svg>
-			</div>
-HTML;
-		}
 		$this->affichage .= <<<HTML
 			<div class="mx-3 p-2 fs-4 flex-1">
 				<a href="index.php?module=home" class="text-decoration-none text-reset">SAE Manager</a>
 			</div>
 HTML;
-		if (isset($_SESSION['loginUtilisateur'])) {
-			$this->affichage .= <<<HTML
-			<div class="flex-1 d-flex">
-				
-				<div class="my-auto mx-4">
-					<a href="index.php?module=home" class="text-decoration-none text-reset">
-						<svg class="icon" width="24" height="24"><use xlink:href="#icon-profile"></use></svg> 
-						Accueil
-					</a>
-				</div>
-			</div>
-HTML;
-		}
 		if (isset($_SESSION['loginUtilisateur'])) {
 			$this->affichage .= <<<HTML
             <div class="flex-1 d-flex">
@@ -70,33 +48,31 @@ HTML;
 		$this->affichage .= <<<HTML
 		</div>
 
-		<div id="side-menu" class="side-menu">
+		<div class="sous-menu py-2 d-flex text-white">
 HTML;
 
 		$module = $_GET['module'] ?? '';
 		$action = $_GET['action'] ?? '';
 
-		if ($module == 'sae' && $action != 'home') {
+		if ($module == 'sae' && $action != 'home' && isset($_SESSION['loginUtilisateur'])) {
 			$saeID = $_GET['id'] ?? "";
 			$this->affichage .= <<<HTML
-			<ul>
-				<li><a href="index.php?module=home">Accueil</a></li>
-				<li><a href="index.php?module=sae&action=ressources">Ressources</a></li>
-				<li><a href="index.php?module=rendu">Rendus</a></li>
-				<li><a href="index.php?module=sae&action=soutenance&id=$saeID">Soutenance</a></li>
-				<li><a href="index.php?module=sae&action=groupe&id=$saeID">Groupe</a></li>
-				<li><a href="index.php?module=sae&action=cloud&id=$saeID">Cloud</a></li>
-				<li><a href="index.php?module=sae&action=note&id=$saeID">Notes</a></li>
-			</ul>
+				<a href="index.php?module=home" class="my-auto mx-3 text-decoration-none text-reset">Accueil</a>
+				<a href="index.php?module=sae&action=home" class="my-auto mx-3 text-decoration-none text-reset">SAÉs</a>
+				<a href="index.php?module=rendu" class="my-auto mx-3 text-decoration-none text-reset">Rendus</a>
+				<a href="index.php?module=sae&action=ressources" class="my-auto mx-3 text-decoration-none text-reset">Ressources</a>
+				<a href="index.php?module=sae&action=soutenance&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Soutenance</a>
+				<a href="index.php?module=sae&action=groupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Groupe</a>
+				<a href="index.php?module=sae&action=cloud&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Cloud</a>
+				<a href="index.php?module=sae&action=note&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Notes</a>
+			
 			</div>
 HTML;
-		} else {
+		} elseif (isset($_SESSION['loginUtilisateur'])) {
 			$this->affichage .= <<<HTML
-			<ul>
-				<li><a href="index.php?module=home">Accueil</a></li>
-				<li><a href="index.php?module=sae&action=home">SAÉs</a></li>
-				<li><a href="index.php?module=rendus&action=home">Rendus</a></li>
-			</ul>
+					<a href="index.php?module=home" class="my-auto mx-3 text-decoration-none text-reset">Accueil</a>
+					<a href="index.php?module=sae&action=home" class="my-auto mx-3 text-decoration-none text-reset">SAÉs</a>
+					<a href="index.php?module=rendus&action=home" class="my-auto mx-3 text-decoration-none text-reset">Rendus</a>			
 			</div>
 HTML;
 		}

@@ -238,6 +238,7 @@ HTML;
             </div>
 HTML;
             }
+        }
             if ($infosEtudiant['inGroupe'] || $_SESSION['estProfUtilisateur']) {
                 // Champs
                 echo <<<HTML
@@ -274,76 +275,71 @@ HTML;
     HTML;
             }
 
+        if ($_SESSION['estProfUtilisateur']) {
             echo <<<HTML
+            <div class="d-flex">
+                <div class="mb-5 w-50 me-3">  
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Professeur(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+        HTML;
+            echo $this->initAjoutProf($profs, $idSAE);
+            echo <<<HTML
+                    </div>
+                </div>
+                <div class="mb-5 w-50">
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Etudiants(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+        HTML;
+            echo $this->initAjoutEtudiant($pasinscrits, $idSAE);
+            echo <<<HTML
+                    </div>
                 </div>
             </div>
-        
-HTML;
-if ($_SESSION['estProfUtilisateur']) {
-    echo <<<HTML
-    <div class="d-flex">
-        <div class="mb-5 w-50 me-3">  
-            <h3 class="fw-bold d-flex align-items-center">
-                <svg class="me-2" width="25" height="25">
-                    <use xlink:href="#arrow-icon"></use>
-                </svg>
-                Professeur(s)
-            </h3>
-            <div class="d-flex flex-column">
-HTML;
-    echo $this->initAjoutProf($profs, $idSAE);
-    echo <<<HTML
-            </div>
-        </div>
-        <div class="mb-5 w-50">
-            <h3 class="fw-bold d-flex align-items-center">
-                <svg class="me-2" width="25" height="25">
-                    <use xlink:href="#arrow-icon"></use>
-                </svg>
-                Etudiants(s)
-            </h3>
-            <div class="d-flex flex-column">
-HTML;
-    echo $this->initAjoutEtudiant($pasinscrits, $idSAE);
-    echo <<<HTML
-            </div>
-        </div>
-    </div>
-HTML;
-} elseif (!$infosEtudiant['inGroupe']) {
-    if ($infosEtudiant['inProposition']) {
-        echo '<h1 class="my-4">Vous faites déjà partie d\'une proposition de groupe</h1>';
-    } else {
-        echo $this->initCreerGroupe($etudiants, $idSAE);
-    }
-}
+        HTML;
+        } elseif (!$infosEtudiant['inGroupe']) {
+            if ($infosEtudiant['inProposition']) {
+                echo '<h1 class="my-4">Vous faites déjà partie d\'une proposition de groupe</h1>';
+            } else {
+                echo $this->initCreerGroupe($etudiants, $idSAE);
+            }
+        }
 
-if ($_SESSION['estProfUtilisateur']) {
-    // Groupes
-    echo <<<HTML
-        <!-- Groupe(s) -->
-        <div class="mb-5">
-            <h3 class="fw-bold d-flex align-items-center">
-                <svg class="me-2" width="25" height="25">
-                    <use xlink:href="#arrow-icon"></use>
-                </svg>
-                Groupe(s)
-            </h3>
-            <div class="d-flex flex-column">
-HTML;
-    if (!empty($groupes)) {
-        foreach ($groupes as $groupe) {
-            echo $this->lineGroupes($groupe, $_SESSION['idUtilisateur'], $idSAE);
+        if ($_SESSION['estProfUtilisateur']) {
+            // Groupes
+            echo <<<HTML
+                <!-- Groupe(s) -->
+                <div class="mb-5">
+                    <h3 class="fw-bold d-flex align-items-center">
+                        <svg class="me-2" width="25" height="25">
+                            <use xlink:href="#arrow-icon"></use>
+                        </svg>
+                        Groupe(s)
+                    </h3>
+                    <div class="d-flex flex-column">
+        HTML;
+            if (!empty($groupes)) {
+                foreach ($groupes as $groupe) {
+                    echo $this->lineGroupes($groupe, $_SESSION['idUtilisateur'], $idSAE);
+                }
+            } else {
+                echo $this->lineGroupes("default", $etudiants, $idSAE);
+            }
+            echo <<<HTML
+                    </div>
+                </div>
+        HTML;
         }
-    } else {
-        echo $this->lineGroupes("default", $etudiants, $idSAE);
-    }
-    echo <<<HTML
-            </div>
-        </div>
-HTML;
-}
-        }
+
         echo <<<HTML
             </div>
         <script src="js/saeview.js"></script>
