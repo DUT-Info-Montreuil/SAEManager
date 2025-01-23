@@ -87,7 +87,7 @@ HTML;
 				<li><a href="index.php?module=home">Rendus</a></li>
 				<li><a href="index.php?module=sae&action=soutenance&id=$saeID">Soutenance</a></li>
 				<li><a href="index.php?module=sae&action=groupe&id=$saeID">Groupe</a></li>
-				<li><a href="index.php?module=home">Cloud</a></li>
+				<li><a href="index.php?module=sae&action=cloud&id=$saeID">Cloud</a></li>
 				<li><a href="index.php?module=home">Messages</a></li>
 				<li><a href="index.php?module=sae&action=note&id=$saeID">Notes</a></li>
 			</ul>

@@ -538,6 +538,36 @@ HTML;
             HTML;
     }
 
+    function lineDocument($dateDepot, $idDoc, $nomAuteur, $prenomAuteur, $idSAE) {
+        if ($dateDepot == "default") {
+            return <<<HTML
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                    <span>Aucun document disponible</span>
+                </div>
+        HTML;
+        }
+
+        return <<<HTML
+            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 shadow-sm mb-2">
+                <div class="d-flex align-items-center">
+                    <p class="mb-0">$nom</p>
+                </div>
+                <div class="text-end">
+                <p class="text-$color mb-0">Document déposé le : $dateDepot</p>
+                    <div class="d-flex flex-column">
+                        <span class="text-primary text-danger text-decoration-none cursor-pointer supressDocumentButton-$idDoc">Supprimer le document déposé</span>
+                        <form method="POST" action="index.php?module=sae&action=deposerFichierDocument&idDoc=$idSAE" style="display: inline;">
+                            <input type="hidden" name="file">
+                            <button type="submit" class="btn btn-link text-primary text-success text-decoration-none p-0 m-0" style="border: none; background: none;">
+                                Voir le document
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        HTML;
+    }
+
     function lineRendus($nom, $dateLimite, $id, $renduDeposer)
     {
 
@@ -664,8 +694,47 @@ HTML .
         HTML;
     }
 
-    
+    function initCloudPage($groupeID, $groupeDocs, $idSAE) {
 
+        echo $this->popUpDepot("Document", $idSAE);
+        
+            // Documents
+            echo <<<HTML
+                <!-- Documents(s) -->
+                <div class="container mt-5">
+                    <h1 class="fw-bold">Documents du groupe</h1>
+                    <div class="card shadow bg-white rounded p-4 min-h75">
+                        <div class="mb-5">
+                            <h3 class="fw-bold d-flex align-items-center">
+                                <svg class="me-2" width="25" height="25">
+                                    <use xlink:href="#arrow-icon"></use>
+                                </svg>
+                                Document(s)
+                            </h3>
+                            <div class="d-flex flex-column">
+                            <div class="text-primary text-decoration-none cursor-pointer fw-bold documentdrop-$groupeID">Déposer un document</div>
+            HTML;
+                    if (!empty($groupeDocs)) {
+                        foreach ($groupeDocs as $d) {
+                            $dateDepot = htmlspecialchars($d['dateDepot']);
+                            $idDoc = htmlspecialchars($d['idDoc']);
+                            $nomAuteur = htmlspecialchars($d['nom']);
+                            $prenomAuteur = htmlspecialchars($d['prenom']);
+            
+                            echo $this->lineDocument($dateDepot, $idDoc, $nomAuteur, $prenomAuteur, $idSAE);
+                        }
+                    } else {
+                        echo $this->lineDocument("default", "", "", "", "");
+                    }
+                    echo <<<HTML
+                            </div>
+                        </div>
+                    </div>
+                    <script src="js/cloud.js"></script>
+                </div>
+    HTML;
+    
+    }
 
     /* Groupes */
 

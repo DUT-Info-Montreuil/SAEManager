@@ -30,6 +30,9 @@ class SaeController
             case "note":
                 $this->initNote();
                 break;
+            case "cloud":
+                $this->initCloud();
+                break;
             case "input_champ":
                 $this->inputChamp();
                 break;
@@ -125,6 +128,9 @@ class SaeController
                 break;
             case "ajoutEtudiantSAE":
                 $this->ajoutEtudiantSAE();
+                break;
+            case "ajoutDepotDocument":
+                $this->depotDocument();
                 break;
         }
     }
@@ -237,6 +243,15 @@ class SaeController
         $noteSoutenance = $this->model->getNoteSoutenance($_GET['id'], $groupeID);
 
         $this->view->initNotePage($notes, $sae, $noteSoutenance);
+    }
+
+    private function initCloud() {
+
+        $groupeID = $this->model->getMyGroupId($_GET['id'])[0]['idGroupe'];
+
+        $groupeDocs = $this->model->getDocsByGrpId($groupeID);
+
+        $this->view->initCloudPage($groupeID, $groupeDocs, $_GET['id']);
     }
 
     private function initSoutenance()
@@ -585,5 +600,20 @@ class SaeController
         $this->model->inscrireEtudiantsSAE($idSAE, $idEtudiants);
 
         header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+
+    private function depotDocument() {
+        $fileName = isset($_POST['fileName']) ? $_POST["fileName"] : (isset($_FILES['fileInputDocument']['name']) ? basename($_FILES['fileInputDocument']['name']) : null);
+
+        if (!isset($_FILES['fileInputDocument'])) {
+            echo "Erreur lors du téléchargement du fichier.";
+            exit;
+        }
+        $file = $_FILES['fileInputDocument'];
+
+        $groupeID = $this->model->getMyGroupId($_GET['id'])[0]['idGroupe'];
+
+        $this->model->uploadDocument($file, $fileName, $groupeID);
+        //header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }
