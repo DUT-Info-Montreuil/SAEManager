@@ -137,10 +137,14 @@ HTML;
                     $idSAE = htmlspecialchars($sae[0]['idSAE']);
                     $idRessource = htmlspecialchars($r['idRessource']);
                     $contenue = htmlspecialchars($r['contenu']);
-                    echo $this->lineRessource($nomRessource, $idSAE, $idRessource, $contenue);
+                    if ($r['misEnAvant'] != null)
+                        $misEnAvant = htmlspecialchars($r['misEnAvant']);
+                    else
+                        $misEnAvant = 0;
+                    echo $this->lineRessource($nomRessource, $idSAE, $idRessource, $contenue, $misEnAvant);
                 }
             } else {
-                echo $this->lineRessource("default", $sae[0]['idSAE'], "", "");
+                echo $this->lineRessource("default", $sae[0]['idSAE'], "", "", "");
             }
 
             if ($_SESSION['estProfUtilisateur']) {
@@ -460,7 +464,7 @@ HTML;
     HTML;
     }
 
-    function lineRessource($nomRessource, $idSAE, $idRessource, $contenue)
+    function lineRessource($nomRessource, $idSAE, $idRessource, $contenue, $misEnAvant)
     {
 
         if ($nomRessource == "default") {
@@ -471,11 +475,17 @@ HTML;
         HTML;
         }
 
+        $svg = '';
+
+        if ($misEnAvant)
+            $svg = '<svg class="icon" width="24" height="24"><use fill="red" xlink:href="#alert-icon"></use></svg>';
+
         $fichier = urlencode($contenue);
 
         if ($_SESSION['estProfUtilisateur']) {
             return <<<HTML
             <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+                $svg
                 <span>$nomRessource</span>
                 <div class="ms-auto d-flex gap-2">
                     <form method="POST" action="index.php?module=sae&action=supprimerRessource&id=$idSAE&idRessource=$idRessource" class="m-0">
@@ -489,6 +499,7 @@ HTML;
 
         return <<<HTML
     <div class="d-flex align-items-center p-3 bg-light rounded-3 shadow-sm mb-2">
+        $svg
         <span>$nomRessource</span> 
         <a href="http://saemanager-api.atwebpages.com/api/api.php?file=$fichier" class="ms-auto text-decoration-none text-primary">Télécharger</a>
     </div>
@@ -1612,6 +1623,7 @@ HTML;
                             <select class="form-control" id="ressourceSelect" name="ressourceSelect" required>
                                 $options
                             </select>
+                            <input name="enAvant" type="checkbox">Mettre en avant
                         </div>
                         <div>
                             <button type="submit" class="btn btn-success m-3">Valider</button>

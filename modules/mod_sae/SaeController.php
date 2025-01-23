@@ -450,7 +450,7 @@ class SaeController
         $idSae = $_GET['id'];
         $idRessource = $_POST['ressourceSelect'];
 
-        $this->model->addRessourceSAE($idSae, $idRessource);
+        $this->model->addRessourceSAE($idSae, $idRessource, isset($_POST['enAvant']));
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 
