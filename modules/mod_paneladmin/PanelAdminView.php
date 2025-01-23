@@ -25,10 +25,11 @@ class PanelAdminView extends GenericView
         $profInputs = '';
         foreach ($listeProf as $prof) {
             $nomProf = $prof['nom'];
+            $prenomProf = $prof['prenom'];
             $profInputs .= '
             <div class="form-check professeurs dropdown-item">
                 <input class="form-check-input" name="professeurs[]" type="checkbox" value="' . $prof['idPersonne'] . '" id="prof_' . $prof['idPersonne'] . '">
-                <label class="form-check-label" for="prof_' . $prof['idPersonne'] . '">' . $nomProf . '</label>
+                <label class="form-check-label" for="prof_' . $prof['idPersonne'] . '">' . $prenomProf .' '. $nomProf . '</label>
             </div>';
         }
 
