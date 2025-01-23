@@ -7,7 +7,7 @@ class CreerSaeModel extends Connexion
         try {
             self::$bdd->beginTransaction();
 
-            // Insertion de la SAE principale
+
             $req = "INSERT INTO SAE (idSAE,nomSae,anneeUniversitaire,semestreUniversitaire, sujet,dateModificationSujet,idResponsable) VALUES (DEFAULT,:nomSae,:annee, :semestre, :sujet,:dateDuJour,:idResponsable)";
             $stmt = self::$bdd->prepare($req);
             $stmt->execute([
@@ -18,9 +18,9 @@ class CreerSaeModel extends Connexion
                 ':dateDuJour' => date("Y-m-d H:i"),
                 ':idResponsable'=> $_SESSION['idUtilisateur']
             ]);
-            $saeId = self::$bdd->lastInsertId(); // Récupérer l'ID de la SAE créée
+            $saeId = self::$bdd->lastInsertId();
 
-            // Insertion des co-responsables
+
             foreach ($coResponsables as $coResponsableId) {
                 $req = "INSERT INTO ResponsablesSAE (idSAE, idResp) VALUES (:idSAE, :idResponsable)";
                 $stmt = self::$bdd->prepare($req);
@@ -30,7 +30,7 @@ class CreerSaeModel extends Connexion
                 ]);
             }
 
-            // Insertion des intervenants
+
             foreach ($intervenants as $intervenantId) {
                 $req = "INSERT INTO IntervenantSAE (idSAE, idIntervenant) VALUES (:idSAE, :idIntervenant)";
                 $stmt = self::$bdd->prepare($req);
@@ -40,7 +40,7 @@ class CreerSaeModel extends Connexion
                 ]);
             }
 
-            // Insertion des élèves
+
             foreach ($eleves as $eleveId) {
                 $req = "INSERT INTO EleveInscritSae (idSAE, idEleve) VALUES (:idSAE, :idEleve)";
                 $stmt = self::$bdd->prepare($req);

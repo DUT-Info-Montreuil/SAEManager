@@ -170,7 +170,7 @@ class RendusModel extends Connexion
         $evalInsert->execute();
         $idEval = self::$bdd->lastInsertId(); // Récupérer l'idEval généré
     
-        // Insérer les notes (avec note NULL) pour les étudiants inscrits au SAE associé au rendu
+
         $notesReq = "
             INSERT INTO Notes (idEval, idEleve, idRendu, note)
             SELECT 

@@ -133,12 +133,12 @@ HTML;
                     </div>
                 </div>
 
-                <!-- Affichage du toast -->
+                
                 $toast
 
 HTML;
 
-        // Script pour activer le toast
+
         echo <<<HTML
     <script src="js/toast.js"></script>
 HTML;
@@ -167,7 +167,7 @@ HTML;
 HTML;
     }
 
-    ///Soutenance.idSoutenance, Soutenance.titre, PassageSoutenance.date, SAE.nomSae, Groupe.nom
+
      function initLineSoutenance($soutenanceNom, $idSAE, $nomSae, $date){
             $color = $this->colorByDate($date);
             $texte = $_SESSION['estProfUtilisateur'] == 1 ? "Vous êtes jury du groupe \"$nomSae\"<br>Date de passage" : "Date et heure de passage";

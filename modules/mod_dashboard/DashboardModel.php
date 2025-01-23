@@ -160,19 +160,19 @@ class DashboardModel extends Connexion{
     }
 
 
-    // PROFILE
+
 
     public function uploadFichier($fileInput, $color)
     {
         $apiUrl = 'http://saemanager-api.atwebpages.com/api/api.php';
 
-        // Vérifiez si un fichier a été envoyé
+
         if (!isset($fileInput['tmp_name']) || !is_uploaded_file($fileInput['tmp_name'])) {
             echo "Aucun fichier valide n'a été téléchargé.";
             return false;
         }
 
-        // Configurez cURL pour envoyer le fichier directement
+
         $curl = curl_init();
 
         $file = new CURLFile($fileInput['tmp_name'], $fileInput['type'], $fileInput['name']);

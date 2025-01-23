@@ -53,7 +53,7 @@ HTML;
 HTML;
         } else { // Est un étudiant
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">Oups...</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
@@ -208,7 +208,7 @@ HTML;
     public function initEvaluerPage($soutenance, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe) {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">ATTRIBUTION DES NOTES</h1>
                 <div class="card shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
@@ -294,7 +294,7 @@ HTML;
     
     function initSupprimerEval($idEval){
         echo <<<HTML
-        <div class="container mt-5">
+        <div class="container mt-5 h-100">
             <h1 class="fw-bold">SUPPRIMER UNE ÉVALUATION</h1>
             <div class="card shadow bg-white rounded min-h75">
                 <div class="d-flex align-items-center p-5 mx-5">

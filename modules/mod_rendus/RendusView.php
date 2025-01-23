@@ -9,7 +9,7 @@ class RendusView extends GenericView
 
     public function initRendusPage($rendus, $notes,$intervenants)
     {
-        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             echo <<<HTML
             <div class="container mt-5 h-100">
                 <h1 class="fw-bold">ÉVALUER DES RENDU(S)</h1>
@@ -37,7 +37,7 @@ HTML;
                 $idSAE = $rendu['idSAE'];
                 $idRendu = $rendu['idRendu'];
 
-                // Filtrer les notes liées au rendu actuel
+
                 $notesForRendu = array_filter($notes, function ($note) use ($rendu) {
                     return $note['idRendu'] === $rendu['idRendu'];
                 });
@@ -49,7 +49,7 @@ HTML;
                 </div>
             </div>
 HTML;
-        } else { // Est un étudiant
+        } else {
             echo <<<HTML
             <div class="container mt-5 h-100">
                 <h1 class="fw-bold">LISTE DES RENDU(S)</h1>
@@ -241,9 +241,9 @@ HTML;
 
     public function initEvaluerPage($rendus, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe)
     {
-        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             echo <<<HTML
-            <div class="container mt-5">
+            <div class="container mt-5 h-100">
                 <h1 class="fw-bold">ATTRIBUTION DES NOTES</h1>
                 <div class="card-general shadow bg-white rounded min-h75">
                     <div class="d-flex align-items-center p-5 mx-5">
@@ -329,7 +329,7 @@ HTML;
 
     function initSupprimerEval($idEval){
         echo <<<HTML
-        <div class="container mt-5">
+        <div class="container mt-5 h-100">
             <h1 class="fw-bold">SUPPRIMER UNE ÉVALUATION</h1>
             <div class="card shadow bg-white rounded min-h75">
                 <div class="d-flex align-items-center p-5 mx-5">

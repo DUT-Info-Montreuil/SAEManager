@@ -1882,7 +1882,7 @@ HTML;
         $isProf = isset($_SESSION['estProfUtilisateur']) && $_SESSION['estProfUtilisateur'];
 
         echo <<<HTML
-    <div class="container mt-5">
+    <div class="container mt-5 h-100">
         <h1 class="fw-bold">LISTE DES RESSOURCES</h1>
         <div class="card shadow bg-white rounded min-h75 p-3">
             <div class="d-flex align-items-center p-4 mx-5">

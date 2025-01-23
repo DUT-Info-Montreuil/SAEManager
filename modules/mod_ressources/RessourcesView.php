@@ -26,7 +26,7 @@ class RessourcesView extends GenericView
                 <input type="text" id="search-bar" class="form-control w-50" placeholder="Rechercher une ressource">
 HTML;
 
-        // Le bouton "Afficher mes SAE" n'est affiché que pour les professeurs
+
         if ($isProf) {
             echo <<<HTML
                 <button id="filter-sae-button" class="btn btn-secondary ms-3">Afficher mes SAE</button>

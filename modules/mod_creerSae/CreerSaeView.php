@@ -49,7 +49,7 @@ class CreerSaeView extends GenericView
                         <div class="border p-2 choix-responsable" style="max-height: 150px; overflow-y: auto;" id="coResponsablesList">
     HTML;
 
-                    // Générer les co-responsables
+
                     foreach ($listePersonne as $personne) {
                         if ($personne['estProf']) {
                             $id = htmlspecialchars($personne['idPersonne']);
@@ -76,7 +76,7 @@ class CreerSaeView extends GenericView
                         <div class="border p-2" style="max-height: 150px; overflow-y: auto;" id="intervenantsList">
     HTML;
 
-                    // Générer les intervenants
+
                     foreach ($listePersonne as $personne) {
                         if ($personne['estProf']) {
                             $id = htmlspecialchars($personne['idPersonne']);
@@ -103,7 +103,7 @@ class CreerSaeView extends GenericView
                         <div class="border p-2" style="max-height: 150px; overflow-y: auto;" id="elevesList">
     HTML;
 
-                    // Générer les élèves
+
                     foreach ($listePersonne as $personne) {
                         if (!($personne['estProf'])) {
                             $id = htmlspecialchars($personne['idPersonne']);

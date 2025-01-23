@@ -47,7 +47,7 @@ class RendusController
     }
 
     private function initRendus(){
-        if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             $rendus = $this->model->getRendusProfByPersonne($_SESSION['idUtilisateur']);
             $notes = $this->model->getNotesdesRendusProfByPersonne($_SESSION['idUtilisateur']);
             $intervenants = $this->model->getAllIntervenantbyAllSaebyProf($_SESSION['idUtilisateur']);
@@ -61,7 +61,7 @@ class RendusController
         
     }
     private function initAjouterUneNote(){
-        if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             $idRendu = $_POST['idRendu'];
 
             $this->model->creerNotePourUnRendu($idRendu);
@@ -73,20 +73,20 @@ class RendusController
     }
 
     private function initEvaluerUneEval() {
-        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             $rendus = $this->model->getRendusProfByPersonne($_SESSION['idUtilisateur']);
             $notes = $this->model->getNotesdesRendusProfByPersonne($_SESSION['idUtilisateur']);
             $flag = 0;
             $infoTitre = [];
             $idSAE = null;
-            // Vérification si l'évaluation existe
+
             foreach ($notes as $note) {
                 if ($_GET['eval'] == $note['idEval']) {
                     $infoTitre['SAE_nom'] = $note['SAE_nom'];
                     $infoTitre['Rendu_nom'] = $note['Rendu_nom'];
                     $infoTitre['Eval_nom'] = $note['Eval_nom'];
                     $infoTitre['idEval'] = $note['idEval'];
-                    $idSAE = $note['idSAE']; // Récupération de l'idSAE
+                    $idSAE = $note['idSAE'];
                     $flag = 1;
                     break;
                 }
@@ -97,12 +97,12 @@ class RendusController
                 return;
             }
     
-            // Récupération des données nécessaires
+
             $notesDesElvesParGroupe = $this->model->getNotesParGroupeDuneEval($_GET['eval']);
             $tousLesElevesParGroupe = $this->model->getElevesParGroupe($idSAE);
             $tousLesElevesSansGroupe = $this->model->getElevesSansGroupe($idSAE);
     
-            // Regroupement des étudiants par groupe
+
             $tousLesGroupes = [];
             foreach ($tousLesElevesParGroupe as $eleve) {
                 $idGroupe = $eleve['idGroupe'] ?? 'Sans groupe';
@@ -115,7 +115,7 @@ class RendusController
                 $tousLesGroupes[$idGroupe]['etudiants'][] = $eleve;
             }
     
-            // Appel à la vue
+
             $this->view->initEvaluerPage(
                 $rendus,
                 $notes,
@@ -124,13 +124,13 @@ class RendusController
                 $tousLesGroupes,
                 $tousLesElevesSansGroupe
             );
-        } else { // Est un étudiant
+        } else {
             $this->initRendus();
         }
     }
 
     private function initMettreAJourLesNotes() {
-        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             $notes = [];
             foreach ($_POST as $key => $value) {
                 if (strpos($key, 'note_idEleve_') === 0) {
@@ -149,14 +149,14 @@ class RendusController
     
             $this->model->MettreAJourLesNotes($notes);
             header('Location: index.php?module=rendus&action=home');
-        } else { // Est un étudiant
+        } else {
             $this->initRendus();
         }
     }
     
 
     private function validerModifHomePage(){
-        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             $idEval = $_POST['idEval'];
             $noteNom = $_POST['noteNom'];
             $coef = $_POST['coef'];
@@ -177,7 +177,7 @@ class RendusController
     }
 
     function supprimerEval(){
-        if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             $idEval = $_GET['idEval'];
             $this->view->initSupprimerEval($idEval);
         } else { // Est un étudiant

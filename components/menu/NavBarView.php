@@ -65,7 +65,7 @@ HTML;
 					<a href="index.php?module=rendus&action=home" class="my-auto mx-3 text-decoration-none text-reset">Rendus</a>
 
 HTML;
-            if ($_SESSION['estAdmin'])
+            if (isset($_SESSION['estAdmin']))
                 $this->affichage .= <<<HTML
                 <a href="index.php?module=paneladmin&action=home" class="my-auto mx-3 text-decoration-none text-reset">Panel Admin</a>
 HTML;

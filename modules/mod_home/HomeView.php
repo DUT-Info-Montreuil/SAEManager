@@ -27,7 +27,7 @@ class HomeView extends GenericView
 HTML;
             unset($_SESSION['connexion_reussie']);
         }
-        if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
+        if ($_SESSION["estProfUtilisateur"] == 1) {
             echo <<<HTML
             <div class="container mt-5 h-100">
                 <h1 class="fw-bold">ACCUEIL</h1>
