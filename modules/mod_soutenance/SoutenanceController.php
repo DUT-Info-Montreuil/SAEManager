@@ -43,11 +43,13 @@ class SoutenanceController
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
             $soutenances = $this->model->getSoutenanceProfByPersonne($_SESSION['idUtilisateur']);
             $notes = $this->model->getNotesdesSoutenanceProfByPersonne($_SESSION['idUtilisateur']);
+            $intervenants = $this->model->getAllIntervenantbyAllSaebyProf($_SESSION['idUtilisateur']);
         }else{
+            $intervenants = null;
             $soutenances = null;
             $notes = null;
         }
-        $this->view->initSoutenancePage($soutenances,$notes);
+        $this->view->initSoutenancePage($soutenances,$notes,$intervenants);
     }
     private function initAjouterUneNote(){
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
@@ -150,7 +152,8 @@ class SoutenanceController
             $idEval = $_POST['idEval'];
             $noteNom = $_POST['noteNom'];
             $coef = $_POST['coef'];
-            $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef);
+            $idIntervenants = isset($_POST['intervenant']) ? $_POST['intervenant'] : [];
+            $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef,$idIntervenants);
             header('Location: index.php?module=soutenance&action=home');
 
             

@@ -45,8 +45,7 @@ class RendusController
             $rendus = $this->model->getRendusProfByPersonne($_SESSION['idUtilisateur']);
             $notes = $this->model->getNotesdesRendusProfByPersonne($_SESSION['idUtilisateur']);
             $intervenants = $this->model->getAllIntervenantbyAllSaebyProf($_SESSION['idUtilisateur']);
-            //var_dump($intervenants);
-            //Recupérer toute les sae avec leur intervenants
+           
         }else{
             $rendus = $this->model->getRendusByPersonne($_SESSION['idUtilisateur']);
             $notes = "";

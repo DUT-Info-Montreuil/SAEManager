@@ -28,6 +28,7 @@ class SoutenanceModel extends Connexion
             e.nom AS Eval_nom,
             e.coef AS Eval_coef,
             n.note AS Note_valeur,
+            e.IntervenantEvaluateur AS idIntervenantEvaluateur,
             CASE 
                 WHEN s.idResponsable = :idPersonne THEN 1
                 WHEN rs.idResp = :idPersonne THEN 1
@@ -45,7 +46,7 @@ class SoutenanceModel extends Connexion
             OR rs.idResp = :idPersonne
             OR i.idIntervenant = :idPersonne
             OR e.IntervenantEvaluateur = :idPersonne
-        ORDER BY sou.idSoutenance, e.idEval;
+        ORDER BY SAE_nom;
         ";
     
         $pdo_req = self::$bdd->prepare($req);
@@ -119,11 +120,33 @@ class SoutenanceModel extends Connexion
         $pdo_req->execute();
         return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    function getAllIntervenantbyAllSaebyProf($idPersonne) {
+        $req = "
+        SELECT 
+            s.idSAE,
+            s.nomSae AS SAE_nom,
+            p.idPersonne AS Intervenant_id,
+            p.nom AS Intervenant_nom,
+            p.prenom AS Intervenant_prenom
+        FROM SAE s
+        LEFT JOIN ResponsablesSAE rs ON s.idSAE = rs.idSAE
+        LEFT JOIN IntervenantSAE i ON s.idSAE = i.idSAE
+        LEFT JOIN Personne p ON i.idIntervenant = p.idPersonne
+        WHERE s.idResponsable = :idPersonne OR rs.idResp = :idPersonne
+        ORDER BY p.nom, p.prenom;
+        ";
+
+        $pdo_req = self::$bdd->prepare($req);
+        $pdo_req->bindParam("idPersonne", $idPersonne, PDO::PARAM_INT);
+        $pdo_req->execute();
+        return $pdo_req->fetchAll(PDO::FETCH_ASSOC);
+    }
     
     function creerNotePourUneSoutenance($idSoutenance) {
         $evalReq = "
-            INSERT INTO Evaluation (nom, coef)
-            VALUES ('nom à définir', 1)
+            INSERT INTO Evaluation (nom, coef,IntervenantEvaluateur)
+            VALUES ('nom à définir', 1,:IntervenantEvaluateur)
         ";
         $evalInsert = self::$bdd->prepare($evalReq);
         $evalInsert->execute();
@@ -146,12 +169,18 @@ class SoutenanceModel extends Connexion
         $insertNotes->execute();
     }
     
-    function MettreAJourInfoUneEval($idEval, $noteNom, $coef){
-        $req = "UPDATE Evaluation SET nom = :noteNom, coef = :coef WHERE idEval = :idEval";
+    function MettreAJourInfoUneEval($idEval, $noteNom, $coef,$intervenants){
+        if($intervenants[0]== ""){
+            $idIntervenant = null;
+        }else{
+            $idIntervenant = $intervenants[0];
+        }
+        $req = "UPDATE Evaluation SET nom = :noteNom, coef = :coef, IntervenantEvaluateur = :idIntervenant WHERE idEval = :idEval";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idEval", $idEval, PDO::PARAM_INT);
         $pdo_req->bindParam("noteNom", $noteNom, PDO::PARAM_STR);
         $pdo_req->bindParam("coef", $coef, PDO::PARAM_INT);
+        $pdo_req->bindParam("idIntervenant", $idIntervenant, PDO::PARAM_INT);
         $pdo_req->execute();
     }
 

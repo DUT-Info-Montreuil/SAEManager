@@ -189,12 +189,17 @@ class RendusModel extends Connexion
     }
     
     function MettreAJourInfoUneEval($idEval, $noteNom, $coef,$intervenants){
+        if($intervenants[0]== ""){
+            $idIntervenant = null;
+        }else{
+            $idIntervenant = $intervenants[0];
+        }
         $req = "UPDATE Evaluation SET nom = :noteNom, coef = :coef, IntervenantEvaluateur = :idIntervenant WHERE idEval = :idEval";
         $pdo_req = self::$bdd->prepare($req);
         $pdo_req->bindParam("idEval", $idEval, PDO::PARAM_INT);
         $pdo_req->bindParam("noteNom", $noteNom, PDO::PARAM_STR);
         $pdo_req->bindParam("coef", $coef, PDO::PARAM_INT);
-        $pdo_req->bindParam("idIntervenant", $intervenants[0], PDO::PARAM_INT);
+        $pdo_req->bindParam("idIntervenant", $idIntervenant, PDO::PARAM_INT);
         $pdo_req->execute();
     }
 

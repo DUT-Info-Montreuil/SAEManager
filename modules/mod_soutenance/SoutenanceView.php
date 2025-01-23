@@ -8,7 +8,8 @@ class SoutenanceView extends GenericView
         parent::__construct();
     }
 
-    public function initSoutenancePage($soutenances, $notes)
+
+    public function initSoutenancePage($soutenances, $notes,$intervenants)
     {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
             echo <<<HTML
@@ -42,7 +43,7 @@ HTML;
                 $notesForSoutenance = array_filter($notes, function ($note) use ($soutenance) {
                     return $note['idSoutenance'] === $soutenance['idSoutenance'];
                 });
-                echo $this->lineSoutenanceProf($soutenanceNom, $saeNom, $date, $idSAE, $notesForSoutenance,$idSoutenance);
+                echo $this->lineSoutenanceProf($soutenanceNom, $saeNom, $date, $idSAE, $notesForSoutenance,$idSoutenance,$intervenants);
             }
 
             echo <<<HTML
@@ -64,12 +65,11 @@ HTML;
                     </div>
                 </div>
             </div>
-
 HTML;
         }
     }
                                 
-    function lineSoutenanceProf($soutenanceNom, $saeNom, $date, $idSAE, $notes, $idSoutenance) {
+    function lineSoutenanceProf($soutenanceNom, $saeNom, $date, $idSAE, $notes, $idSoutenance,$intervenants) {
         $notesTable = '';
         $uniqueNotes = [];
     
@@ -84,6 +84,8 @@ HTML;
             $noteNom = $note['Eval_nom'] ? htmlspecialchars($note['Eval_nom'], ENT_QUOTES, 'UTF-8') : "";
             $noteId = $note['idEval'] ? $note['idEval'] : "";
             $coef = $note['Eval_coef'] ? htmlspecialchars($note['Eval_coef'], ENT_QUOTES, 'UTF-8') : "";
+            $idDeCetteSae = $note['idSAE'] ? htmlspecialchars($note['idSAE']) : "";
+            $idIntervenantEvaluateur = $note['idIntervenantEvaluateur'] ? htmlspecialchars($note['idIntervenantEvaluateur']) : "";
             $canEvaluate = $note['PeutEvaluer'] 
                 ? '<a href="index.php?module=soutenance&action=evaluer&eval=' . $noteId . '" class="btn btn-primary btn-sm">Évaluer</a>' 
                 : 'Vous n\'êtes pas évaluateur';
@@ -93,17 +95,19 @@ HTML;
                 <tr>
                     <form method="POST" action="index.php?module=soutenance&action=homeMaj">
                         <input type="hidden" name="idEval" value="$noteId">
-                        <td>
+                        <td class="text-center">
                             <input class="input-group form-control" type="text" name="noteNom" value="$noteNom" placeholder="Nom de l'évaluation">
                         </td>
-                        <td>$canEvaluate</td>
-                        <td>
+                        <td class="text-center">
                             <input type="number" name="coef" class="form-control form-control-sm w-auto" value="$coef" placeholder="Coef">
                         </td>
-                        <td>
-                            <button type="submit" class="btn btn-primary btn-sm btn-success">Valider</button>
+                        <td class="text-center">
+                            {$this->initAjoutIntervenant($intervenants,$idDeCetteSae,$idIntervenantEvaluateur)}
                         </td>
-                        
+                        <td class="align-center d-flex">
+                            $canEvaluate
+                            <button type="submit" class="btn btn-primary btn-sm btn-success ms-2">Valider</button>
+                        </td>
                     </form>
                 </tr>
                 HTML;
@@ -173,7 +177,30 @@ HTML;
     HTML;
     }
     
-    
+    function initAjoutIntervenant($intervenants, $idEval,$idIntervenantEvaluateur) {
+        $options = '';
+        
+        foreach ($intervenants as $intervenant) {
+            $testIdEval = $intervenant['idSAE'] ? htmlspecialchars($intervenant['idSAE']) : "";
+            $id = $intervenant['Intervenant_id'] ? htmlspecialchars($intervenant['Intervenant_id']) : "";
+            $nom = $intervenant['Intervenant_nom'] ? htmlspecialchars($intervenant['Intervenant_nom']) : "";
+            $prenom = $intervenant['Intervenant_prenom'] ? htmlspecialchars($intervenant['Intervenant_prenom']) : "";
+            if ($id && $testIdEval == $idEval) {
+                $options .= '<option name="id_intervenent_'.$id.'" value="' . $id . '" ';
+                if ($idIntervenantEvaluateur==$id){
+                    $options .= "selected";
+                }  
+                $options .= '>' . $prenom . ' ' . $nom . '</option>';
+            }
+        }
+        
+        return <<<HTML
+        <select class="form-select" name="intervenant[]">
+            <option value="" >Aucun intervenant</option>
+            $options
+        </select>
+    HTML;
+    }
     
     
     public function initEvaluerPage($soutenance, $notes, $infoTitre, $notesDesElvesParGroupe, $tousLesGroupes, $tousLesElevesSansGroupe) {
