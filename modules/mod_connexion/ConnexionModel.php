@@ -24,6 +24,7 @@ class ConnexionModel extends Connexion
             $_SESSION['loginUtilisateur'] = $result['login'];
             $_SESSION['idUtilisateur'] = $result['idPersonne'];
             $_SESSION['estProfUtilisateur'] = $result['estProf'];
+            $_SESSION['estAdmin'] = $result['estAdmin'];
             return true;
         } else {
             return false;
@@ -40,23 +41,39 @@ class ConnexionModel extends Connexion
             return false;
         }
 
-        $login = strtolower($prenom . '.' . $nom);
+        $baseLogin = strtolower($prenom . '.' . $nom);
+        $login = $baseLogin;
 
-        $sql = self::$bdd->prepare('SELECT * from Personne WHERE login = ?');
-        $sql->execute([$login]);
-        $result = $sql->fetch(PDO::FETCH_ASSOC);
+        $counter = 1;
+        while (true) {
+            $sql = self::$bdd->prepare('SELECT * FROM Personne WHERE login = ?');
+            $sql->execute([$login]);
+            $result = $sql->fetch(PDO::FETCH_ASSOC);
 
-        if (!empty($result)) {
-            return false; // Login already exists
+            if (empty($result)) {
+                break;
+            }
+
+            $login = $baseLogin . $counter;
+            $counter++;
+        }
+
+        $sql = self::$bdd->prepare('SELECT * FROM Personne WHERE email = ?');
+        $sql->execute([$email]);
+        $emailResult = $sql->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($emailResult)) {
+            throw new Exception("L'email est déjà utilisé.");
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = self::$bdd->prepare('INSERT INTO Personne (nom, prenom, photoDeProfil, password, login, email, estProf) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        $success = $sql->execute([$nom, $prenom, null, $hashedPassword, $login, $email, 0]);
+        $success = $sql->execute([$nom, $prenom, '67924ce223934-default-profile.png', $hashedPassword, $login, $email, 0]);
 
         return $success;
     }
+
 
     function deconnexion()
     {
@@ -66,6 +83,17 @@ class ConnexionModel extends Connexion
             return true;
         }
         return false;
+    }
+
+    public function getLoginByEmail($email)
+    {
+        $query = "SELECT login FROM Personne WHERE email = :email";
+        $stmt = self::$bdd->prepare($query);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['login'] : null;
     }
 }
 
