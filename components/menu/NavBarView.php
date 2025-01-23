@@ -68,13 +68,13 @@ HTML;
 			if ($module == 'sae' && $action != 'home') {
 				$saeID = $_GET['id'] ?? "";
 				$this->affichage .= <<<HTML
-				<a href="index.php?module=sae&action=details&id=$saeID">Détails SAE</a>
+				|<a href="index.php?module=sae&action=details&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Détails SAE</a>
 HTML;
 			if($estProfUtilisateur)
 			$this->affichage .= <<<HTML
-				<a href="index.php?module=sae&action=listeRendusGroupe&id=$saeID">Fichiers des rendus</a>
-				<a href="index.php?module=sae&action=reponsesAuxChamps&id=$saeID">Réponses aux champs</a>
-				<a href="index.php?module=sae&action=listeSupportGroupe&id=$saeID">Supports des soutenances</a>
+				<a href="index.php?module=sae&action=listeRendusGroupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Fichiers des rendus</a>
+				<a href="index.php?module=sae&action=reponsesAuxChamps&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Réponses aux champs</a>
+				<a href="index.php?module=sae&action=listeSupportGroupe&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Supports des soutenances</a>
 				<a href="index.php?module=sae&action=soutenance&id=$saeID" class="my-auto mx-3 text-decoration-none text-reset">Soutenance</a>
 
 HTML;
