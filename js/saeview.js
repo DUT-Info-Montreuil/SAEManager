@@ -379,7 +379,6 @@ dropdownButton.addEventListener('click', function () {
   if (!isVisible) searchInput.focus();
 });
 
-// Mettre à jour texte bouton
 function updateDropdownButton() {
   const selected = Array.from(checkboxes)
     .filter(checkbox => checkbox.querySelector('input').checked)
@@ -388,7 +387,6 @@ function updateDropdownButton() {
   dropdownButton.textContent = selected.length > 0 ? selected.join(', ') : 'Rechercher des étudiants';
 }
 
-// Filtrer options
 searchInput.addEventListener('input', () => {
   const filter = searchInput.value.toLowerCase();
   checkboxes.forEach((checkbox) => {

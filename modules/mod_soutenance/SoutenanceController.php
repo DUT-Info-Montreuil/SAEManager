@@ -1,9 +1,9 @@
 <?php
 
-require_once 'modules/mod_rendus/RendusView.php';
-require_once 'modules/mod_rendus/RendusModel.php';
+require_once 'modules/mod_soutenance/SoutenanceView.php';
+require_once 'modules/mod_soutenance/SoutenanceModel.php';
 
-class RendusController
+class SoutenanceController
 {
 
     private $view;
@@ -11,15 +11,15 @@ class RendusController
 
     public function __construct()
     {
-        $this->view = new RendusView();
-        $this->model = new RendusModel();
+        $this->view = new SoutenanceView();
+        $this->model = new SoutenanceModel();
     }
 
     public function exec()
     {
         switch ($_GET['action']) {
             case "home":
-                $this->initRendus();
+                $this->initSoutenance();
                 break;
             case "homeMaj":
                 $this->validerModifHomePage();
@@ -40,42 +40,37 @@ class RendusController
                 $this->confirmationSupprimerEval();
                 break;
             default :
-                $this->initRendus();
+                $this->initSoutenance();
                 break;
         }
-        $this->view->initScript();
     }
 
-    private function initRendus(){
+    private function initSoutenance(){
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
-            $rendus = $this->model->getRendusProfByPersonne($_SESSION['idUtilisateur']);
-            $notes = $this->model->getNotesdesRendusProfByPersonne($_SESSION['idUtilisateur']);
+            $soutenances = $this->model->getSoutenanceProfByPersonne($_SESSION['idUtilisateur']);
+            $notes = $this->model->getNotesdesSoutenanceProfByPersonne($_SESSION['idUtilisateur']);
             $intervenants = $this->model->getAllIntervenantbyAllSaebyProf($_SESSION['idUtilisateur']);
-           
         }else{
-            $rendus = $this->model->getRendusByPersonne($_SESSION['idUtilisateur']);
-            $notes = "";
-            $intervenants = "";
+            $intervenants = null;
+            $soutenances = null;
+            $notes = null;
         }
-        $this->view->initRendusPage($rendus,$notes,$intervenants);
-        
+        $this->view->initSoutenancePage($soutenances,$notes,$intervenants);
     }
     private function initAjouterUneNote(){
         if ($_SESSION["estProfUtilisateur"] == 1) { //Est un prof
-            $idRendu = $_POST['idRendu'];
-
-            $this->model->creerNotePourUnRendu($idRendu);
-
-            header('Location: index.php?module=rendus&action=home');
+            $idSoutenance = $_POST['idSoutenance'];
+            $this->model->creerNotePourUneSoutenance($idSoutenance);
+            header('Location: index.php?module=soutenance&action=home');
         }else{
-            $this->initRendus();
+            $this->initSoutenance();
         }
     }
 
     private function initEvaluerUneEval() {
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un prof
-            $rendus = $this->model->getRendusProfByPersonne($_SESSION['idUtilisateur']);
-            $notes = $this->model->getNotesdesRendusProfByPersonne($_SESSION['idUtilisateur']);
+            $soutenances = $this->model->getSoutenanceProfByPersonne($_SESSION['idUtilisateur']);
+            $notes = $this->model->getNotesdesSoutenanceProfByPersonne($_SESSION['idUtilisateur']);
             $flag = 0;
             $infoTitre = [];
             $idSAE = null;
@@ -83,7 +78,7 @@ class RendusController
             foreach ($notes as $note) {
                 if ($_GET['eval'] == $note['idEval']) {
                     $infoTitre['SAE_nom'] = $note['SAE_nom'];
-                    $infoTitre['Rendu_nom'] = $note['Rendu_nom'];
+                    $infoTitre['Soutenance_nom'] = $note['Soutenance_nom'];
                     $infoTitre['Eval_nom'] = $note['Eval_nom'];
                     $infoTitre['idEval'] = $note['idEval'];
                     $idSAE = $note['idSAE']; // Récupération de l'idSAE
@@ -93,7 +88,7 @@ class RendusController
             }
     
             if ($flag === 0 || $idSAE === null) {
-                $this->initRendus();
+                $this->initSoutenance();
                 return;
             }
     
@@ -117,7 +112,7 @@ class RendusController
     
             // Appel à la vue
             $this->view->initEvaluerPage(
-                $rendus,
+                $soutenances,
                 $notes,
                 $infoTitre,
                 $notesDesElvesParGroupe,
@@ -125,7 +120,7 @@ class RendusController
                 $tousLesElevesSansGroupe
             );
         } else { // Est un étudiant
-            $this->initRendus();
+            $this->initSoutenance();
         }
     }
 
@@ -146,11 +141,11 @@ class RendusController
                     ];
                 }
             }
-    
+
             $this->model->MettreAJourLesNotes($notes);
-            header('Location: index.php?module=rendus&action=home');
+            header('Location: index.php?module=soutenance&action=home');
         } else { // Est un étudiant
-            $this->initRendus();
+            $this->initSoutenance();
         }
     }
     
@@ -160,19 +155,21 @@ class RendusController
             $idEval = $_POST['idEval'];
             $noteNom = $_POST['noteNom'];
             $coef = $_POST['coef'];
+
             if($coef <0 || $coef > 100){
                 $coef = 1;
             }
             if($noteNom == ""){
                 $noteNom = "nom à définir";
             }
+
             $idIntervenants = isset($_POST['intervenant']) ? $_POST['intervenant'] : [];
             $this->model->MettreAJourInfoUneEval($idEval, $noteNom, $coef,$idIntervenants);
-            header('Location: index.php?module=rendus&action=home');
+            header('Location: index.php?module=soutenance&action=home');
 
             
         }else { // Est un étudiant
-            $this->initRendus();
+            $this->initSoutenance();
         }
     }
 
@@ -189,10 +186,9 @@ class RendusController
         if ($_SESSION["estProfUtilisateur"] == 1) { // Est un professeur
             $idEval = $_GET['idEval'];
             $this->model->supprimerEval($idEval);
-            header('Location: index.php?module=rendus&action=home');
+            header('Location: index.php?module=soutenance&action=home');
         } else { // Est un étudiant
             $this->initRendus();
         }
     }
-    
 }

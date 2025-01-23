@@ -5,6 +5,7 @@
     --sae-color: #7171FF;
     --rendus-color: #F1B2FD;
     --create-sae-color: #B2B2FD;
+    --soutenance-color: #fdccb2;
     --ressource-color: #B4FFEA;
 }
 
@@ -66,6 +67,9 @@
 .card-create-sae {
     background: var(--create-sae-color);
 }
+.card-soutenance {
+    background: var(--soutenance-color);
+}
 
 .card-ressource {
     background: var(--ressource-color);
@@ -74,6 +78,7 @@
 .card-sae:hover,
 .card-sae-content:hover,
 .card-rendus:hover,
+.card-soutenance:hover,
 .card-rendus-content:hover,
 .card-create-sae:hover,
 .card-ressources:hover

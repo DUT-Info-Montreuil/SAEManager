@@ -42,6 +42,10 @@ HTML;
                             {$this->cardRessource()}
                         </div>
                     </div>
+                    <div class="d-flex w-100 h-75 justify-content-center m-auto">
+                        {$this->cardSoutenance()}
+                        {$this->cardSoutenance()}
+                    </div>
                 </div>
             </div>
 HTML;
@@ -105,7 +109,6 @@ HTML;
 
     function cardCreerSAE()
     {
-
         return <<<HTML
         <div class="card shadow px-3 mx-5 rounded-bottom w-25 card-rendus-content">
             <a href="index.php?module=creerSae&action=home" class="text-decoration-none text-reset">
@@ -135,5 +138,18 @@ HTML;
             </a>
         </div>
 HTML;
+    }
+    function cardSoutenance(){
+        return <<<HTML
+        <div class="card shadow px-3 mx-5 rounded-bottom w-25 h-75 card-rendus-content">
+            <a href="index.php?module=soutenance&action=home" class="text-decoration-none text-reset">
+                <div style="min-height: 50px;" class="card card-soutenance shadow w-100 h-100"></div>
+                <div class="m-4">
+                    <h4>Soutenances</h4>
+                    <p>Retrouvez ici la liste de toutes les soutenances.</p>
+                </div>
+            </a>
+        </div>
+        HTML;
     }
 }
