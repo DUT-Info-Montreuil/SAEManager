@@ -1,4 +1,8 @@
+
 <?php
+//Tout droit réservée
+//All right reserved
+//Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
 
 require_once 'GenericView.php';
 
@@ -104,6 +108,13 @@ HTML .
     $toast
 
     <script src="js/toast.js"></script>
+    <footer style="background-color: #343a40; color: white; padding: 10px; text-align: center;">
+        <p>
+            Tout droit réservée &copy 2025 <br>
+            All right reserved &copy 2025 <br>
+            Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
+        </p>
+    </footer>
 HTML;
     }
 
@@ -182,6 +193,13 @@ HTML .
     </div>
 
     <script src="js/connexion.js"></script>
+    <footer style="background-color: #343a40; color: white; padding: 10px; text-align: center;">
+        <p>
+            Tout droit réservée &copy 2025 <br>
+            All right reserved &copy 2025 <br>
+            Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
+        </p>
+    </footer>
 HTML;
     }
 }

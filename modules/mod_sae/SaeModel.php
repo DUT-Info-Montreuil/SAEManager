@@ -1,4 +1,8 @@
 <?php
+//Tout droit réservée
+//All right reserved
+//Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
+
 class SaeModel extends Connexion
 {
 
@@ -488,10 +492,10 @@ class SaeModel extends Connexion
     {
         $idEleve = $_SESSION['idUtilisateur'];
 
-        $req = "SELECT r.nom, Notes.note, Evaluation.coef,Notes.idRendu
+        $req = "SELECT Notes.idRendu, Notes.note, Evaluation.nom,  Evaluation.coef
                 FROM Notes
                 INNER JOIN Evaluation ON Evaluation.idEval = Notes.idEval
-                INNER JOIN Rendu r ON r.idEvaluation = Evaluation.idEval
+                INNER JOIN Rendu r ON r.idRendu = Notes.idRendu
                 WHERE Notes.idEleve = :idEleve AND r.idSAE = :idSAE";
 
         $pdo_req = self::$bdd->prepare($req);
@@ -505,10 +509,10 @@ class SaeModel extends Connexion
     {
         $idEleve = $_SESSION['idUtilisateur'];
 
-        $req = "SELECT s.titre, NotesSoutenance.note, Evaluation.coef, NotesSoutenance.idSoutenance
+        $req = "SELECT Evaluation.nom, NotesSoutenance.note, Evaluation.coef, NotesSoutenance.idSoutenance
                 FROM NotesSoutenance
                 INNER JOIN Evaluation ON Evaluation.idEval = NotesSoutenance.idEval
-                INNER JOIN Soutenance s ON s.idEvaluation = Evaluation.idEval
+                INNER JOIN Soutenance s ON s.idSoutenance = NotesSoutenance.idSoutenance
                 WHERE NotesSoutenance.idEleve = :idEleve AND s.idSAE = :idSAE";
 
         $pdo_req = self::$bdd->prepare($req);
@@ -1052,9 +1056,18 @@ class SaeModel extends Connexion
                 JOIN Rendu ON Rendu.idSAE = EleveInscritSae.idSAE
                 JOIN Evaluation ON Evaluation.idEval = Rendu.idEvaluation
                 WHERE EleveInscritSae.idSAE = :idSAE
+                AND EleveInscritSae.idEleve = :idEleve
+                AND NOT EXISTS (
+                    SELECT 1 
+                    FROM Notes 
+                    WHERE Notes.idEval = Evaluation.idEval 
+                    AND Notes.idEleve = EleveInscritSae.idEleve 
+                    AND Notes.idRendu = Rendu.idRendu
+                )
             ";
             $insertNotes = self::$bdd->prepare($notesReq);
             $insertNotes->bindValue(":idSAE", $idSAE);
+            $insertNotes->bindValue(":idEleve", $id['idEleve']);
             $insertNotes->execute();
         }
         $this->eraseProposition($idProposition);
@@ -1249,8 +1262,7 @@ class SaeModel extends Connexion
         }
     }
 
-    public function getDocsByGrpId($groupeID)
-    {
+    public function getDocsByGrpId($groupeID){
         $req = "SELECT Document.Nom, dateDepot, idDoc, Personne.nom, prenom
                 FROM Document
                 INNER JOIN Personne ON idAuteur = idPersonne

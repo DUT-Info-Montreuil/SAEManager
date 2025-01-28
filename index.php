@@ -20,3 +20,6 @@ include 'template.php';
 
 
 
+//Tout droit réservée
+//All right reserved
+//Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN

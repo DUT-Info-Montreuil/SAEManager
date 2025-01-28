@@ -1,5 +1,8 @@
 
 <?php
+//Tout droit réservée
+//All right reserved
+//Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
 
 class RessourcesView extends GenericView
 {
@@ -42,7 +45,7 @@ HTML;
         foreach ($ressources as $ressource) {
             $nomRessource = htmlspecialchars($ressource['nom']);
             $idSAE = htmlspecialchars($ressource['idRessource']);
-            $contenue = explode('-', htmlspecialchars($ressource['contenu']))[1];
+            $contenue = htmlspecialchars($ressource['contenu']);
             $idRessource = htmlspecialchars($ressource['idRessource']);
 
             $isMySae = in_array($idRessource, $myRessourcesIds) ? "true" : "false";

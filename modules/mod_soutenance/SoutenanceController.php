@@ -1,4 +1,7 @@
 <?php
+//Tout droit réservée
+//All right reserved
+//Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
 
 require_once 'modules/mod_soutenance/SoutenanceView.php';
 require_once 'modules/mod_soutenance/SoutenanceModel.php';
@@ -74,14 +77,14 @@ class SoutenanceController
             $flag = 0;
             $infoTitre = [];
             $idSAE = null;
-            // Vérification si l'évaluation existe
+            
             foreach ($notes as $note) {
                 if ($_GET['eval'] == $note['idEval']) {
                     $infoTitre['SAE_nom'] = $note['SAE_nom'];
                     $infoTitre['Soutenance_nom'] = $note['Soutenance_nom'];
                     $infoTitre['Eval_nom'] = $note['Eval_nom'];
                     $infoTitre['idEval'] = $note['idEval'];
-                    $idSAE = $note['idSAE']; // Récupération de l'idSAE
+                    $idSAE = $note['idSAE']; 
                     $flag = 1;
                     break;
                 }
@@ -92,7 +95,6 @@ class SoutenanceController
                 return;
             }
     
-            // Récupération des données nécessaires
             $notesDesElvesParGroupe = $this->model->getNotesParGroupeDuneEval($_GET['eval']);
             $tousLesElevesParGroupe = $this->model->getElevesParGroupe($idSAE);
             $tousLesElevesSansGroupe = $this->model->getElevesSansGroupe($idSAE);
@@ -110,7 +112,6 @@ class SoutenanceController
                 $tousLesGroupes[$idGroupe]['etudiants'][] = $eleve;
             }
     
-            // Appel à la vue
             $this->view->initEvaluerPage(
                 $soutenances,
                 $notes,

@@ -1,4 +1,7 @@
 <?php
+//Tout droit réservée
+//All right reserved
+//Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
 
 require_once 'modules/mod_sae/SaeView.php';
 require_once 'modules/mod_sae/SaeModel.php';
@@ -269,11 +272,23 @@ class SaeController
         if ($_SESSION['estProfUtilisateur']) {
             header("Location: " . $_SERVER['HTTP_REFERER']);
         }
+        if($_GET['id']){
+            $groupeIDList = $this->model->getMyGroupId($_GET['id']);
+            if($groupeIDList){
+                $groupeID = $groupeIDList[0]['idGroupe'];
+            }
+            else{
+                $groupeID=$groupeIDList;
+            }
 
-        $groupeID = $this->model->getMyGroupId($_GET['id'])[0]['idGroupe'];
-
-        $groupeDocs = $this->model->getDocsByGrpId($groupeID);
-
+            if($groupeID){
+                
+                $groupeDocs = $this->model->getDocsByGrpId($groupeID);
+            }
+            else{
+                $groupeDocs=null;
+            }
+        }
         $this->view->initCloudPage($groupeID, $groupeDocs, $_GET['id']);
     }
 
@@ -551,7 +566,6 @@ class SaeController
         $i = 0;
 
         while (isset($_POST['etudiant' . $i])) {
-            var_dump($_POST);
             $idEtudiants[$i] = $_POST['etudiant' . $i];
             $i++;
         }

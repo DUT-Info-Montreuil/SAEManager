@@ -1,4 +1,7 @@
 <?php
+//Tout droit réservée
+//All right reserved
+//Créer par Vincent MATIAS, Thomas GOMES, Arthur HUGUET et Fabrice CANNAN
 
 class SaeView extends GenericView
 {
@@ -715,6 +718,53 @@ HTML .
                     <div class="card shadow bg-white rounded p-4 min-h75">
                         <div class="mb-5">
                             <div class="d-flex justify-content-end">
+            HTML;
+                            if($groupeID){
+                                echo <<<HTML
+                                <button class="btn mb-3 btn-primary documentdrop-$groupeID">Déposer un document</button>
+                                HTML;
+                            }
+                                echo <<<HTML
+                            </div>
+                            <h3 class="fw-bold d-flex align-items-center">
+                                <svg class="me-2" width="25" height="25">
+                                    <use xlink:href="#arrow-icon"></use>
+                                </svg>
+                                Document(s)
+                            </h3>
+                            <div class="d-flex flex-column">
+            HTML;
+                    if (!empty($groupeDocs)) {
+                        foreach ($groupeDocs as $d) {
+                            $dateDepot = htmlspecialchars($d['dateDepot']);
+                            $idDoc = htmlspecialchars($d['idDoc']);
+                            $nomAuteur = htmlspecialchars($d['nom']);
+                            $prenomAuteur = htmlspecialchars($d['prenom']);
+                            $nomDoc = htmlspecialchars($d['Nom']);
+            
+                            echo $this->lineDocument($dateDepot, $idDoc, $nomAuteur, $prenomAuteur, $idSAE, $nomDoc);
+                        }
+                    } else {
+                        echo $this->lineDocument("default", "", "", "", "", "");
+                    }
+                    echo <<<HTML
+                            </div>
+                        </div>
+                    </div>
+                    <script src="js/cloud.js"></script>
+                </div>
+    HTML;
+    }
+
+    function initCloudNoGroupePage() {
+
+            echo <<<HTML
+                <!-- Documents(s) -->
+                <div class="container mt-5 h-100">
+                    <h1 class="fw-bold">Cloud du groupe</h1>
+                    <div class="card shadow bg-white rounded p-4 min-h75">
+                        <div class="mb-5">
+                            <div class="d-flex justify-content-end">
                                 <button class="btn mb-3 btn-primary documentdrop-$groupeID">Déposer un document</button>
                             </div>
                             <h3 class="fw-bold d-flex align-items-center">
@@ -745,7 +795,6 @@ HTML .
                     <script src="js/cloud.js"></script>
                 </div>
     HTML;
-    
     }
 
     /* Groupes */
@@ -753,12 +802,13 @@ HTML .
     function initGroupPage($sae, $groupe, $responsable, $members)
     {
 
-
         if (!$_SESSION['estProfUtilisateur']) {
-            $groupeName = htmlspecialchars($groupe[0]['GroupeName']);
-            $groupePhoto = htmlspecialchars($groupe[0]['imageTitre']);
-            $idGroupe = htmlspecialchars($groupe[0]['idGroupe']);
-            echo $this->popUpModifierNomGroupe($sae[0]['idSAE'], $idGroupe);
+            if ($groupe){
+                $groupeName = $groupe[0]['GroupeName'] ? htmlspecialchars($groupe[0]['GroupeName']) : "";
+                $groupePhoto = $groupe[0]['imageTitre'] ? htmlspecialchars($groupe[0]['imageTitre']) : "";
+                $idGroupe = $groupe[0]['idGroupe'] ? htmlspecialchars($groupe[0]['idGroupe']) : "";
+                echo $this->popUpModifierNomGroupe($sae[0]['idSAE'], $idGroupe);
+            }
         }
 
 
@@ -800,18 +850,23 @@ HTML;
 HTML;
         } else {
             echo <<<HTML
-<div class="mb-5">
-    <div class="d-flex align-items-center justify-content-between">
-        <!-- Titre et icône -->
-        <h3 class="d-flex align-items-center">
-            <svg class="me-2" width="25" height="25">
-                <use xlink:href="#arrow-icon"></use>
-            </svg>
-            Membre du groupe
-        </h3>
-        <!-- Nom du groupe et image -->
-        <div class="d-flex align-items-center">
-            <!-- Formulaire d'upload d'image -->
+                <div class="mb-5">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <!-- Titre et icône -->
+                        <h3 class="d-flex align-items-center">
+                            <svg class="me-2" width="25" height="25">
+                                <use xlink:href="#arrow-icon"></use>
+                            </svg>
+                            Membre du groupe
+                        </h3>
+                        <!-- Nom du groupe et image -->
+                        <div class="d-flex align-items-center">
+                <!-- Formulaire d'upload d'image -->
+             HTML;
+             if($groupe){
+                
+             
+            echo <<<HTML
             <form id="groupImageForm" action="index.php?module=sae&action=uploadGroupImage&idGroupe=$idGroupe" method="POST" enctype="multipart/form-data">
                 <label for="groupImage" style="cursor: pointer; margin-right: 10px;">
                     <img src="http://saemanager-api.atwebpages.com/api/api.php?file=$groupePhoto" 
@@ -847,7 +902,7 @@ HTML;
     </div>
     <div class="d-flex flex-wrap">
 HTML;
-
+        }
 
 
             if ($groupe) {
@@ -908,8 +963,7 @@ HTML;
 
     // Notes
 
-    function initNotePage($notes, $sae, $noteSoutenance)
-    {
+    function initNotePage($notes, $sae, $noteSoutenance){
         foreach ($sae as $s) {
             $nom = htmlspecialchars($s['nomSae']);
         }
@@ -971,9 +1025,9 @@ HTML;
             foreach ($noteSoutenance as $note) {
                 $noteAttribuee = isset($note['note']);
 
-                $nom = htmlspecialchars($note['titre']);
+                $nom = htmlspecialchars($note['nom']);
                 $noteValue = $noteAttribuee ? htmlspecialchars($note['note']) : "~";
-                $coeff = htmlspecialchars($note['coeff']);
+                $coeff = htmlspecialchars($note['coef']);
 
                 if ($noteAttribuee) {
                     $totalSoutenance += $noteValue * $coeff;
